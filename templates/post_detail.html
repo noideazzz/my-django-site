@@ -1,0 +1,120 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ post.title }} - 学习社区</title>
+    <link rel="stylesheet" href="{% static 'bootstrap5/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        .bg-hqu-red { background-color: #C20E0E !important; }
+        .post-content { line-height: 1.8; font-size: 1.05rem; }
+        .comment-box { background-color: #f8f9fa; border-radius: 8px; }
+        .teacher-badge { background-color: #C20E0E; color: white; font-size: 0.75rem; padding: 0.2em 0.6em; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-light">
+
+<header class="p-3 bg-hqu-red text-white shadow-sm">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <a href="/" class="text-white text-decoration-none fw-bold">
+                <i class="bi bi-arrow-left me-2"></i>返回社区
+            </a>
+            <span class="fw-bold">问题详情</span>
+        </div>
+    </div>
+</header>
+
+<div class="container mt-4 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- 主帖子 -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span class="badge bg-light text-danger border">{{ post.get_chapter_display }}</span>
+                        <small class="text-muted"><i class="bi bi-eye me-1"></i>{{ post.views }} 浏览</small>
+                    </div>
+                    
+                    <h3 class="fw-bold mb-3">{{ post.title }}</h3>
+                    
+                    <div class="d-flex align-items-center mb-4 text-muted small">
+                        <div class="bg-danger bg-opacity-10 text-danger rounded-circle d-flex align-items-center justify-content-center me-2" 
+                             style="width: 36px; height: 36px; font-weight: bold;">
+                            {{ post.author|first }}
+                        </div>
+                        <div>
+                            <div class="fw-bold text-dark">{{ post.author }}</div>
+                            <div>{{ post.created_at|date:"Y年m月d日 H:i" }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="post-content text-secondary mb-3" style="white-space: pre-line;">
+                        {{ post.content }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- 评论区 -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-chat-left-text me-2 text-danger"></i>回复讨论 ({{ comments.count }})</h5>
+                </div>
+                <div class="card-body">
+                    {% for comment in comments %}
+                    <div class="d-flex mb-4 {% if not forloop.last %}border-bottom pb-3{% endif %}">
+                        <div class="flex-shrink-0 me-3">
+                            <div class="bg-secondary bg-opacity-10 text-secondary rounded-circle d-flex align-items-center justify-content-center" 
+                                 style="width: 40px; height: 40px; font-weight: bold;">
+                                {{ comment.author|first }}
+                            </div>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div>
+                                    <span class="fw-bold me-2">{{ comment.author }}</span>
+                                    {% if comment.is_teacher %}
+                                    <span class="teacher-badge"><i class="bi bi-patch-check-fill me-1"></i>教师</span>
+                                    {% endif %}
+                                </div>
+                                <small class="text-muted">{{ comment.created_at|date:"m-d H:i" }}</small>
+                            </div>
+                            <div class="text-secondary" style="white-space: pre-line;">{{ comment.content }}</div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-chat-square-dots fs-2 d-block mb-2"></i>
+                        暂无回复，来做第一个回答者吧！
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- 回复表单 -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-3">发表回复</h5>
+                    <form method="post" action="{% url 'add_comment' post.id %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <textarea class="form-control" name="content" rows="4" placeholder="分享你的见解或解答..." required></textarea>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <input type="text" class="form-control" name="author" placeholder="你的昵称" value="匿名同学">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-danger fw-bold">
+                            <i class="bi bi-send me-2"></i>提交回复
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

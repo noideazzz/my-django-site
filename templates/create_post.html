@@ -1,0 +1,122 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>发布问题 - 学习社区</title>
+    <link rel="stylesheet" href="{% static 'bootstrap5/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        .bg-hqu-red { background-color: #C20E0E !important; }
+        
+        /* 发布问题页面灰白朦胧背景效果 */
+        body {
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                linear-gradient(180deg, 
+                    rgba(255, 255, 255, 0.7) 0%, 
+                    rgba(250, 250, 250, 0.6) 50%, 
+                    rgba(245, 245, 245, 0.7) 100%
+                ),
+                url('{% static 'image/background_grey.webp' %}') center/cover no-repeat;
+            background-blend-mode: normal;
+            filter: grayscale(100%) brightness(1.15) contrast(0.85) blur(0.5px);
+            opacity: 0.9;
+            z-index: -2;
+        }
+        
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(
+                ellipse at center,
+                rgba(255, 255, 255, 0.3) 0%,
+                rgba(240, 240, 240, 0.4) 50%,
+                rgba(230, 230, 230, 0.5) 100%
+            );
+            pointer-events: none;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 简化导航 -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-hqu-red shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="{% url 'community' %}">
+            <i class="bi bi-arrow-left me-2"></i>返回社区
+        </a>
+    </div>
+</nav>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow border-0">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <h4 class="fw-bold text-danger mb-0">
+                        <i class="bi bi-pencil-square me-2"></i>发布新问题
+                    </h4>
+                    <p class="text-muted small mt-2 mb-0">描述清楚你的疑问，有助于获得更好的解答</p>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" action="{% url 'create_post' %}">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">问题标题 <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control form-control-lg" name="title" 
+                                   placeholder="例如：波导中TE10模的截止频率如何计算？" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">所属章节 <span class="text-danger">*</span></label>
+                            <select class="form-select" name="chapter" required>
+                                <option value="" selected disabled>请选择相关章节...</option>
+                                {% for code, name in chapter_choices %}
+                                <option value="{{ code }}">{{ name }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">选择正确章节有助于同学找到你的问题</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">问题详情 <span class="text-danger">*</span></label>
+                            <textarea class="form-control" name="content" rows="8" 
+                                      placeholder="详细描述你的问题：&#10;1. 具体哪里不理解？&#10;2. 你尝试过什么方法？&#10;3. 相关公式或题目条件是什么？" required></textarea>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">你的称呼</label>
+                            <input type="text" class="form-control" name="author" value="匿名同学" placeholder="留下你的昵称">
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'community' %}" class="btn btn-outline-secondary px-4">取消</a>
+                            <button type="submit" class="btn btn-danger px-4 fw-bold">
+                                <i class="bi bi-send me-2"></i>发布问题
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

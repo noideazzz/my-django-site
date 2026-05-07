@@ -1,0 +1,811 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}仿真平台 - 电磁场与微波技术{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --crimson: #8B0000;
+        --off-white: #FAFAFA;
+        --transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    /* 覆盖body和html背景 - 使用渐变实现左右颜色衔接 */
+    html, body {
+        background: linear-gradient(to right, #fafafa 50%, #f5f5f5 50%) !important;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    
+    /* 主容器 - 左右分栏 */
+    .simulation-split-container {
+        display: flex;
+        min-height: calc(100vh - 60px);
+        width: 100%;
+        overflow: hidden;
+    }
+    
+    /* 仿真面板 */
+    .simulation-panel {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 120px 50px 60px;
+        position: relative;
+        transition: var(--transition);
+        overflow: hidden;
+        box-sizing: border-box;
+        min-height: calc(100vh - 60px);
+    }
+    
+    .simulation-panel:hover {
+        flex: 1.08;
+    }
+    
+    /* 左侧 - HFSS */
+    .simulation-panel-left {
+        background-color: #fafafa;
+        border-right: 1px solid #e8e8e8;
+    }
+    
+    /* 右侧 - CST */
+    .simulation-panel-right {
+        background-color: #f5f5f5;
+    }
+    
+    /* SVG 图案容器 */
+    .motif-container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.03;
+        transition: var(--transition);
+        pointer-events: none;
+        width: 100%;
+        height: 100%;
+    }
+    
+    .simulation-panel:hover .motif-container {
+        opacity: 0.06;
+        transform: translate(-50%, -50%) scale(1.05);
+    }
+    
+    .motif-container svg {
+        width: 60%;
+        height: 60%;
+        max-width: 400px;
+        max-height: 400px;
+    }
+    
+    /* 软件编号 */
+    .software-number {
+        position: absolute;
+        top: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 13px;
+        font-weight: 300;
+        color: #999;
+        letter-spacing: 3px;
+        font-family: 'Cormorant Garamond', 'Times New Roman', serif;
+        z-index: 2;
+        white-space: nowrap;
+    }
+    
+    /* 软件标签 */
+    .software-label {
+        font-size: 10px;
+        font-weight: 600;
+        color: #888;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+        margin-bottom: 20px;
+        font-family: 'Inter', sans-serif;
+        z-index: 2;
+        transition: var(--transition);
+        white-space: nowrap;
+        text-align: center;
+    }
+    
+    .simulation-panel-left:hover .software-label {
+        color: #ff6b35;
+    }
+    
+    .simulation-panel-right:hover .software-label {
+        color: #0066cc;
+    }
+    
+    /* 软件图标 */
+    .software-icon {
+        width: 140px;
+        height: 140px;
+        margin: 0 auto 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        z-index: 2;
+        transition: var(--transition);
+    }
+    
+    .software-icon::before {
+        content: '';
+        position: absolute;
+        width: 170px;
+        height: 170px;
+        border: 1px solid rgba(0,0,0,0.08);
+        border-radius: 50%;
+        transition: var(--transition);
+    }
+    
+    .simulation-panel:hover .software-icon::before {
+        transform: scale(1.1);
+    }
+    
+    /* HFSS 图标样式 */
+    .hfss-icon {
+        background: linear-gradient(135deg, #fff8f0 0%, #ffe8d6 100%);
+        box-shadow: 0 10px 40px rgba(255, 107, 53, 0.15);
+    }
+    
+    .hfss-icon svg {
+        width: 70px;
+        height: 70px;
+    }
+    
+    /* CST 图标样式 */
+    .cst-icon {
+        background: linear-gradient(135deg, #f0f8ff 0%, #d6e8ff 100%);
+        box-shadow: 0 10px 40px rgba(0, 102, 204, 0.15);
+    }
+    
+    .cst-icon svg {
+        width: 70px;
+        height: 70px;
+    }
+    
+    /* 软件名称 */
+    .software-name {
+        font-size: 2.2rem;
+        font-weight: 300;
+        color: #1a1a1a;
+        margin-bottom: 15px;
+        text-align: center;
+        font-family: 'Noto Serif SC', 'Cormorant Garamond', serif;
+        letter-spacing: 2px;
+        z-index: 2;
+    }
+    
+    .software-name-accent {
+        color: var(--crimson);
+        font-style: italic;
+        font-weight: 400;
+    }
+    
+    /* 软件描述 */
+    .software-desc {
+        font-size: 13px;
+        color: #777;
+        line-height: 2;
+        text-align: center;
+        max-width: 380px;
+        margin: 0 auto 25px;
+        font-weight: 300;
+        letter-spacing: 0.5px;
+        font-family: 'Inter', sans-serif;
+        z-index: 2;
+    }
+    
+    /* 功能标签 */
+    .feature-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: center;
+        margin-bottom: 30px;
+        z-index: 2;
+    }
+    
+    .feature-tag {
+        padding: 6px 14px;
+        background: rgba(255,255,255,0.8);
+        border-radius: 20px;
+        font-size: 11px;
+        color: #666;
+        border: 1px solid #e0e0e0;
+        transition: all 0.3s ease;
+        font-family: 'Inter', sans-serif;
+        letter-spacing: 0.5px;
+    }
+    
+    .feature-tag:hover {
+        background: var(--crimson);
+        color: #fff;
+        border-color: var(--crimson);
+    }
+    
+    /* 详细内容区域 */
+    .detail-section {
+        margin-top: 25px;
+        padding-top: 25px;
+        border-top: 1px solid #e8e8e8;
+        z-index: 2;
+    }
+    
+    .detail-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-family: 'Inter', sans-serif;
+        letter-spacing: 1px;
+    }
+    
+    .detail-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .detail-list li {
+        padding: 8px 0;
+        font-size: 12px;
+        color: #666;
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        line-height: 1.6;
+    }
+    
+    .detail-list li::before {
+        content: '•';
+        color: var(--crimson);
+        font-weight: bold;
+        font-size: 1.2rem;
+        line-height: 1;
+    }
+    
+    /* 应用案例 */
+    .use-cases {
+        margin-top: 20px;
+    }
+    
+    .use-case-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .use-case-item:last-child {
+        border-bottom: none;
+    }
+    
+    .use-case-icon {
+        width: 36px;
+        height: 36px;
+        background: linear-gradient(135deg, #fef8f8 0%, #fef5f5 100%);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--crimson);
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+    
+    .use-case-text {
+        flex: 1;
+    }
+    
+    .use-case-title {
+        font-size: 12px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 2px;
+    }
+    
+    .use-case-desc {
+        font-size: 11px;
+        color: #999;
+    }
+    
+    /* 底部按钮 */
+    .panel-footer {
+        margin-top: auto;
+        padding-top: 30px;
+        text-align: center;
+        z-index: 2;
+    }
+    
+    .panel-btn {
+        display: inline-block;
+        padding: 12px 35px;
+        border: 1px solid #333;
+        background: transparent;
+        color: #333;
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 2px;
+        text-decoration: none;
+        transition: all 0.4s ease;
+        position: relative;
+        overflow: hidden;
+        z-index: 2;
+        font-family: 'Inter', sans-serif;
+        border-radius: 2px;
+    }
+    
+    .panel-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: #333;
+        transition: left 0.4s ease;
+        z-index: -1;
+    }
+    
+    .panel-btn:hover {
+        color: #fff;
+        text-decoration: none;
+    }
+    
+    .panel-btn:hover::before {
+        left: 0;
+    }
+    
+    /* 右侧按钮使用红色主题 */
+    .simulation-panel-right .panel-btn {
+        border-color: var(--crimson);
+        color: var(--crimson);
+    }
+    
+    .simulation-panel-right .panel-btn::before {
+        background: var(--crimson);
+    }
+
+    .simulation-panel-right .panel-btn:hover {
+        color: #fff;
+        border-color: var(--crimson);
+    }
+
+    /* 功能区域按钮容器 */
+    .feature-buttons {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin: 25px auto;
+        max-width: 400px;
+        width: 100%;
+    }
+
+    /* 功能区域按钮 - 黑色样式 */
+    .feature-btn {
+        display: inline-block;
+        padding: 10px 20px;
+        border: 1px solid #222;
+        background: transparent;
+        color: #222;
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 1.5px;
+        text-decoration: none;
+        text-align: center;
+        transition: all 0.4s ease;
+        position: relative;
+        overflow: hidden;
+        z-index: 2;
+        font-family: 'Inter', sans-serif;
+        border-radius: 2px;
+    }
+
+    .feature-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: #222;
+        transition: left 0.4s ease;
+        z-index: -1;
+    }
+
+    .feature-btn:hover {
+        color: #fff;
+        text-decoration: none;
+        border-color: #222;
+    }
+
+    .feature-btn:hover::before {
+        left: 0;
+    }
+
+    /* 响应式适配 */
+    @media (max-width: 1200px) {
+        .simulation-panel {
+            padding: 110px 35px 50px;
+        }
+        
+        .software-name {
+            font-size: 1.9rem;
+        }
+        
+        .software-desc {
+            font-size: 12px;
+            max-width: 320px;
+        }
+        
+        .software-icon {
+            width: 120px;
+            height: 120px;
+        }
+        
+        .software-icon::before {
+            width: 145px;
+            height: 145px;
+        }
+        
+        .software-icon svg {
+            width: 60px;
+            height: 60px;
+        }
+    }
+    
+    @media (max-width: 1024px) {
+        .simulation-split-container {
+            flex-direction: column;
+            height: auto;
+            min-height: calc(100vh - 60px);
+        }
+        
+        .simulation-panel {
+            min-height: auto;
+            padding: 100px 40px 60px;
+        }
+
+        .simulation-panel:hover {
+            flex: 1;
+        }
+        
+        .simulation-panel-left {
+            border-right: none;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        
+        .software-name {
+            font-size: 1.8rem;
+        }
+        
+        .software-number {
+            top: 30px;
+        }
+        
+        .motif-container svg {
+            width: 40%;
+            height: 40%;
+        }
+
+        .feature-buttons {
+            max-width: 100%;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .simulation-panel {
+            padding: 90px 25px 50px;
+        }
+        
+        .software-name {
+            font-size: 1.6rem;
+            letter-spacing: 1px;
+        }
+        
+        .software-label {
+            font-size: 9px;
+            letter-spacing: 2px;
+        }
+        
+        .software-desc {
+            font-size: 12px;
+            max-width: 280px;
+        }
+        
+        .software-icon {
+            width: 100px;
+            height: 100px;
+        }
+        
+        .software-icon::before {
+            width: 120px;
+            height: 120px;
+        }
+        
+        .software-icon svg {
+            width: 50px;
+            height: 50px;
+        }
+        
+        .feature-tags {
+            gap: 6px;
+        }
+        
+        .feature-tag {
+            padding: 5px 10px;
+            font-size: 10px;
+        }
+        
+        .panel-btn {
+            padding: 10px 28px;
+            font-size: 10px;
+            letter-spacing: 1px;
+        }
+
+        .feature-buttons {
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            max-width: 100%;
+        }
+
+        .feature-btn {
+            padding: 8px 12px;
+            font-size: 10px;
+            letter-spacing: 1px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .feature-buttons {
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+
+        .feature-btn {
+            padding: 8px 16px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="simulation-split-container">
+    <!-- 左侧 - HFSS -->
+    <div class="simulation-panel simulation-panel-left">
+        <!-- HFSS SVG 图案 -->
+        <div class="motif-container">
+            <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+                <!-- 同心圆 -->
+                <circle cx="200" cy="200" r="180" fill="none" stroke="#ff6b35" stroke-width="0.8"/>
+                <circle cx="200" cy="200" r="140" fill="none" stroke="#ff6b35" stroke-width="0.8"/>
+                <circle cx="200" cy="200" r="100" fill="none" stroke="#ff6b35" stroke-width="0.8"/>
+                <circle cx="200" cy="200" r="60" fill="none" stroke="#ff6b35" stroke-width="0.8"/>
+                <!-- 十字线 -->
+                <line x1="200" y1="20" x2="200" y2="380" stroke="#ff6b35" stroke-width="0.6"/>
+                <line x1="20" y1="200" x2="380" y2="200" stroke="#ff6b35" stroke-width="0.6"/>
+                <!-- 对角线 -->
+                <line x1="65" y1="65" x2="335" y2="335" stroke="#ff6b35" stroke-width="0.5"/>
+                <line x1="335" y1="65" x2="65" y2="335" stroke="#ff6b35" stroke-width="0.5"/>
+                <!-- 中心波浪 -->
+                <path d="M120 200 Q160 160, 200 200 T280 200" fill="none" stroke="#C20E0E" stroke-width="2"/>
+                <!-- 电场线 -->
+                <line x1="200" y1="50" x2="200" y2="80" stroke="#ff6b35" stroke-width="1.5"/>
+                <line x1="200" y1="320" x2="200" y2="350" stroke="#ff6b35" stroke-width="1.5"/>
+                <line x1="50" y1="200" x2="80" y2="200" stroke="#ff6b35" stroke-width="1.5"/>
+                <line x1="320" y1="200" x2="350" y2="200" stroke="#ff6b35" stroke-width="1.5"/>
+            </svg>
+        </div>
+        
+        <span class="software-number">SOLVER-01</span>
+        <!-- <div class="software-label">Finite Element Method</div> -->
+        
+        <!-- 软件图标 -->
+        <div class="software-icon hfss-icon">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="45" fill="none" stroke="#ff6b35" stroke-width="2"/>
+                <circle cx="50" cy="50" r="35" fill="none" stroke="#ff6b35" stroke-width="1.5" opacity="0.6"/>
+                <path d="M25 50 Q35 35, 50 50 T75 50" fill="none" stroke="#C20E0E" stroke-width="3" stroke-linecap="round"/>
+                <line x1="50" y1="15" x2="50" y2="25" stroke="#ff6b35" stroke-width="2"/>
+                <line x1="50" y1="75" x2="50" y2="85" stroke="#ff6b35" stroke-width="2"/>
+                <line x1="15" y1="50" x2="25" y2="50" stroke="#ff6b35" stroke-width="2"/>
+                <line x1="75" y1="50" x2="85" y2="50" stroke="#ff6b35" stroke-width="2"/>
+            </svg>
+        </div>
+        
+        <h2 class="software-name">Ansys <span class="software-name-accent">HFSS</span></h2>
+        
+        <p class="software-desc">
+            全球领先的3D全波电磁场仿真器，利用有限元法(FEM)处理复杂的高频结构。广泛应用于天线设计、射频/微波器件、高速互连和电磁兼容分析等领域。
+        </p>
+        
+   
+
+        <!-- 功能区域按钮 -->
+        <div class="feature-buttons">
+            <a href="https://ansyshelp.ansys.com/public//Views/Secured/Electronics/v252/en/Subsystems/HFSS/Content/GettingStarted/DielectricResonatorAntenna.htm" target="_blank" class="feature-btn">高频天线</a>
+            <a href="https://ansyshelp.ansys.com/public/Views/Secured/Electronics/v242/en/Subsystems/HFSS/Content/HFSS/TheFiniteElementMethod.htm" target="_blank" class="feature-btn">FEM算法</a>
+            <a href="https://blog.csdn.net/weixin_42309599/article/details/154519273" target="_blank" class="feature-btn">信号完整性</a>
+            <a href="https://blog.csdn.net/qq_41542947/article/details/119720480" target="_blank" class="feature-btn">自适应网格</a>
+        </div>
+
+        <div class="detail-section">
+            <div class="detail-title">
+                <i class="bi bi-check-circle-fill" style="color: var(--crimson);"></i>
+                核心功能
+            </div>
+            <ul class="detail-list">
+                <li>3D全波电磁场仿真，精确计算S参数和场分布</li>
+                <li>自适应网格划分技术，自动优化计算精度</li>
+                <li>频域和时域求解器，支持宽带分析</li>
+                <li>与电路仿真器协同，实现系统级仿真</li>
+            </ul>
+        </div>
+        
+        <div class="use-cases">
+            <div class="detail-title">
+                <i class="bi bi-briefcase-fill" style="color: var(--crimson);"></i>
+                典型应用
+            </div>
+            <div class="use-case-item">
+                <div class="use-case-icon">
+                    <i class="bi bi-broadcast"></i>
+                </div>
+                <div class="use-case-text">
+                    <div class="use-case-title">5G/6G天线设计</div>
+                    <div class="use-case-desc">Massive MIMO阵列、毫米波天线优化</div>
+                </div>
+            </div>
+            <div class="use-case-item">
+                <div class="use-case-icon">
+                    <i class="bi bi-cpu"></i>
+                </div>
+                <div class="use-case-text">
+                    <div class="use-case-title">高速互连分析</div>
+                    <div class="use-case-desc">PCB信号完整性、连接器仿真</div>
+                </div>
+            </div>
+            <div class="use-case-item">
+                <div class="use-case-icon">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+                <div class="use-case-text">
+                    <div class="use-case-title">电磁兼容分析</div>
+                    <div class="use-case-desc">EMI/EMC预测与抑制设计</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="panel-footer">
+            <a href="https://www.ansys.com/" target="_blank" class="panel-btn">访问官网</a>
+        </div>
+    </div>
+    
+    <!-- 右侧 - CST -->
+    <div class="simulation-panel simulation-panel-right">
+        <!-- CST SVG 图案 -->
+        <div class="motif-container">
+            <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+                <!-- 外框矩形 -->
+                <rect x="50" y="50" width="300" height="300" fill="none" stroke="#0066cc" stroke-width="0.8"/>
+                <!-- 内框矩形 -->
+                <rect x="90" y="90" width="220" height="220" fill="none" stroke="#0066cc" stroke-width="0.6"/>
+                <!-- 中心矩形 -->
+                <rect x="150" y="150" width="100" height="100" fill="none" stroke="#0066cc" stroke-width="0.8"/>
+                <!-- 水平传输线 -->
+                <line x1="50" y1="200" x2="150" y2="200" stroke="#0066cc" stroke-width="1"/>
+                <line x1="250" y1="200" x2="350" y2="200" stroke="#0066cc" stroke-width="1"/>
+                <!-- 垂直传输线 -->
+                <line x1="200" y1="50" x2="200" y2="150" stroke="#0066cc" stroke-width="1"/>
+                <line x1="200" y1="250" x2="200" y2="350" stroke="#0066cc" stroke-width="1"/>
+                <!-- 虚线圆 -->
+                <circle cx="200" cy="200" r="120" fill="none" stroke="#0066cc" stroke-width="0.5" stroke-dasharray="8,6"/>
+                <circle cx="200" cy="200" r="80" fill="none" stroke="#0066cc" stroke-width="0.5" stroke-dasharray="6,4"/>
+                <!-- 中心十字 -->
+                <line x1="200" y1="150" x2="200" y2="250" stroke="#C20E0E" stroke-width="2"/>
+                <line x1="150" y1="200" x2="250" y2="200" stroke="#C20E0E" stroke-width="2"/>
+                <!-- 连接点 -->
+                <rect x="145" y="195" width="10" height="10" fill="#C20E0E"/>
+                <rect x="195" y="145" width="10" height="10" fill="#C20E0E"/>
+                <rect x="245" y="195" width="10" height="10" fill="#C20E0E"/>
+                <rect x="195" y="245" width="10" height="10" fill="#C20E0E"/>
+            </svg>
+        </div>
+        
+        <span class="software-number">SOLVER-02</span>
+        <!-- <div class="software-label">Finite Integration Technique</div> -->
+        
+        <!-- 软件图标 -->
+        <div class="software-icon cst-icon">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <rect x="15" y="15" width="70" height="70" fill="none" stroke="#0066cc" stroke-width="2" rx="5"/>
+                <rect x="25" y="25" width="50" height="50" fill="none" stroke="#0066cc" stroke-width="1.5" opacity="0.6"/>
+                <line x1="50" y1="25" x2="50" y2="75" stroke="#C20E0E" stroke-width="2"/>
+                <line x1="25" y1="50" x2="75" y2="50" stroke="#C20E0E" stroke-width="2"/>
+                <line x1="25" y1="25" x2="75" y2="75" stroke="#0066cc" stroke-width="1" opacity="0.4"/>
+                <line x1="75" y1="25" x2="25" y2="75" stroke="#0066cc" stroke-width="1" opacity="0.4"/>
+                <circle cx="50" cy="50" r="5" fill="#C20E0E"/>
+            </svg>
+        </div>
+        
+        <h2 class="software-name">CST <span class="software-name-accent">Studio Suite</span></h2>
+        
+        <p class="software-desc">
+            全面的电磁设计平台，以时域求解(FIT)著称，适合处理宽频带和大型系统的时域特性。提供从静态到光学的全频段电磁仿真解决方案。
+        </p>
+        
+
+
+        <!-- 功能区域按钮 -->
+        <div class="feature-buttons">
+            <a href="https://blog.csdn.net/OVEN_b612/article/details/127873904" target="_blank" class="feature-btn">时域求解器</a>
+            <a href="https://trimech.com/cst-studio-suite-emc-emi-simulation-training-course/" target="_blank" class="feature-btn">EMC/EMI</a>
+            <a href="https://akamai.3ds.com/products/simulia/electromagnetic-simulation/particle-dynamics" target="_blank" class="feature-btn">粒子动力学</a>
+            <a href="https://events.3ds.com/one-gui-multiphysics" target="_blank" class="feature-btn">多物理场</a>
+        </div>
+
+        <div class="detail-section">
+            <div class="detail-title">
+                <i class="bi bi-check-circle-fill" style="color: var(--crimson);"></i>
+                核心功能
+            </div>
+            <ul class="detail-list">
+                <li>时域有限积分(FIT)技术，高效处理宽带问题</li>
+                <li>频域有限元(FEM)求解器，精确分析谐振结构</li>
+                <li>传输线矩阵(TLM)方法，适用于大型电磁系统</li>
+                <li>多物理场耦合仿真，支持热、力、流体分析</li>
+            </ul>
+        </div>
+        
+        <div class="use-cases">
+            <div class="detail-title">
+                <i class="bi bi-briefcase-fill" style="color: var(--crimson);"></i>
+                典型应用
+            </div>
+            <div class="use-case-item">
+                <div class="use-case-icon">
+                    <i class="bi bi-lightning-charge"></i>
+                </div>
+                <div class="use-case-text">
+                    <div class="use-case-title">瞬态电磁分析</div>
+                    <div class="use-case-desc">雷击防护、ESD仿真、脉冲响应</div>
+                </div>
+            </div>
+            <div class="use-case-item">
+                <div class="use-case-icon">
+                    <i class="bi bi-car-front"></i>
+                </div>
+                <div class="use-case-text">
+                    <div class="use-case-title">汽车电子</div>
+                    <div class="use-case-desc">车载雷达、传感器集成、线缆束</div>
+                </div>
+            </div>
+            <div class="use-case-item">
+                <div class="use-case-icon">
+                    <i class="bi bi-hospital"></i>
+                </div>
+                <div class="use-case-text">
+                    <div class="use-case-title">生物医学</div>
+                    <div class="use-case-desc">MRI线圈、植入物安全性评估</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="panel-footer">
+            <a href="https://www.3ds.com/products/simulia/cst-studio-suite" target="_blank" class="panel-btn">访问官网</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

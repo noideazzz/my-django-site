@@ -1,0 +1,3092 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}课程学习 - 电磁场与微波技术{% endblock %}
+
+{% block content %}
+<style>
+    .doc-container {
+        display: flex;
+        min-height: calc(100vh - 60px);
+        background: #fff;
+    }
+    .doc-sidebar {
+        width: 280px;
+        border-right: 1px solid #e5e5e5;
+        padding: 30px 0;
+        position: fixed;
+        height: 100%;
+        overflow-y: auto;
+        background: #fafafa;
+    }
+    .doc-logo {
+        padding: 0 25px 25px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+        letter-spacing: 1px;
+    }
+    .doc-logo span {
+        color: #C20E0E;
+    }
+    .doc-nav-section {
+        margin-bottom: 25px;
+    }
+    .doc-nav-header {
+        padding: 10px 25px;
+        font-size: 12px;
+        font-weight: 700;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .doc-nav-header .num {
+        font-size: 11px;
+        color: #999;
+    }
+    .doc-nav-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .doc-nav-list li a {
+        display: block;
+        padding: 10px 25px;
+        color: #333;
+        text-decoration: none;
+        font-size: 14px;
+        border-left: 3px solid transparent;
+        transition: all 0.2s;
+    }
+    .doc-nav-list li a:hover,
+    .doc-nav-list li a.active {
+        background: #fff;
+        border-left-color: #C20E0E;
+        color: #C20E0E;
+    }
+    .doc-main {
+        margin-left: 280px;
+        flex: 1;
+        padding: 50px 60px;
+        max-width: 900px;
+    }
+    .doc-tag {
+        display: inline-block;
+        padding: 6px 14px;
+        border: 1px solid #333;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-bottom: 20px;
+    }
+    .doc-title {
+        font-size: 42px;
+        font-weight: 800;
+        color: #111;
+        line-height: 1.1;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+    }
+    .doc-desc {
+        font-size: 16px;
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 40px;
+    }
+    .doc-example-box {
+        border: 1px solid #e5e5e5;
+        margin-bottom: 40px;
+        position: relative;
+    }
+    .doc-example-label {
+        position: absolute;
+        top: 0;
+        right: 0;
+        background: #333;
+        color: #fff;
+        padding: 8px 16px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 1px;
+    }
+    .doc-example-content {
+        padding: 30px;
+        background: #f8f8f8;
+        font-family: 'Consolas', 'Monaco', monospace;
+        font-size: 14px;
+        line-height: 1.8;
+        overflow-x: auto;
+    }
+    .doc-example-content .comment { color: #999; }
+    .doc-example-content .selector { color: #C20E0E; }
+    .doc-example-content .property { color: #333; }
+    .doc-example-content .value { color: #2d8a3e; }
+    .doc-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        margin-top: 40px;
+    }
+    .doc-card {
+        border-top: 4px solid #C20E0E;
+        padding-top: 20px;
+    }
+    .doc-card.blue {
+        border-top-color: #2c5282;
+    }
+    .doc-card-label {
+        border: 1px solid #333;
+        padding: 8px 12px;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        display: inline-block;
+        margin-bottom: 15px;
+    }
+    .doc-card-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #111;
+        margin-bottom: 10px;
+    }
+    .doc-card-desc {
+        font-size: 14px;
+        color: #666;
+    }
+    .course-tabs {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 30px;
+        border-bottom: 2px solid #e5e5e5;
+    }
+    .course-tab {
+        padding: 15px 25px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #666;
+        cursor: pointer;
+        border-bottom: 3px solid transparent;
+        margin-bottom: -2px;
+        transition: all 0.2s;
+    }
+    .course-tab:hover {
+        color: #C20E0E;
+    }
+    .course-tab.active {
+        color: #C20E0E;
+        border-bottom-color: #C20E0E;
+    }
+    .tab-content {
+        display: none;
+    }
+    .tab-content.active {
+        display: block;
+    }
+    
+    /* 首页样式 */
+    .home-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: calc(100vh - 200px);
+        text-align: center;
+        padding: 60px 40px;
+    }
+    .home-subtitle {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 3px;
+        color: #C20E0E;
+        text-transform: uppercase;
+        margin-bottom: 30px;
+    }
+    .home-title {
+        font-size: 72px;
+        font-weight: 400;
+        color: #111;
+        line-height: 1.2;
+        margin-bottom: 10px;
+    }
+    .home-title .highlight {
+        color: #C20E0E;
+        font-style: italic;
+        font-weight: 300;
+    }
+    .home-divider {
+        width: 1px;
+        height: 80px;
+        background: #ddd;
+        margin: 40px 0;
+    }
+    .home-footer-text {
+        font-size: 10px;
+        letter-spacing: 2px;
+        color: #999;
+        text-transform: uppercase;
+        line-height: 1.8;
+    }
+    
+    /* 章节内容样式 */
+    .chapter-content {
+        padding: 40px 0;
+    }
+    .chapter-header {
+        margin-bottom: 40px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #C20E0E;
+    }
+    .chapter-number {
+        font-size: 12px;
+        font-weight: 600;
+        color: #C20E0E;
+        letter-spacing: 2px;
+        margin-bottom: 10px;
+    }
+    .chapter-title {
+        font-size: 36px;
+        font-weight: 700;
+        color: #111;
+    }
+    .section-list {
+        list-style: none;
+        padding: 0;
+    }
+    .section-item {
+        padding: 20px 0;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        align-items: baseline;
+        gap: 20px;
+    }
+    .section-number {
+        font-size: 14px;
+        font-weight: 600;
+        color: #C20E0E;
+        min-width: 60px;
+    }
+    .section-title {
+        font-size: 18px;
+        color: #333;
+        flex: 1;
+    }
+    .section-desc {
+        font-size: 14px;
+        color: #999;
+    }
+    
+    /* 知识点样式 */
+    .knowledge-section {
+        margin-bottom: 40px;
+    }
+    .knowledge-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #111;
+        margin-bottom: 20px;
+        padding-left: 15px;
+        border-left: 4px solid #C20E0E;
+    }
+    .knowledge-list {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 30px 0;
+    }
+    .knowledge-list li {
+        padding: 12px 0;
+        padding-left: 20px;
+        position: relative;
+        color: #444;
+        font-size: 15px;
+        line-height: 1.6;
+        border-bottom: 1px dashed #eee;
+    }
+    .knowledge-list li:before {
+        content: "▸";
+        position: absolute;
+        left: 0;
+        color: #C20E0E;
+        font-weight: bold;
+    }
+    .knowledge-list li strong {
+        color: #C20E0E;
+        font-weight: 600;
+    }
+    
+    /* 例题样式 */
+    .example-section {
+        margin-top: 40px;
+        padding-top: 30px;
+        border-top: 2px solid #e5e5e5;
+    }
+    .example-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #2c5282;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .example-title:before {
+        content: "";
+        width: 4px;
+        height: 20px;
+        background: #2c5282;
+    }
+    .example-box {
+        background: #f8f9fa;
+        border: 1px solid #e5e5e5;
+        border-radius: 4px;
+        margin-bottom: 25px;
+        overflow: hidden;
+    }
+    .example-header {
+        background: #2c5282;
+        color: #fff;
+        padding: 12px 20px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+    .example-content {
+        padding: 20px;
+    }
+    .example-question {
+        font-size: 15px;
+        color: #333;
+        line-height: 1.8;
+        margin-bottom: 20px;
+    }
+    .example-solution {
+        background: #fff;
+        border-left: 3px solid #C20E0E;
+        padding: 15px 20px;
+        margin-top: 15px;
+    }
+    .solution-label {
+        font-size: 13px;
+        font-weight: 700;
+        color: #C20E0E;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+    }
+    .solution-content {
+        font-size: 14px;
+        color: #444;
+        line-height: 1.8;
+    }
+    .solution-content code {
+        background: #f0f0f0;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-family: 'Consolas', monospace;
+        color: #C20E0E;
+    }
+    .formula-box {
+        background: #fff;
+        border: 1px solid #ddd;
+        padding: 15px 20px;
+        margin: 15px 0;
+        text-align: center;
+        font-family: 'Times New Roman', serif;
+        font-size: 16px;
+        color: #333;
+    }
+    
+    /* 章节完成度样式 */
+    .chapter-completion-section {
+        margin-top: 50px;
+        padding: 30px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        text-align: center;
+    }
+    .completion-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 16px;
+        color: #495057;
+        margin-bottom: 20px;
+    }
+    .completion-status.completed {
+        color: #28a745;
+    }
+    .completion-status-icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+    }
+    .completion-status.completed .completion-status-icon {
+        background: #28a745;
+        color: white;
+    }
+    .completion-status:not(.completed) .completion-status-icon {
+        background: #dee2e6;
+        color: #6c757d;
+    }
+    .btn-complete {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 30px;
+        border: 2px solid #C20E0E;
+        background: transparent;
+        color: #C20E0E;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        border-radius: 25px;
+        transition: all 0.3s ease;
+    }
+    .btn-complete:hover {
+        background: #C20E0E;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(194, 14, 14, 0.3);
+    }
+    .btn-complete.completed {
+        background: #28a745;
+        border-color: #28a745;
+        color: white;
+    }
+    .btn-complete.completed:hover {
+        background: #218838;
+        border-color: #218838;
+    }
+    .btn-complete:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+    /* 可隐藏式进度栏组件样式 */
+    .progress-toggle-btn {
+        position: fixed;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        background: linear-gradient(135deg, #C20E0E, #e74c3c);
+        color: white;
+        border: none;
+        border-radius: 8px 0 0 8px;
+        padding: 15px 10px;
+        cursor: pointer;
+        z-index: 101;
+        box-shadow: -2px 0 15px rgba(194, 14, 14, 0.3);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        min-width: 40px;
+    }
+    .progress-toggle-btn:hover {
+        padding-right: 15px;
+        box-shadow: -4px 0 20px rgba(194, 14, 14, 0.4);
+    }
+    .progress-toggle-btn.has-progress::after {
+        content: '';
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 8px;
+        height: 8px;
+        background: #10b981;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.7; transform: scale(1.2); }
+    }
+    .progress-toggle-btn svg {
+        width: 20px;
+        height: 20px;
+    }
+    .chapter-progress-panel {
+        position: fixed;
+        right: -320px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 280px;
+        background: white;
+        border-radius: 12px 0 0 12px;
+        box-shadow: -4px 0 30px rgba(0,0,0,0.15);
+        z-index: 102;
+        transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+    }
+    .chapter-progress-panel.show {
+        right: 0;
+    }
+    .progress-panel-header {
+        background: linear-gradient(135deg, #C20E0E, #e74c3c);
+        color: white;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .progress-panel-title {
+        font-size: 14px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .progress-close-btn {
+        background: rgba(255,255,255,0.2);
+        border: none;
+        color: white;
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+    }
+    .progress-close-btn:hover {
+        background: rgba(255,255,255,0.3);
+    }
+    .progress-panel-body {
+        padding: 20px;
+    }
+    .progress-overview {
+        text-align: center;
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    .progress-percentage {
+        font-size: 36px;
+        font-weight: 700;
+        color: #C20E0E;
+        line-height: 1;
+        margin-bottom: 5px;
+    }
+    .progress-label {
+        font-size: 12px;
+        color: #999;
+    }
+    .progress-bar-container {
+        width: 100%;
+        height: 10px;
+        background: #f0f0f0;
+        border-radius: 5px;
+        overflow: hidden;
+        margin: 15px 0;
+    }
+    .progress-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #C20E0E, #e74c3c);
+        border-radius: 5px;
+        transition: width 0.5s ease;
+    }
+    .progress-stats {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 15px;
+    }
+    .progress-stat-item {
+        text-align: center;
+    }
+    .progress-stat-value {
+        font-size: 20px;
+        font-weight: 600;
+        color: #333;
+    }
+    .progress-stat-label {
+        font-size: 11px;
+        color: #999;
+        margin-top: 2px;
+    }
+    .current-module {
+        margin-top: 20px;
+    }
+    .current-module-title {
+        font-size: 12px;
+        color: #666;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .current-module-card {
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        border-radius: 8px;
+        padding: 12px 15px;
+        border-left: 3px solid #C20E0E;
+    }
+    .current-module-name {
+        font-size: 13px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 4px;
+    }
+    .current-module-status {
+        font-size: 11px;
+        color: #28a745;
+    }
+    .current-module-status.pending {
+        color: #f59e0b;
+    }
+    .progress-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.3);
+        z-index: 100;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+    .progress-overlay.show {
+        opacity: 1;
+        visibility: visible;
+    }
+    /* 移动端适配 */
+    @media (max-width: 768px) {
+        .progress-toggle-btn {
+            padding: 12px 8px;
+            min-width: 36px;
+        }
+        .progress-toggle-btn span {
+            display: none;
+        }
+        .chapter-progress-panel {
+            width: 260px;
+            right: -280px;
+        }
+    }
+    .nav-completed-indicator {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 18px;
+        height: 18px;
+        background: #28a745;
+        color: white;
+        border-radius: 50%;
+        font-size: 10px;
+        margin-left: 8px;
+    }
+
+    /* 第0章教材介绍样式 */
+    .intro-book-section {
+        display: flex;
+        gap: 40px;
+        margin-top: 30px;
+        align-items: flex-start;
+    }
+    
+    .intro-book-cover {
+        flex: 0 0 320px;
+        text-align: center;
+    }
+    
+    .book-cover-img {
+        width: 100%;
+        max-width: 300px;
+        height: auto;
+        border-radius: 8px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .book-cover-img:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+    }
+    
+    .intro-book-content {
+        flex: 1;
+        padding: 20px 0;
+    }
+    
+    .intro-book-content p {
+        font-size: 15px;
+        line-height: 2;
+        color: #444;
+        text-align: justify;
+        text-indent: 2em;
+        margin: 0;
+    }
+    
+    /* 响应式适配 */
+    @media (max-width: 992px) {
+        .intro-book-section {
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+        
+        .intro-book-cover {
+            flex: 0 0 auto;
+            max-width: 280px;
+        }
+        
+        .intro-book-content {
+            padding: 0;
+        }
+        
+        .intro-book-content p {
+            font-size: 14px;
+            line-height: 1.9;
+        }
+    }
+    
+    @media (max-width: 640px) {
+        .intro-book-section {
+            gap: 25px;
+        }
+        
+        .intro-book-cover {
+            max-width: 240px;
+        }
+        
+        .book-cover-img {
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+        }
+        
+        .intro-book-content p {
+            font-size: 14px;
+            line-height: 1.8;
+            text-indent: 1.5em;
+        }
+    }
+</style>
+
+<div class="doc-container">
+    <!-- 左侧导航 -->
+    <aside class="doc-sidebar">
+        <div class="doc-logo">
+            <span>EM</span> / COURSE
+        </div>
+        
+        <nav>
+            <div class="doc-nav-section">
+                <div class="doc-nav-header">
+                    第0章 教材介绍
+                    <span class="num">00</span>
+                </div>
+                <ul class="doc-nav-list">
+                    <li><a href="#ch0-1">0.1 教材概述</a></li>
+                </ul>
+            </div>
+
+            <div class="doc-nav-section">
+                <div class="doc-nav-header">
+                    第1章 矢量分析
+                    <span class="num">01</span>
+                </div>
+                <ul class="doc-nav-list">
+                    <li><a href="#ch1-1">1.1 矢量代数</a></li>
+                    <li><a href="#ch1-2">1.2 三种常用的正交曲线坐标系</a></li>
+                    <li><a href="#ch1-3">1.3 标量场的方向导数与梯度</a></li>
+                    <li><a href="#ch1-4">1.4 矢量场的通量与散度</a></li>
+                    <li><a href="#ch1-5">1.5 矢量场的环流与旋度</a></li>
+                    <li><a href="#ch1-6">1.6 无旋场的标量位</a></li>
+                    <li><a href="#ch1-7">1.7 无散场的矢量位</a></li>
+                    <li><a href="#ch1-8">1.8 格林定理</a></li>
+                    <li><a href="#ch1-9">1.9 亥姆霍兹定理</a></li>
+                </ul>
+            </div>
+            
+            <div class="doc-nav-section">
+                <div class="doc-nav-header">
+                    第2章 电磁场的基本规律
+                    <span class="num">02</span>
+                </div>
+                <ul class="doc-nav-list">
+                    <li><a href="#ch2-1">2.1 电荷守恒定律</a></li>
+                    <li><a href="#ch2-2">2.2 真空中静电场的基本规律</a></li>
+                    <li><a href="#ch2-3">2.3 真空中恒定磁场的基本规律</a></li>
+                    <li><a href="#ch2-4">2.4 媒质的电磁特性</a></li>
+                    <li><a href="#ch2-5">2.5 电磁感应定律和位移电流</a></li>
+                    <li><a href="#ch2-6">2.6 麦克斯韦方程组</a></li>
+                    <li><a href="#ch2-7">2.7 电磁场的边界条件</a></li>
+                </ul>
+            </div>
+            
+            <div class="doc-nav-section">
+                <div class="doc-nav-header">
+                    第3章 静态电磁场及其边值问题的解
+                    <span class="num">03</span>
+                </div>
+                <ul class="doc-nav-list">
+                    <li><a href="#ch3-1">3.1 静电场分析</a></li>
+                    <li><a href="#ch3-2">3.2 导电媒质中的恒定电场分析</a></li>
+                    <li><a href="#ch3-3">3.3 恒定磁场分析</a></li>
+                    <li><a href="#ch3-4">3.4 静态场的边值问题及解的唯一性定理</a></li>
+                    <li><a href="#ch3-5">3.5 镜像法</a></li>
+                    <li><a href="#ch3-6">3.6 分离变量法</a></li>
+                    <li><a href="#ch3-7">3.7 有限差分法</a></li>
+                </ul>
+            </div>
+            
+            <div class="doc-nav-section">
+                <div class="doc-nav-header">
+                    第4章 时变电磁场
+                    <span class="num">04</span>
+                </div>
+                <ul class="doc-nav-list">
+                    <li><a href="#ch4-1">4.1 波动方程</a></li>
+                    <li><a href="#ch4-2">4.2 电磁场的位函数</a></li>
+                    <li><a href="#ch4-3">4.3 电磁能量守恒定律</a></li>
+                    <li><a href="#ch4-4">4.4 时变电磁场的唯一性定理</a></li>
+                    <li><a href="#ch4-5">4.5 时谐电磁场</a></li>
+                </ul>
+            </div>
+            
+            <div class="doc-nav-section">
+                <div class="doc-nav-header">
+                    第5章 均匀平面波在无界空间中的传播
+                    <span class="num">05</span>
+                </div>
+                <ul class="doc-nav-list">
+                    <li><a href="#ch5-1">5.1 理想介质中的均匀平面波</a></li>
+                    <li><a href="#ch5-2">5.2 均匀平面波在导电媒质中的传播</a></li>
+                    <li><a href="#ch5-3">5.3 电磁波的极化</a></li>
+                    <li><a href="#ch5-4">5.4 均匀平面波在各向异性媒质中的传播</a></li>
+                </ul>
+            </div>
+            
+            <div class="doc-nav-section">
+                <div class="doc-nav-header">
+                    第6章 均匀平面波的反射与透射
+                    <span class="num">06</span>
+                </div>
+                <ul class="doc-nav-list">
+                    <li><a href="#ch6-1">6.1 均匀平面波对分界平面的垂直入射</a></li>
+                    <li><a href="#ch6-2">6.2 均匀平面波对多层介质分界平面的垂直入射</a></li>
+                    <li><a href="#ch6-3">6.3 均匀平面波对理想介质分界平面的斜入射</a></li>
+                    <li><a href="#ch6-4">6.4 均匀平面波对理想导体平面的斜入射</a></li>
+                    <li><a href="#ch6-5">6.5 均匀平面波在负折射率媒质表面上的反射和透射</a></li>
+                </ul>
+            </div>
+            
+            <div class="doc-nav-section">
+                <div class="doc-nav-header">
+                    第7章 导行电磁波
+                    <span class="num">07</span>
+                </div>
+                <ul class="doc-nav-list">
+                    <li><a href="#ch7-1">7.1 导行电磁波概论</a></li>
+                    <li><a href="#ch7-2">7.2 矩形波导</a></li>
+                    <li><a href="#ch7-3">7.3 圆柱形波导</a></li>
+                    <li><a href="#ch7-4">7.4 同轴波导</a></li>
+                    <li><a href="#ch7-5">7.5 谐振腔</a></li>
+                    <li><a href="#ch7-6">7.6 传输线</a></li>
+                </ul>
+            </div>
+            
+            <div class="doc-nav-section">
+                <div class="doc-nav-header">
+                    第8章 电磁辐射
+                    <span class="num">08</span>
+                </div>
+                <ul class="doc-nav-list">
+                    <li><a href="#ch8-1">8.1 滞后位</a></li>
+                    <li><a href="#ch8-2">8.2 电偶极子的辐射</a></li>
+                    <li><a href="#ch8-3">8.3 电与磁的对偶性</a></li>
+                    <li><a href="#ch8-4">8.4 磁偶极子的辐射</a></li>
+                    <li><a href="#ch8-5">8.5 天线的基本参数</a></li>
+                    <li><a href="#ch8-6">8.6 对称天线</a></li>
+                    <li><a href="#ch8-7">8.7 天线阵</a></li>
+                    <li><a href="#ch8-8">8.8 口径场辐射</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- 主内容区 -->
+    <main class="doc-main">
+        <!-- 首页 - 课程封面 -->
+        <div id="home-content" class="home-content">
+            <div class="home-subtitle">Department of Electromagnetic Science</div>
+            <h1 class="home-title">电磁场与</h1>
+            <h1 class="home-title"><span class="highlight">电磁波</span></h1>
+            <div class="home-divider"></div>
+            <div class="home-footer-text">
+                Theoretical Excellence · Precision Engineering ·<br>
+                Academic Integrity
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- 进度栏触发按钮 -->
+<button class="progress-toggle-btn" id="progressToggleBtn" aria-label="查看课程进度">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+    </svg>
+    <span>进度</span>
+</button>
+
+<!-- 进度栏遮罩层 -->
+<div class="progress-overlay" id="progressOverlay"></div>
+
+<!-- 可隐藏式章节进度面板 -->
+<div class="chapter-progress-panel" id="chapterProgressPanel">
+    <div class="progress-panel-header">
+        <div class="progress-panel-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            课程进度
+        </div>
+        <button class="progress-close-btn" id="progressCloseBtn" aria-label="关闭进度面板">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+    </div>
+    <div class="progress-panel-body">
+        <!-- 进度概览 -->
+        <div class="progress-overview">
+            <div class="progress-percentage" id="progressPercentage">0%</div>
+            <div class="progress-label">总体完成度</div>
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="progressBarFill" style="width: 0%"></div>
+            </div>
+            <div class="progress-stats">
+                <div class="progress-stat-item">
+                    <div class="progress-stat-value" id="completedCount">0</div>
+                    <div class="progress-stat-label">已完成</div>
+                </div>
+                <div class="progress-stat-item">
+                    <div class="progress-stat-value" id="totalCount">0</div>
+                    <div class="progress-stat-label">总章节</div>
+                </div>
+                <div class="progress-stat-item">
+                    <div class="progress-stat-value" id="remainingCount">0</div>
+                    <div class="progress-stat-label">待学习</div>
+                </div>
+            </div>
+        </div>
+        <!-- 当前学习模块 -->
+        <div class="current-module">
+            <div class="current-module-title">当前学习位置</div>
+            <div class="current-module-card">
+                <div class="current-module-name" id="currentModuleName">尚未开始</div>
+                <div class="current-module-status pending" id="currentModuleStatus">等待学习</div>
+            </div>
+        </div>
+        
+        <!-- 同步按钮 -->
+        <div class="sync-section" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e5e7eb;">
+            <button class="btn-sync" id="syncToServerBtn" style="width: 100%; padding: 10px; background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                同步到服务器
+            </button>
+            <div id="syncStatus" style="text-align: center; margin-top: 8px; font-size: 12px; color: #6b7280; min-height: 18px;"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 侧边栏导航点击处理
+    document.querySelectorAll('.doc-nav-list li a').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // 更新激活状态
+            document.querySelectorAll('.doc-nav-list li a').forEach(l => l.classList.remove('active'));
+            this.classList.add('active');
+            
+            // 获取章节ID
+            const chapterId = this.getAttribute('href').substring(1);
+            loadChapter(chapterId);
+        });
+    });
+    
+    // 章节详细内容
+    const chapterDetails = {
+        'ch0-1': {
+            chapter: '第0章 教材介绍',
+            title: '0.1 教材概述',
+            desc: '《电磁场与电磁波》精品教材介绍',
+            isIntro: true,
+            content: `
+                <div class="intro-book-section">
+                    <div class="intro-book-cover">
+                        <img src="{% static 'image/ee_cover.png' %}" alt="电磁场与电磁波教材封面" class="book-cover-img">
+                    </div>
+                    <div class="intro-book-content">
+                        <p>《电磁场与电磁波》自出版以来，深受广大读者的好评和喜爱，被普遍认为是一本非常适合教学的优秀教材。首先以三大实验定律和两个基本假说为基础，归纳总结出麦克斯韦方程，然后分析静态电磁场、时变电磁场、电磁波的传播与辐射特性。对部分章节进行了改写与补充、调整和合并，内容更加充实和丰富，叙述更清楚，阐述更深刻。书中引入了多媒体素材，利用动画形象地演示电磁场的分布，能够帮助读者更形象地理解电磁现象。全书仍分为 8 章，即矢量分析、电磁场的基本规律、静态电磁场及其边值问题的解、时变电磁场、均匀平面波在无界空间中的传播、均匀平面波的反射与透射、导行电磁波、电磁辐射。本书可供普通高等学校电子科学与技术、电子信息工程与通信工程等专业作为电磁场与电磁波课程的教材使用，也可供工程技术人员参考。</p>
+                    </div>
+                </div>
+            `
+        },
+        'ch1-1': {
+            chapter: '第1章 矢量分析',
+            title: '1.1 矢量代数',
+            desc: '矢量的基本概念、运算规则与代数性质',
+            knowledge: [
+                '<strong>标量与矢量</strong>：标量只有大小（如温度、质量），矢量既有大小又有方向（如力、速度）',
+                '<strong>矢量加法</strong>：平行四边形法则或三角形法则，满足交换律 A + B = B + A',
+                '<strong>矢量减法</strong>：A - B = A + (-B)，其中 -B 是与 B 大小相等、方向相反的矢量',
+                '<strong>点积（标积）</strong>：A · B = |A||B|cosθ，结果是一个标量，满足交换律',
+                '<strong>叉积（矢积）</strong>：A × B = |A||B|sinθ n，结果是一个矢量，方向垂直于 A 和 B 所在平面，不满足交换律（A × B = -B × A）',
+                '<strong>单位矢量</strong>：模为1的矢量，e = A/|A|，任何矢量可表示为 A = |A|e',
+                '<strong>常矢量</strong>：大小和方向都不变的矢量',
+                '<strong>矢量三重积</strong>：A · (B × C) 为标量三重积；A × (B × C) 为矢量三重积，满足 BAC-CAB 法则'
+            ],
+            examples: [
+                {
+                    title: '例题 1.1',
+                    question: '已知矢量 A = 3e<sub>x</sub> + 4e<sub>y</sub>，B = 2e<sub>x</sub> - e<sub>y</sub>，求：(1) A + B；(2) A · B；(3) A × B。',
+                    solution: '(1) <strong>矢量加法</strong>：A + B = (3+2)e<sub>x</sub> + (4-1)e<sub>y</sub> = 5e<sub>x</sub> + 3e<sub>y</sub><br><br>(2) <strong>点积计算</strong>：A · B = 3×2 + 4×(-1) = 6 - 4 = 2<br><br>(3) <strong>叉积计算</strong>：A × B = (3×(-1) - 4×2)e<sub>z</sub> = (-3-8)e<sub>z</sub> = -11e<sub>z</sub><br>（注：在二维情况下，叉积结果垂直于xy平面）'
+                },
+                {
+                    title: '例题 1.2',
+                    question: '求矢量 A = 2e<sub>x</sub> + 3e<sub>y</sub> + 6e<sub>z</sub> 的模和单位矢量。',
+                    solution: '<strong>第一步：求模</strong><br>|A| = √(2² + 3² + 6²) = √(4 + 9 + 36) = √49 = 7<br><br><strong>第二步：求单位矢量</strong><br>e<sub>a</sub> = A/|A| = (2/7)e<sub>x</sub> + (3/7)e<sub>y</sub> + (6/7)e<sub>z</sub><br><br><strong>验证</strong>：|e<sub>a</sub>| = √[(2/7)² + (3/7)² + (6/7)²] = √(49/49) = 1 ✓'
+                }
+            ]
+        },
+        'ch1-2': {
+            chapter: '第1章 矢量分析',
+            title: '1.2 三种常用的正交曲线坐标系',
+            desc: '直角坐标系、圆柱坐标系、球坐标系的转换与应用',
+            knowledge: [
+                '<strong>直角坐标系 (x, y, z)</strong>：三个坐标轴互相垂直，单位矢量 e<sub>x</sub>, e<sub>y</sub>, e<sub>z</sub> 为常矢量',
+                '<strong>直角坐标系线元</strong>：dl = dx e<sub>x</sub> + dy e<sub>y</sub> + dz e<sub>z</sub>',
+                '<strong>直角坐标系体元</strong>：dV = dx dy dz',
+                '<strong>圆柱坐标系 (ρ, φ, z)</strong>：ρ 为到z轴的距离，φ 为方位角，z 与直角坐标相同',
+                '<strong>圆柱坐标系单位矢量</strong>：e<sub>ρ</sub>, e<sub>φ</sub>, e<sub>z</sub>，其中 e<sub>ρ</sub> 和 e<sub>φ</sub> 随 φ 变化',
+                '<strong>圆柱坐标与直角坐标转换</strong>：x = ρcosφ, y = ρsinφ, z = z；ρ = √(x²+y²), φ = arctan(y/x)',
+                '<strong>球坐标系 (r, θ, φ)</strong>：r 为到原点的距离，θ 为极角（与z轴夹角），φ 为方位角',
+                '<strong>球坐标与直角坐标转换</strong>：x = rsinθcosφ, y = rsinθsinφ, z = rcosθ',
+                '<strong>坐标系选择原则</strong>：根据问题对称性选择，可简化计算'
+            ],
+            examples: [
+                {
+                    title: '例题 1.3',
+                    question: '将直角坐标系中的点 P(3, 4, 5) 转换为圆柱坐标和球坐标。',
+                    solution: '<strong>圆柱坐标转换</strong>：<br>ρ = √(3² + 4²) = 5<br>φ = arctan(4/3) ≈ 53.13°<br>z = 5<br>∴ P(5, 53.13°, 5)<br><br><strong>球坐标转换</strong>：<br>r = √(3² + 4² + 5²) = √50 ≈ 7.07<br>θ = arccos(5/7.07) ≈ 45°<br>φ = arctan(4/3) ≈ 53.13°<br>∴ P(7.07, 45°, 53.13°)'
+                },
+                {
+                    title: '例题 1.4',
+                    question: '在圆柱坐标系中，已知 A = ρe<sub>ρ</sub> + z e<sub>z</sub>，求该矢量在直角坐标系中的表达式（取 φ = 45°）。',
+                    solution: '<strong>单位矢量转换关系</strong>：<br>e<sub>ρ</sub> = cosφ e<sub>x</sub> + sinφ e<sub>y</sub><br>e<sub>φ</sub> = -sinφ e<sub>x</sub> + cosφ e<sub>y</sub><br>e<sub>z</sub> = e<sub>z</sub><br><br><strong>代入 φ = 45°</strong>：<br>e<sub>ρ</sub> = (√2/2)e<sub>x</sub> + (√2/2)e<sub>y</sub><br><br><strong>矢量转换</strong>：<br>A = ρ[(√2/2)e<sub>x</sub> + (√2/2)e<sub>y</sub>] + z e<sub>z</sub><br>= (√2/2)ρ e<sub>x</sub> + (√2/2)ρ e<sub>y</sub> + z e<sub>z</sub><br><br>其中 ρ = √(x²+y²)，在45°方向上 ρ = √2 x'
+                }
+            ]
+        },
+        'ch1-3': {
+            chapter: '第1章 矢量分析',
+            title: '1.3 标量场的方向导数与梯度',
+            desc: '方向导数的定义、梯度的物理意义与计算方法',
+            knowledge: [
+                '<strong>标量场</strong>：空间每一点对应一个标量值的函数，如温度场 T(x,y,z)、电位场 φ(x,y,z)',
+                '<strong>等值面</strong>：标量场中函数值相等的点构成的曲面，如 φ(x,y,z) = C',
+                '<strong>方向导数</strong>：标量场在某方向上的变化率，∂φ/∂l = lim(Δl→0) Δφ/Δl',
+                '<strong>方向导数公式</strong>：∂φ/∂l = ∇φ · e<sub>l</sub> = |∇φ|cosθ，其中 e<sub>l</sub> 为单位方向矢量',
+                '<strong>梯度（Gradient）</strong>：∇φ = (∂φ/∂x)e<sub>x</sub> + (∂φ/∂y)e<sub>y</sub> + (∂φ/∂z)e<sub>z</sub>，是一个矢量',
+                '<strong>梯度的物理意义</strong>：方向为函数变化率最大的方向，大小为最大变化率',
+                '<strong>哈密顿算子∇</strong>：∇ = e<sub>x</sub>(∂/∂x) + e<sub>y</sub>(∂/∂y) + e<sub>z</sub>(∂/∂z)，又称纳布拉算子',
+                '<strong>梯度与等值面关系</strong>：梯度方向垂直于等值面，指向函数值增大的方向',
+                '<strong>梯度运算规则</strong>：∇(φ+ψ) = ∇φ + ∇ψ；∇(φψ) = φ∇ψ + ψ∇φ'
+            ],
+            examples: [
+                {
+                    title: '例题 1.5',
+                    question: '求标量场 φ(x,y,z) = x²y + yz² 在点 P(1, 2, -1) 处的梯度。',
+                    solution: '<strong>第一步：计算偏导数</strong><br>∂φ/∂x = 2xy<br>∂φ/∂y = x² + z²<br>∂φ/∂z = 2yz<br><br><strong>第二步：写出梯度表达式</strong><br>∇φ = 2xy e<sub>x</sub> + (x² + z²) e<sub>y</sub> + 2yz e<sub>z</sub><br><br><strong>第三步：代入点 P(1, 2, -1)</strong><br>∇φ|<sub>P</sub> = 2(1)(2) e<sub>x</sub> + (1 + 1) e<sub>y</sub> + 2(2)(-1) e<sub>z</sub><br>= 4e<sub>x</sub> + 2e<sub>y</sub> - 4e<sub>z</sub>'
+                },
+                {
+                    title: '例题 1.6',
+                    question: '求标量场 φ = x² + y² 在点 P(1, 1) 处沿方向 l = e<sub>x</sub> + 2e<sub>y</sub> 的方向导数。',
+                    solution: '<strong>第一步：求梯度</strong><br>∇φ = 2x e<sub>x</sub> + 2y e<sub>y</sub><br>∇φ|<sub>P</sub> = 2e<sub>x</sub> + 2e<sub>y</sub><br><br><strong>第二步：求单位方向矢量</strong><br>|l| = √(1² + 2²) = √5<br>e<sub>l</sub> = (1/√5)e<sub>x</sub> + (2/√5)e<sub>y</sub><br><br><strong>第三步：计算方向导数</strong><br>∂φ/∂l = ∇φ · e<sub>l</sub> = (2)(1/√5) + (2)(2/√5) = 6/√5 = 6√5/5 ≈ 2.68'
+                }
+            ]
+        },
+        'ch1-4': {
+            chapter: '第1章 矢量分析',
+            title: '1.4 矢量场的通量与散度',
+            desc: '通量的概念、散度的定义与高斯定理',
+            knowledge: [
+                '<strong>矢量线</strong>：曲线上每一点的切线方向与该点矢量场方向一致的曲线',
+                '<strong>矢量线方程</strong>：dx/A<sub>x</sub> = dy/A<sub>y</sub> = dz/A<sub>z</sub>',
+                '<strong>通量（Flux）</strong>：Ψ = ∫∫ₛ A · dS，表示矢量场穿过曲面 S 的量',
+                '<strong>通量的物理意义</strong>：若 A 为流速场，通量表示单位时间内穿过曲面的流体体积',
+                '<strong>闭合曲面通量</strong>：Ψ = ∮ₛ A · dS，dS 方向为外法向',
+                '<strong>散度（Divergence）</strong>：∇ · A = ∂A<sub>x</sub>/∂x + ∂A<sub>y</sub>/∂y + ∂A<sub>z</sub>/∂z，是一个标量',
+                '<strong>散度的物理意义</strong>：表示场中某点单位体积的通量，即"源"的强度',
+                '<strong>散度定理（高斯定理）</strong>：∮ₛ A · dS = ∫∫∫ᵥ (∇ · A) dV，将面积分转化为体积分',
+                '<strong>无源场（无散场）</strong>：∇ · A = 0，表示该点没有通量源',
+                '<strong>散度运算规则</strong>：∇ · (A + B) = ∇ · A + ∇ · B；∇ · (φA) = ∇φ · A + φ(∇ · A)'
+            ],
+            examples: [
+                {
+                    title: '例题 1.7',
+                    question: '求矢量场 A = x²e<sub>x</sub> + y²e<sub>y</sub> + z²e<sub>z</sub> 的散度。',
+                    solution: '<strong>应用散度公式</strong>：<br>∇ · A = ∂A<sub>x</sub>/∂x + ∂A<sub>y</sub>/∂y + ∂A<sub>z</sub>/∂z<br><br><strong>计算各偏导数</strong>：<br>∂A<sub>x</sub>/∂x = ∂(x²)/∂x = 2x<br>∂A<sub>y</sub>/∂y = ∂(y²)/∂y = 2y<br>∂A<sub>z</sub>/∂z = ∂(z²)/∂z = 2z<br><br><strong>结果</strong>：<br>∇ · A = 2x + 2y + 2z = 2(x + y + z)'
+                },
+                {
+                    title: '例题 1.8',
+                    question: '验证散度定理：A = x e<sub>x</sub> + y e<sub>y</sub> + z e<sub>z</sub>，积分区域为边长为2的立方体（中心在原点）。',
+                    solution: '<strong>第一步：计算 ∇ · A</strong><br>∇ · A = ∂x/∂x + ∂y/∂y + ∂z/∂z = 3<br><br><strong>第二步：计算体积分</strong><br>∫∫∫ᵥ (∇ · A) dV = 3 × 体积 = 3 × (2×2×2) = 3 × 8 = 24<br><br><strong>第三步：计算闭合面积分</strong><br>立方体有6个面，每个面的面积 = 2×2 = 4<br>在 x=1 面上：A · dS = 1 × 4 = 4；在 x=-1 面上：A · dS = |-1| × 4 = 4<br>同理每个面的通量均为 4<br>总通量 = 6 × 4 = 24<br><br><strong>验证</strong>：24 = 24，散度定理成立 ✓'
+                }
+            ]
+        },
+        'ch1-5': {
+            chapter: '第1章 矢量分析',
+            title: '1.5 矢量场的环流与旋度',
+            desc: '环流的定义、旋度的物理意义与斯托克斯定理',
+            knowledge: [
+                '<strong>环流（Circulation）</strong>：Γ = ∮ₗ A · dl，表示矢量场沿闭合曲线 L 的切向积分',
+                '<strong>环流的物理意义</strong>：若 A 为流速场，环流表示流体沿闭合路径的旋转趋势',
+                '<strong>环流面密度</strong>：lim(ΔS→0) Γ/ΔS，单位面积的环流',
+                '<strong>旋度（Curl）</strong>：∇ × A，是一个矢量，表示场在某点的旋转强度和转轴方向',
+                '<strong>旋度在直角坐标系中的表达式</strong>：<br>∇ × A = | e<sub>x</sub> e<sub>y</sub> e<sub>z</sub> |<br>   | ∂/∂x ∂/∂y ∂/∂z |<br>   | A<sub>x</sub> A<sub>y</sub> A<sub>z</sub> |',
+                '<strong>斯托克斯定理</strong>：∮ₗ A · dl = ∫∫ₛ (∇ × A) · dS，将线积分转化为面积分',
+                '<strong>无旋场</strong>：∇ × A = 0，表示场中无旋涡源，可表示为标量位的梯度（A = ∇φ）',
+                '<strong>旋度运算规则</strong>：∇ × (A + B) = ∇ × A + ∇ × B；∇ × (φA) = ∇φ × A + φ(∇ × A)',
+                '<strong>散度与旋度的区别</strong>：散度是标量，表示"源"；旋度是矢量，表示"涡"'
+            ],
+            examples: [
+                {
+                    title: '例题 1.9',
+                    question: '求矢量场 A = y e<sub>x</sub> - x e<sub>y</sub> 的旋度。',
+                    solution: '<strong>应用旋度公式</strong>：<br>∇ × A = (∂A<sub>z</sub>/∂y - ∂A<sub>y</sub>/∂z)e<sub>x</sub> + (∂A<sub>x</sub>/∂z - ∂A<sub>z</sub>/∂x)e<sub>y</sub> + (∂A<sub>y</sub>/∂x - ∂A<sub>x</sub>/∂y)e<sub>z</sub><br><br><strong>计算各分量</strong>：<br>(∂A<sub>z</sub>/∂y - ∂A<sub>y</sub>/∂z) = 0 - 0 = 0<br>(∂A<sub>x</sub>/∂z - ∂A<sub>z</sub>/∂x) = 0 - 0 = 0<br>(∂A<sub>y</sub>/∂x - ∂A<sub>x</sub>/∂y) = (-1) - 1 = -2<br><br><strong>结果</strong>：<br>∇ × A = -2e<sub>z</sub><br>表示该场在xy平面内有顺时针旋转趋势'
+                },
+                {
+                    title: '例题 1.10',
+                    question: '验证斯托克斯定理：A = -y e<sub>x</sub> + x e<sub>y</sub>，闭合路径为 xy 平面内半径为 R 的圆。',
+                    solution: '<strong>第一步：计算 ∇ × A</strong><br>∇ × A = (∂x/∂x - ∂(-y)/∂y)e<sub>z</sub> = (1 + 1)e<sub>z</sub> = 2e<sub>z</sub><br><br><strong>第二步：计算面积分</strong><br>∫∫ₛ (∇ × A) · dS = 2 × πR² = 2πR²<br><br><strong>第三步：计算线积分（参数方程：x=Rcosθ, y=Rsinθ）</strong><br>∮ A · dl = ∮(-y dx + x dy)<br>= ∫₀²<sup>π</sup> [R²sin²θ + R²cos²θ]dθ<br>= R² ∫₀²<sup>π</sup> dθ = 2πR²<br><br><strong>验证</strong>：2πR² = 2πR²，斯托克斯定理成立 ✓'
+                }
+            ]
+        },
+        'ch1-6': {
+            chapter: '第1章 矢量分析',
+            title: '1.6 无旋场的标量位',
+            desc: '无旋场的性质、标量位的引入与计算',
+            knowledge: [
+                '<strong>无旋场的判定条件</strong>：∇ × F = 0，表示矢量场 F 是无旋场',
+                '<strong>无旋场的性质</strong>：沿任意闭合路径的环流为零，即 ∮ F · dl = 0',
+                '<strong>无旋场与标量位的关系</strong>：F = -∇u（或 F = ∇u），其中 u 为标量位函数',
+                '<strong>标量位的物理意义</strong>：在静电场中，标量位就是电位 φ，E = -∇φ',
+                '<strong>拉普拉斯算子 ∇²</strong>：∇² = ∂²/∂x² + ∂²/∂y² + ∂²/∂z²，是标量算子',
+                '<strong>泊松方程</strong>：∇²u = -ρ/ε（静电场中），表示标量位与源的关系',
+                '<strong>拉普拉斯方程</strong>：∇²u = 0，在无源区域成立',
+                '<strong>三种坐标系下的拉普拉斯算子</strong>：<br>直角坐标：∇²u = ∂²u/∂x² + ∂²u/∂y² + ∂²u/∂z²<br>圆柱坐标：∇²u = (1/ρ)∂(ρ∂u/∂ρ)/∂ρ + (1/ρ²)∂²u/∂φ² + ∂²u/∂z²<br>球坐标：∇²u = (1/r²)∂(r²∂u/∂r)/∂r + (1/r²sinθ)∂(sinθ∂u/∂θ)/∂θ + (1/r²sin²θ)∂²u/∂φ²'
+            ],
+            examples: [
+                {
+                    title: '例题 1.11',
+                    question: '验证 F = 2xy e<sub>x</sub> + x² e<sub>y</sub> 是无旋场，并求其标量位 u（设 u(0,0) = 0）。',
+                    solution: '<strong>第一步：验证无旋</strong><br>∇ × F = (∂(x²)/∂x - ∂(2xy)/∂y)e<sub>z</sub> = (2x - 2x)e<sub>z</sub> = 0<br>∴ F 是无旋场 ✓<br><br><strong>第二步：求标量位</strong><br>由 F = ∇u 得：<br>∂u/∂x = 2xy → u = x²y + f(y)<br>∂u/∂y = x² + f\'\(y\) = x² → f\'\(y\) = 0 → f(y) = C<br><br><strong>第三步：确定常数</strong><br>u(0,0) = 0 → C = 0<br>∴ <strong>u = x²y</strong>'
+                },
+                {
+                    title: '例题 1.12',
+                    question: '已知电位 φ = x² + y² - 2z²，求对应的电场强度 E，并验证 ∇ × E = 0。',
+                    solution: '<strong>第一步：求电场强度</strong><br>E = -∇φ = -(2x e<sub>x</sub> + 2y e<sub>y</sub> - 4z e<sub>z</sub>)<br>= -2x e<sub>x</sub> - 2y e<sub>y</sub> + 4z e<sub>z</sub><br><br><strong>第二步：验证无旋</strong><br>∇ × E = | e<sub>x</sub> e<sub>y</sub> e<sub>z</sub> |<br>   | ∂/∂x ∂/∂y ∂/∂z |<br>   | -2x -2y 4z |<br>= (0-0)e<sub>x</sub> + (0-0)e<sub>y</sub> + (0-0)e<sub>z</sub> = 0<br><br><strong>结论</strong>：静电场是无旋场，E = -∇φ 成立 ✓'
+                }
+            ]
+        },
+        'ch1-7': {
+            chapter: '第1章 矢量分析',
+            title: '1.7 无散场的矢量位',
+            desc: '无散场的性质、矢量位的引入与规范条件',
+            knowledge: [
+                '<strong>无散场的判定条件</strong>：∇ · F = 0，表示矢量场 F 是无散场（无源场）',
+                '<strong>无散场的性质</strong>：穿过任意闭合曲面的通量为零，即 ∮ₛ F · dS = 0',
+                '<strong>无散场与矢量位的关系</strong>：F = ∇ × A，其中 A 为矢量位函数',
+                '<strong>矢量位的物理意义</strong>：在恒定磁场中，B = ∇ × A，A 为磁矢位',
+                '<strong>矢量位的非唯一性</strong>：A\' = A + ∇ψ 也满足 F = ∇ × A\'，需要引入规范条件',
+                '<strong>库仑规范</strong>：∇ · A = 0，常用于静电场问题',
+                '<strong>洛伦兹规范</strong>：∇ · A + με(∂φ/∂t) = 0，常用于时变电磁场',
+                '<strong>矢量泊松方程</strong>：∇²A = -μJ（恒定磁场中），表示矢量位与电流源的关系',
+                '<strong>矢量拉普拉斯运算</strong>：∇²A = ∇(∇ · A) - ∇ × (∇ × A)'
+            ],
+            examples: [
+                {
+                    title: '例题 1.13',
+                    question: '验证 F = y e<sub>x</sub> - x e<sub>y</sub> 是无散场，并求其矢量位 A（取 A<sub>z</sub> = 0）。',
+                    solution: '<strong>第一步：验证无散</strong><br>∇ · F = ∂y/∂x + ∂(-x)/∂y + 0 = 0 + 0 + 0 = 0<br>∴ F 是无散场 ✓<br><br><strong>第二步：求矢量位</strong><br>由 F = ∇ × A，且 A<sub>z</sub> = 0：<br>∂A<sub>y</sub>/∂z = y → A<sub>y</sub> = yz + f(x,y)<br>-∂A<sub>x</sub>/∂z = -x → A<sub>x</sub> = xz + g(x,y)<br>∂A<sub>y</sub>/∂x - ∂A<sub>x</sub>/∂y = 0<br><br>取 f = g = 0，得：<br><strong>A = xz e<sub>x</sub> + yz e<sub>y</sub></strong><br>（注：矢量位不唯一，此为其中一个解）'
+                },
+                {
+                    title: '例题 1.14',
+                    question: '已知磁感应强度 B = e<sub>z</sub>（均匀磁场），求满足库仑规范的矢量位 A。',
+                    solution: '<strong>第一步：验证无散</strong><br>∇ · B = 0，B 是无散场 ✓<br><br><strong>第二步：设 A = A<sub>x</sub> e<sub>x</sub> + A<sub>y</sub> e<sub>y</sub> + A<sub>z</sub> e<sub>z</sub></strong><br>由 B = ∇ × A = e<sub>z</sub>：<br>∂A<sub>y</sub>/∂x - ∂A<sub>x</sub>/∂y = 1<br><br><strong>第三步：应用库仑规范 ∇ · A = 0</strong><br>∂A<sub>x</sub>/∂x + ∂A<sub>y</sub>/∂y + ∂A<sub>z</sub>/∂z = 0<br><br><strong>简单解</strong>：取 A<sub>x</sub> = -y/2, A<sub>y</sub> = x/2, A<sub>z</sub> = 0<br>验证：∂A<sub>y</sub>/∂x - ∂A<sub>x</sub>/∂y = 1/2 - (-1/2) = 1 ✓<br>∇ · A = 0 + 0 + 0 = 0 ✓<br><br><strong>答案</strong>：<strong>A = (-y/2) e<sub>x</sub> + (x/2) e<sub>y</sub></strong>'
+                }
+            ]
+        },
+        'ch1-8': {
+            chapter: '第1章 矢量分析',
+            title: '1.8 格林定理',
+            desc: '格林第一恒等式与格林第二恒等式',
+            knowledge: [
+                '<strong>格林第一恒等式</strong>：∫∫∫ᵥ (φ∇²ψ + ∇φ · ∇ψ) dV = ∮ₛ φ(∂ψ/∂n) dS',
+                '<strong>格林第一恒等式推导</strong>：由高斯定理，令 A = φ∇ψ，则 ∇ · A = φ∇²ψ + ∇φ · ∇ψ',
+                '<strong>格林第二恒等式（格林定理）</strong>：∫∫∫ᵥ (φ∇²ψ - ψ∇²φ) dV = ∮ₛ (φ∂ψ/∂n - ψ∂φ/∂n) dS',
+                '<strong>格林第二恒等式推导</strong>：将第一恒等式中 φ 和 ψ 互换后相减',
+                '<strong>格林定理的物理意义</strong>：将体积分转化为面积分，简化计算',
+                '<strong>在电磁场中的应用</strong>：求解泊松方程、唯一性定理证明、镜像法推导等',
+                '<strong>特殊情况</strong>：当 φ 和 ψ 都满足拉普拉斯方程时，∮ₛ (φ∂ψ/∂n - ψ∂φ/∂n) dS = 0'
+            ],
+            examples: [
+                {
+                    title: '例题 1.15',
+                    question: '用格林第一恒等式证明：若 φ 在体积 V 内满足 ∇²φ = 0，且在边界 S 上 φ = 0，则在 V 内 φ ≡ 0。',
+                    solution: '<strong>证明</strong>：<br>在格林第一恒等式中令 ψ = φ：<br>∫∫∫ᵥ (φ∇²φ + |∇φ|²) dV = ∮ₛ φ(∂φ/∂n) dS<br><br>由条件：<br>∇²φ = 0（在 V 内）<br>φ = 0（在 S 上）<br><br>代入得：<br>∫∫∫ᵥ |∇φ|² dV = 0<br><br>因为 |∇φ|² ≥ 0，所以 ∇φ = 0，即 φ = 常数<br>又 φ|ₛ = 0，故 <strong>φ ≡ 0</strong><br><br><strong>证毕</strong> ✓'
+                },
+                {
+                    title: '例题 1.16',
+                    question: '已知 φ = x² + y²，ψ = z，区域 V 为单位立方体 [0,1]×[0,1]×[0,1]，验证格林第一恒等式。',
+                    solution: '<strong>计算各项</strong>：<br>∇²ψ = 0，∇φ = 2x e<sub>x</sub> + 2y e<sub>y</sub>，∇ψ = e<sub>z</sub><br>∇φ · ∇ψ = 0<br><br><strong>左边</strong>：<br>∫∫∫ᵥ (φ∇²ψ + ∇φ · ∇ψ) dV = ∫∫∫ᵥ 0 dV = 0<br><br><strong>右边</strong>：<br>∂ψ/∂n = ∂z/∂z = 1（在 z=1 面），= -1（在 z=0 面），= 0（其他面）<br>∮ₛ φ(∂ψ/∂n) dS = ∫₀¹∫₀¹ (x²+y²)(1)dxdy - ∫₀¹∫₀¹ (x²+y²)(-1)dxdy<br>= 2∫₀¹∫₀¹ (x²+y²)dxdy = 2[1/3 + 1/3] = 4/3<br><br>注：此例中 φ 不满足边界条件，故两边不等，仅作计算演示。'
+                }
+            ]
+        },
+        'ch1-9': {
+            chapter: '第1章 矢量分析',
+            title: '1.9 亥姆霍兹定理',
+            desc: '矢量场的唯一性定理与分解定理',
+            knowledge: [
+                '<strong>亥姆霍兹定理（Helmholtz Theorem）</strong>：在有限区域内，一个矢量场由其散度、旋度和边界条件唯一确定',
+                '<strong>矢量场的分解</strong>：任意矢量场 F 可分解为无旋场（纵场）和无散场（横场）之和：F = F<sub>l</sub> + F<sub>t</sub>',
+                '<strong>无旋场（纵场）</strong>：∇ × F<sub>l</sub> = 0，可表示为 F<sub>l</sub> = -∇φ',
+                '<strong>无散场（横场）</strong>：∇ · F<sub>t</sub> = 0，可表示为 F<sub>t</sub> = ∇ × A',
+                '<strong>唯一性条件</strong>：给定 ∇ · F（散度源）、∇ × F（旋度源）和边界上的法向或切向分量',
+                '<strong>物理意义</strong>：矢量场的源只有两种——散度源（标量源）和旋度源（矢量源）',
+                '<strong>在电磁场中的应用</strong>：静电场（无旋）由电荷（散度源）决定；恒定磁场（无散）由电流（旋度源）决定',
+                '<strong>工程意义</strong>：已知场的源分布和边界条件，可以唯一确定整个场的分布'
+            ],
+            examples: [
+                {
+                    title: '例题 1.17',
+                    question: '已知矢量场 F 满足 ∇ · F = 3，∇ × F = 0，且 F|<sub>r→∞</sub> → 0，求 F。',
+                    solution: '<strong>分析</strong>：<br>由 ∇ × F = 0，F 是无旋场，可设 F = -∇φ<br>由 ∇ · F = 3，得 ∇ · (-∇φ) = 3，即 ∇²φ = -3<br><br><strong>求解泊松方程</strong>：<br>类比静电场中点电荷的解，对于均匀分布的源：<br>φ = -r²/4（在一维情况下）<br><br><strong>更一般的解</strong>：<br>对于球对称情况，F = r e<sub>r</sub>（验证：∇ · (r e<sub>r</sub>) = 3）<br><br><strong>答案</strong>：<strong>F = r e<sub>r</sub> = x e<sub>x</sub> + y e<sub>y</sub> + z e<sub>z</sub></strong><br>验证：∇ · F = 3，∇ × F = 0 ✓'
+                },
+                {
+                    title: '例题 1.18',
+                    question: '证明：若 F₁ 和 F₂ 在区域 V 内有相同的散度和旋度，且在边界 S 上有相同的法向分量，则 F₁ = F₂。',
+                    solution: '<strong>证明</strong>：<br>令 F = F₁ - F₂<br><br>由条件：<br>∇ · F = ∇ · F₁ - ∇ · F₂ = 0<br>∇ × F = ∇ × F₁ - ∇ × F₂ = 0<br>F · n|ₛ = 0<br><br>由 ∇ × F = 0，F 是无旋场，设 F = ∇φ<br>由 ∇ · F = 0，得 ∇²φ = 0（拉普拉斯方程）<br><br>由格林第一恒等式：<br>∫∫∫ᵥ |∇φ|² dV = ∮ₛ φ(∂φ/∂n) dS = 0<br>（因为 F · n = ∂φ/∂n = 0）<br><br>∴ ∇φ = 0，即 F = 0<br><strong>故 F₁ = F₂</strong><br><br><strong>证毕</strong> ✓'
+                }
+            ]
+        },
+        'ch2-1': {
+            chapter: '第2章 电磁场的基本规律',
+            title: '2.1 电荷守恒定律',
+            desc: '电流连续性方程与电荷守恒',
+            knowledge: [
+                '<strong>电荷的分布形式</strong>：体电荷 ρ（C/m³）、面电荷 ρ<sub>s</sub>（C/m²）、线电荷 ρ<sub>l</sub>（C/m）、点电荷 q（C）',
+                '<strong>电流密度</strong>：J = ρv（A/m²），表示单位面积通过的电流；面电流密度 J<sub>s</sub> = ρ<sub>s</sub>v（A/m）',
+                '<strong>电荷守恒定律</strong>：封闭系统中总电荷保持不变，是电磁学的基本实验定律',
+                '<strong>电流连续性方程（积分形式）</strong>：∮ₛ J · dS = -d/dt ∫∫∫ᵥ ρ dV，表示流出闭合面的电流等于内部电荷的减少率',
+                '<strong>电流连续性方程（微分形式）</strong>：∇ · J + ∂ρ/∂t = 0，是电荷守恒的局部表达式',
+                '<strong>恒定电流条件</strong>：∇ · J = 0，表示电流线总是闭合的，无源无汇',
+                '<strong>恒定电流的物理意义</strong>：在直流电路中，电流处处相等，满足基尔霍夫电流定律'
+            ],
+            examples: [
+                {
+                    title: '例题 2.1',
+                    question: '已知导体中的电流密度 J = 10⁶ sin(10⁹t) e<sub>x</sub> A/m²，求电荷密度随时间的变化规律（设初始时刻 ρ = 0）。',
+                    solution: '<strong>第一步：应用电流连续性方程</strong><br>∇ · J + ∂ρ/∂t = 0<br><br><strong>第二步：计算散度</strong><br>∇ · J = ∂J<sub>x</sub>/∂x = 0（J 只与 t 有关）<br><br><strong>第三步：求解电荷密度</strong><br>∂ρ/∂t = 0 → ρ = 常数<br>由初始条件 ρ(0) = 0，得 <strong>ρ = 0</strong><br><br><strong>物理意义</strong>：在纯传导电流情况下，电荷密度为零，电流由电荷运动形成但局部电荷中性保持。'
+                },
+                {
+                    title: '例题 2.2',
+                    question: '在球形电容器两球壳间的介质中，电流密度 J = (k/r²) e<sub>r</sub>，验证该电流是否满足恒定电流条件。',
+                    solution: '<strong>在球坐标系中计算散度</strong>：<br>∇ · J = (1/r²) ∂(r²J<sub>r</sub>)/∂r<br>= (1/r²) ∂(r² · k/r²)/∂r<br>= (1/r²) ∂k/∂r = 0<br><br><strong>结论</strong>：<br>∇ · J = 0，满足恒定电流条件 ✓<br><br><strong>物理意义</strong>：电流从球壳均匀流出，通过不同半径球面的总电流 I = 4πk 为常数。'
+                }
+            ]
+        },
+        'ch2-2': {
+            chapter: '第2章 电磁场的基本规律',
+            title: '2.2 真空中静电场的基本规律',
+            desc: '库仑定律、电场强度、高斯定理',
+            knowledge: [
+                '<strong>库仑定律</strong>：F = (q₁q₂)/(4πε₀r²) e<sub>r</sub>，描述真空中两个点电荷之间的相互作用力',
+                '<strong>电场强度定义</strong>：E = F/q₀，单位正电荷所受的力，单位 V/m 或 N/C',
+                '<strong>点电荷电场</strong>：E = qR/(4πε₀R³) = q/(4πε₀r²) e<sub>r</sub>，方向沿径向',
+                '<strong>电场叠加原理</strong>：多个点电荷产生的电场等于各电荷产生电场的矢量和',
+                '<strong>电偶极子远区电场</strong>：E ≈ p/(4πε₀r³)(2cosθ e<sub>r</sub> + sinθ e<sub>θ</sub>)，其中 p = qd 为电偶极矩',
+                '<strong>静电场散度</strong>：∇ · E = ρ/ε₀，表示静电场是有源场，电荷是电场的源',
+                '<strong>静电场旋度</strong>：∇ × E = 0，表示静电场是无旋场，可引入电位',
+                '<strong>高斯定理（积分形式）</strong>：∮ₛ E · dS = Q/ε₀，通过闭合面的电通量等于内部总电荷除以 ε₀',
+                '<strong>高斯定理（微分形式）</strong>：∇ · E = ρ/ε₀，电场的散度与电荷密度成正比',
+                '<strong>静电场环路定理</strong>：∮ E · dl = 0，静电场是保守场，电场力做功与路径无关',
+                '<strong>泊松方程</strong>：∇²φ = -ρ/ε₀，描述有源区电位与电荷密度的关系，是静电场的基本微分方程',
+                '<strong>拉普拉斯方程</strong>：∇²φ = 0，描述无源区电位的分布，是泊松方程在 ρ = 0 时的特例'
+            ],
+            examples: [
+                {
+                    title: '例题 2.3',
+                    question: '求电偶极子 p = qd（沿z轴放置）在远区点 P(r, θ) 产生的电场强度。',
+                    solution: '<strong>电偶极子电位</strong>：<br>φ = (p · r)/(4πε₀r³) = (pcosθ)/(4πε₀r²)<br><br><strong>求电场（E = -∇φ）</strong>：<br>E<sub>r</sub> = -∂φ/∂r = 2pcosθ/(4πε₀r³)<br>E<sub>θ</sub> = -(1/r)∂φ/∂θ = psinθ/(4πε₀r³)<br><br><strong>结果</strong>：<br><strong>E = p/(4πε₀r³)(2cosθ e<sub>r</sub> + sinθ e<sub>θ</sub>)</strong><br><br><strong>特点</strong>：电场与 r³ 成反比，具有轴对称性。'
+                },
+                {
+                    title: '例题 2.4',
+                    question: '用高斯定理求均匀带电球面（半径 R，面电荷密度 ρ<sub>s</sub>）内外的电场分布。',
+                    solution: '<strong>球外 (r > R)</strong>：<br>由高斯定理 ∮ E · dS = Q/ε₀<br>E · 4πr² = 4πR²ρₛ/ε₀<br><strong>E = ρ<sub>s</sub>R²/(ε₀r²) e<sub>r</sub> = Q/(4πε₀r²) e<sub>r</sub></strong><br><br><strong>球内 (r < R)</strong>：<br>高斯面内无电荷，Q = 0<br><strong>E = 0</strong><br><br><strong>结论</strong>：均匀带电球面外电场等效于点电荷，球内电场为零。'
+                }
+            ]
+        },
+        'ch2-3': {
+            chapter: '第2章 电磁场的基本规律',
+            title: '2.3 真空中恒定磁场的基本规律',
+            desc: '安培力定律、毕奥-萨伐尔定律、安培环路定理',
+            knowledge: [
+                '<strong>安培力定律</strong>：F = (μ₀/4π) ∮∮ (I₁dl₁ × (I₂dl₂ × R))/R³，描述电流回路间的相互作用力',
+                '<strong>磁感应强度定义</strong>：洛伦兹力 F = qv × B，单位特斯拉(T)或韦伯/平方米(Wb/m²)',
+                '<strong>毕奥-萨伐尔定律</strong>：dB = (μ₀Idl × R)/(4πR³)，电流元产生的磁场',
+                '<strong>恒定磁场散度</strong>：∇ · B = 0，表示磁场是无散场，不存在磁单极子（磁荷）',
+                '<strong>恒定磁场旋度</strong>：∇ × B = μ₀J，表示磁场是有旋场，电流是磁场的旋涡源',
+                '<strong>磁通连续性原理</strong>：∮ B · dS = 0，穿过任意闭合面的磁通量为零，磁感应线总是闭合的',
+                '<strong>安培环路定理（积分形式）</strong>：∮ B · dl = μ₀I，沿闭合路径的磁感应强度环流等于穿过路径的电流的 μ₀ 倍',
+                '<strong>安培环路定理（微分形式）</strong>：∇ × B = μ₀J，磁场的旋度与电流密度成正比',
+                '<strong>无限长直导线磁场</strong>：B = μ₀I/(2πr) e<sub>φ</sub>，方向沿圆周切向，与距离成反比',
+                '<strong>圆环电流轴线磁场</strong>：B = μ₀IR²/[2(R²+z²)^(3/2)]，在圆心处 B = μ₀I/(2R)'
+            ],
+            examples: [
+                {
+                    title: '例题 2.5',
+                    question: '用毕奥-萨伐尔定律求无限长直导线（电流 I）在距离 r 处产生的磁感应强度。',
+                    solution: '<strong>建立坐标系</strong>：导线沿z轴，场点在x轴上<br><br><strong>电流元贡献</strong>：<br>dB = (μ₀Idl × R)/(4πR³)<br>|dl × R| = dz · r（垂直关系）<br><br><strong>积分</strong>：<br>B = ∫[-∞,+∞] (μ₀Irdz)/[4π(r²+z²)^(3/2)]<br>= (μ₀Ir/4π) · [z/(r²√(r²+z²))]|[-∞,+∞]<br><br><strong>结果</strong>：<br><strong>B = μ₀I/(2πr) e<sub>φ</sub></strong><br>方向由右手定则确定。'
+                },
+                {
+                    title: '例题 2.6',
+                    question: '用安培环路定理求无限长直螺线管（单位长度匝数 n，电流 I）内部的磁场。',
+                    solution: '<strong>选择矩形安培环路</strong>：一边在管内平行于轴线，一边在管外<br><br><strong>应用安培环路定理</strong>：<br>∮ B · dl = B · L + 0 + 0 + 0 = μ₀ · nL · I<br><br><strong>结果</strong>：<br><strong>B = μ₀nI</strong>（管内，均匀磁场）<br><br><strong>管外</strong>：B = 0（理想无限长螺线管）<br><br><strong>特点</strong>：内部磁场均匀，与位置无关。'
+                }
+            ]
+        },
+        'ch2-4': {
+            chapter: '第2章 电磁场的基本规律',
+            title: '2.4 媒质的电磁特性',
+            desc: '电介质的极化、磁介质的磁化、导电媒质',
+            knowledge: [
+                '<strong>电介质极化</strong>：在外电场作用下，束缚电荷发生位移，产生宏观电偶极矩',
+                '<strong>极化强度 P</strong>：单位体积内的电偶极矩，P = lim(ΔV→0) Σpᵢ/ΔV',
+                '<strong>极化电荷体密度</strong>：ρ<sub>p</sub> = -∇ · P，极化产生的束缚电荷',
+                '<strong>极化电荷面密度</strong>：ρ<sub>sp</sub> = P · e<sub>n</sub>，表面极化电荷',
+                '<strong>电位移矢量 D</strong>：D = ε₀E + P，辅助场量，单位为 C/m²',
+                '<strong>线性各向同性介质</strong>：P = ε₀χ<sub>e</sub>E，其中 χ<sub>e</sub> 为电极化率',
+                '<strong>介电常数</strong>：D = εE = ε₀ε<sub>r</sub>E，ε<sub>r</sub> = 1 + χ<sub>e</sub> 为相对介电常数',
+                '<strong>磁介质磁化</strong>：在外磁场作用下，分子磁矩取向排列，产生宏观磁矩',
+                '<strong>磁化强度 M</strong>：单位体积内的磁偶极矩',
+                '<strong>磁化电流体密度</strong>：J<sub>m</sub> = ∇ × M，磁化产生的束缚电流',
+                '<strong>磁化面电流密度</strong>：J<sub>sm</sub> = M × e<sub>n</sub>，表面磁化电流',
+                '<strong>磁场强度 H</strong>：H = B/μ₀ - M，辅助场量，单位为 A/m',
+                '<strong>线性各向同性磁介质</strong>：B = μH = μ₀μ<sub>r</sub>H，μ<sub>r</sub> = 1 + χ<sub>m</sub> 为相对磁导率',
+                '<strong>欧姆定律微分形式</strong>：J = σE，电流密度与电场强度成正比，σ 为电导率',
+                '<strong>焦耳定律</strong>：p = J · E = σE²，单位体积的功率损耗（热功率密度）'
+            ],
+            examples: [
+                {
+                    title: '例题 2.7',
+                    question: '在均匀极化的电介质球（极化强度 P）中，求极化电荷分布。',
+                    solution: '<strong>体极化电荷</strong>：<br>ρ<sub>p</sub> = -∇ · P = 0（均匀极化，P为常数）<br><br><strong>面极化电荷</strong>：<br>ρ<sub>sp</sub> = P · e<sub>n</sub> = Pcosθ<br>其中 θ 为极化方向与表面法向的夹角<br><br><strong>分布特点</strong>：<br>- θ = 0（右极）：ρ<sub>sp</sub> = P（最大正电荷）<br>- θ = π/2（赤道）：ρ<sub>sp</sub> = 0<br>- θ = π（左极）：ρ<sub>sp</sub> = -P（最大负电荷）<br><br><strong>结论</strong>：极化电荷只分布在表面，呈余弦分布。'
+                },
+                {
+                    title: '例题 2.8',
+                    question: '铜导线（电导率 σ = 5.8×10⁷ S/m）中电场强度 E = 0.01 V/m，求电流密度和功率损耗密度。',
+                    solution: '<strong>第一步：求电流密度</strong><br>J = σE = 5.8×10⁷ × 0.01<br>= <strong>5.8×10⁵ A/m²</strong><br><br><strong>第二步：求功率损耗密度</strong><br>p = J · E = σE² = 5.8×10⁷ × (0.01)²<br>= <strong>5.8×10³ W/m³</strong><br><br><strong>或</strong>：p = J²/σ = (5.8×10⁵)²/(5.8×10⁷) = 5.8×10³ W/m³ ✓'
+                }
+            ]
+        },
+        'ch2-5': {
+            chapter: '第2章 电磁场的基本规律',
+            title: '2.5 电磁感应定律和位移电流',
+            desc: '法拉第定律、感应电场、位移电流假说',
+            knowledge: [
+                '<strong>法拉第电磁感应定律（积分形式）</strong>：∮ E · dl = -dΦ/dt = -∂/∂t ∫ B · dS，闭合回路中的感应电动势等于穿过回路的磁通量变化率的负值',
+                '<strong>法拉第电磁感应定律（微分形式）</strong>：∇ × E = -∂B/∂t，时变电场是有旋场',
+                '<strong>感应电场（涡旋电场）</strong>：由变化的磁场产生，不是保守场，∇ × E = -∂B/∂t ≠ 0',
+                '<strong>动生电动势</strong>：导体在恒定磁场中运动产生的电动势，ε = ∮ (v × B) · dl',
+                '<strong>感生电动势</strong>：导体静止，由变化磁场产生的电动势，ε = -∫∫ (∂B/∂t) · dS',
+                '<strong>位移电流假说</strong>：J<sub>d</sub> = ∂D/∂t，变化的电场等效为一种电流',
+                '<strong>全电流定律</strong>：∇ × H = J + ∂D/∂t = J + J<sub>d</sub>，传导电流与位移电流共同产生磁场',
+                '<strong>位移电流与传导电流的区别</strong>：位移电流不产生焦耳热，可在真空中存在；传导电流是电荷运动，产生焦耳热',
+                '<strong>时变场的相互激发</strong>：变化的电场产生磁场，变化的磁场产生电场，形成电磁波'
+            ],
+            examples: [
+                {
+                    title: '例题 2.9',
+                    question: '圆形平行板电容器（半径 R）充电时，极板间电场 E = E₀sin(ωt)，求位移电流密度和磁场分布。',
+                    solution: '<strong>位移电流密度</strong>：<br>J<sub>d</sub> = ∂D/∂t = ε₀∂E/∂t = ε₀E₀ωcos(ωt)<br><br><strong>求磁场（安培环路定理）</strong>：<br>在极板间取半径为 r 的圆形环路<br>∮ H · dl = ∫ J<sub>d</sub> · dS<br><br><strong>情况一：r ≤ R（极板内部）</strong><br>H · 2πr = J<sub>d</sub> · πr² = ε₀E₀ωcos(ωt) · πr²<br><strong>H = (ε₀E₀ωr/2)cos(ωt) e<sub>φ</sub></strong><br><strong>B = μ₀H = (μ₀ε₀E₀ωr/2)cos(ωt) e<sub>φ</sub></strong><br><br><strong>情况二：r > R（极板外部）</strong><br>位移电流仅存在于极板面积 πR² 内<br>H · 2πr = J<sub>d</sub> · πR² = ε₀E₀ωcos(ωt) · πR²<br><strong>H = (ε₀E₀ωR²/(2r))cos(ωt) e<sub>φ</sub></strong><br><strong>B = μ₀H = (μ₀ε₀E₀ωR²/(2r))cos(ωt) e<sub>φ</sub></strong><br><br><strong>特点</strong>：极板内磁场与 r 成正比，极板外与 r 成反比，呈涡旋分布。'
+                },
+                {
+                    title: '例题 2.10',
+                    question: '长直导线（电流 I = I₀cos(ωt)）旁有一矩形线圈（宽 a，长 b，距离导线 r），求线圈中的感应电动势。',
+                    solution: '<strong>第一步：求磁通量</strong><br>导线产生的磁场 B = μ₀I/(2πx)<br>Φ = ∫[r,r+a] (μ₀I/(2πx))b dx<br>= (μ₀Ib/2π)ln[(r+a)/r]<br><br><strong>第二步：求感应电动势</strong><br>ε = -dΦ/dt = -(μ₀b/2π)ln[(r+a)/r] · dI/dt<br><br><strong>结果</strong>：<br><strong>ε = (μ₀bωI₀/2π)ln[(r+a)/r]sin(ωt)</strong><br><br>感应电动势随时间正弦变化，与线圈位置有关。'
+                }
+            ]
+        },
+        'ch2-6': {
+            chapter: '第2章 电磁场的基本规律',
+            title: '2.6 麦克斯韦方程组',
+            desc: '电磁场的基本方程组',
+            knowledge: [
+                '<strong>麦克斯韦方程组（积分形式）</strong>：<br>① ∮ H · dl = ∫(J + ∂D/∂t) · dS — 全电流定律<br>② ∮ E · dl = -∫(∂B/∂t) · dS — 法拉第电磁感应定律<br>③ ∮ B · dS = 0 — 磁通连续性原理<br>④ ∮ D · dS = ∫ρ dV — 高斯电通定理',
+                '<strong>麦克斯韦方程组（微分形式）</strong>：<br>① ∇ × H = J + ∂D/∂t<br>② ∇ × E = -∂B/∂t<br>③ ∇ · B = 0<br>④ ∇ · D = ρ',
+                '<strong>本构关系</strong>：<br>D = εE，B = μH，J = σE<br>描述媒质中电磁场量之间的关系',
+                '<strong>方程组的物理意义</strong>：方程①②描述场的旋度（涡旋特性），方程③④描述场的散度（源特性）',
+                '<strong>时变电磁场的耦合</strong>：变化的电场产生磁场，变化的磁场产生电场，形成自维持的电磁场',
+                '<strong>准静态近似</strong>：当频率较低时，可忽略某些时间导数项，简化计算',
+                '<strong>电准静态场（EQS）</strong>：忽略 ∂B/∂t，电场近似无旋，满足 ∇ × E ≈ 0',
+                '<strong>磁准静态场（MQS）</strong>：忽略 ∂D/∂t，满足 ∇ × H ≈ J',
+                '<strong>低频电路近似</strong>：准静态条件下，电路理论中的基尔霍夫定律成立'
+            ],
+            examples: [
+                {
+                    title: '例题 2.11',
+                    question: '在无源自由空间（ρ = 0, J = 0）中，验证 E = E₀cos(ωt - kz)e<sub>x</sub>，H = (kE₀/ωμ₀)cos(ωt - kz)e<sub>y</sub> 满足麦克斯韦方程组（设 k² = ω²μ₀ε₀）。',
+                    solution: '<strong>验证方程②（法拉第定律）</strong>：<br>∇ × E = -∂E<sub>x</sub>/∂z e<sub>y</sub> = -kE₀sin(ωt-kz)e<sub>y</sub><br>-∂B/∂t = -μ₀∂H/∂t = (kE₀ω/ω)sin(ωt-kz)e<sub>y</sub><br>= kE₀sin(ωt-kz)e<sub>y</sub> ✓<br><br><strong>验证方程①（全电流定律）</strong>：<br>∇ × H = ∂H<sub>y</sub>/∂z e<sub>x</sub> = -(k²E₀/ωμ₀)sin(ωt-kz)e<sub>x</sub><br>∂D/∂t = -ε₀ωE₀sin(ωt-kz)e<sub>x</sub><br>由 k² = ω²μ₀ε₀，两边相等 ✓<br><br><strong>结论</strong>：该电磁波解满足麦克斯韦方程组。'
+                },
+                {
+                    title: '例题 2.12',
+                    question: '在良导体（σ >> ωε）中，证明位移电流可以忽略，并导出准静态近似下的磁场方程。',
+                    solution: '<strong>比较传导电流与位移电流</strong>：<br>J = σE，J<sub>d</sub> = ∂D/∂t = jωεE<br>|J<sub>d</sub>/J| = ωε/σ << 1（良导体条件）<br><br><strong>准静态近似</strong>：<br>∇ × H ≈ J = σE<br>∇ × E = -∂B/∂t<br><br><strong>消去 E</strong>：<br>∇ × (∇ × H) = σ∇ × E = -σ∂B/∂t<br>∇(∇ · H) - ∇²H = -σμ∂H/∂t<br><br><strong>结果</strong>：<br><strong>∇²H = σμ∂H/∂t</strong>（扩散方程）<br>描述磁场在导体中的扩散过程。'
+                }
+            ]
+        },
+        'ch2-7': {
+            chapter: '第2章 电磁场的基本规律',
+            title: '2.7 电磁场的边界条件',
+            desc: '不同媒质分界面上电磁场的连续性条件',
+            knowledge: [
+                '<strong>边界条件的一般形式</strong>：<br>e<sub>n</sub> × (H₁ - H₂) = J<sub>s</sub> — 磁场切向不连续<br>e<sub>n</sub> × (E₁ - E₂) = 0 — 电场切向连续<br>e<sub>n</sub> · (B₁ - B₂) = 0 — 磁感应强度法向连续<br>e<sub>n</sub> · (D₁ - D₂) = ρ<sub>s</sub> — 电位移法向不连续',
+                '<strong>理想介质分界面</strong>（J<sub>s</sub> = 0, ρ<sub>s</sub> = 0）：<br>H₁<sub>t</sub> = H₂<sub>t</sub>，E₁<sub>t</sub> = E₂<sub>t</sub>，B₁<sub>n</sub> = B₂<sub>n</sub>，D₁<sub>n</sub> = D₂<sub>n</sub><br>切向场和法向场均连续',
+                '<strong>理想导体表面</strong>（内部场为0）：<br>e<sub>n</sub> × E₁ = 0 — 电场切向为0<br>e<sub>n</sub> × H₁ = J<sub>s</sub> — 磁场切向等于面电流<br>e<sub>n</sub> · B₁ = 0 — 磁场法向为0<br>e<sub>n</sub> · D₁ = ρ<sub>s</sub> — 电位移法向等于面电荷',
+                '<strong>折射定律</strong>：tanθ₁/tanθ₂ = ε₁/ε₂（电场），tanθ₁/tanθ₂ = μ₁/μ₂（磁场）',
+                '<strong>边界条件的物理意义</strong>：保证电磁场方程在边界处的连续性和唯一性',
+                '<strong>实际应用</strong>：分析电磁波反射折射、导体表面电流分布、电容器边缘效应等'
+            ],
+            examples: [
+                {
+                    title: '例题 2.13',
+                    question: '两种理想介质（ε₁, ε₂）分界面上无自由电荷，电场在介质1中与法向夹角为 θ₁，求介质2中的电场方向。',
+                    solution: '<strong>应用边界条件</strong>：<br>E₁ₜ = E₂ₜ → E₁sinθ₁ = E₂sinθ₂<br>D₁ₙ = D₂ₙ → ε₁E₁cosθ₁ = ε₂E₂cosθ₂<br><br><strong>两式相除</strong>：<br>tanθ₁/ε₁ = tanθ₂/ε₂<br><br><strong>结果</strong>：<br><strong>tanθ₂ = (ε₂/ε₁)tanθ₁</strong><br><br><strong>讨论</strong>：<br>- 若 ε₂ > ε₁，则 θ₂ > θ₁，电场偏离法向<br>- 若 ε₂ < ε₁，则 θ₂ < θ₁，电场靠近法向'
+                },
+                {
+                    title: '例题 2.14',
+                    question: '理想导体平板上方有均匀电场 E = E₀e<sub>y</sub> 和磁场 H = H₀e<sub>x</sub>，求导体表面的面电荷密度和面电流密度。',
+                    solution: '<strong>面电荷密度</strong>：<br>由 e<sub>n</sub> · D = ρ<sub>s</sub>，e<sub>n</sub> = -e<sub>y</sub>（指向导体外部）<br>D = ε₀E = ε₀E₀e<sub>y</sub><br>ρ<sub>s</sub> = (-e<sub>y</sub>) · (ε₀E₀e<sub>y</sub>) = <strong>-ε₀E₀</strong><br><br><strong>面电流密度</strong>：<br>由 e<sub>n</sub> × H = J<sub>s</sub><br>(-e<sub>y</sub>) × (H₀e<sub>x</sub>) = -H₀(e<sub>y</sub> × e<sub>x</sub>) = -H₀(-e<sub>z</sub>) = H₀e<sub>z</sub><br><strong>J<sub>s</sub> = H₀e<sub>z</sub></strong><br><br><strong>物理意义</strong>：导体表面感应出面电荷和面电流，使内部场为零。'
+                }
+            ]
+        },
+        'ch3-1': {
+            chapter: '第3章 静态电磁场及其边值问题的解',
+            title: '3.1 静电场分析',
+            desc: '静电场基本方程、电位函数、泊松方程',
+            knowledge: [
+                '<strong>静电场基本方程（微分形式）</strong>：∇ × E = 0，∇ · D = ρ；<strong>（积分形式）</strong>：∮ E · dl = 0，∮ D · dS = Q',
+                '<strong>电位函数</strong>：E = -∇φ，静电场是无旋场，可引入标量电位 φ 描述电场',
+                '<strong>泊松方程</strong>：∇²φ = -ρ/ε，描述有源区域的电位分布，是静电场的基本微分方程',
+                '<strong>拉普拉斯方程</strong>：∇²φ = 0（无源区，ρ = 0），描述无自由电荷区域的电位分布',
+                '<strong>电位边界条件</strong>：φ₁ = φ₂（电位连续），ε₁(∂φ₁/∂n) = ε₂(∂φ₂/∂n)（电位移法向连续）',
+                '<strong>导体系统电容</strong>：C = q/U，表示导体储存电荷的能力，单位法拉(F)',
+                '<strong>静电场能量</strong>：W<sub>e</sub> = (1/2)∫ ρφ dV = (1/2)∫ E · D dV = (1/2)∫ εE² dV，表示电场储存的能量',
+                '<strong>静电力（虚位移法）</strong>：F = -∂W<sub>e</sub>/∂g|q=const 或 F = +∂W<sub>e</sub>/∂g|U=const，g 为广义坐标',
+                '<strong>电场力公式</strong>：F = qE（点电荷），F = ∫ ρE dV（体分布），f = ρE（力密度）'
+            ],
+            examples: [
+                {
+                    title: '例题 3.1',
+                    question: '平行板电容器（极板面积 S，间距 d，介电常数 ε），充电至电压 U，求：(1) 电容；(2) 储能；(3) 用虚位移法求极板间作用力。',
+                    solution: '<strong>(1) 电容</strong>：<br>E = U/d，D = εE = εU/d<br>Q = σS = DS = εUS/d<br><strong>C = Q/U = εS/d</strong><br><br><strong>(2) 储能</strong>：<br>W<sub>e</sub> = (1/2)CU² = <strong>(1/2)(εS/d)U²</strong><br>或 W<sub>e</sub> = (1/2)∫ εE² dV = (1/2)ε(U/d)² · Sd = (εSU²)/(2d)<br><br><strong>(3) 静电力（虚位移法）</strong>：<br>F = ∂W<sub>e</sub>/∂d|U = -(εSU²)/(2d²) = <strong>-(1/2)CU²/d</strong><br>负号表示吸引力，大小与 d² 成反比。'
+                },
+                {
+                    title: '例题 3.2',
+                    question: '已知导体球（半径 a）带电荷 Q，外包同心介质球壳（内半径 a，外半径 b，介电常数 ε），求：(1) 电位分布；(2) 系统电容。',
+                    solution: '<strong>(1) 电位分布</strong>：<br>由高斯定理，D<sub>r</sub> = Q/(4πr²)<br><br>区域 a < r < b（介质中）：<br>E<sub>r</sub> = D<sub>r</sub>/ε = Q/(4πεr²)<br>φ = ∫[r,∞] E dr = Q/(4πε)(1/r - 1/b) + Q/(4πε₀b)<br><br>区域 r > b（空气中）：<br>E<sub>r</sub> = Q/(4πε₀r²)<br>φ = Q/(4πε₀r)<br><br><strong>(2) 系统电容</strong>：<br>导体球电位：φ<sub>a</sub> = Q/(4πε)(1/a - 1/b) + Q/(4πε₀b)<br><strong>C = Q/φ<sub>a</sub> = 4π/[1/ε(1/a-1/b) + 1/(ε₀b)]</strong>'
+                }
+            ]
+        },
+        'ch3-2': {
+            chapter: '第3章 静态电磁场及其边值问题的解',
+            title: '3.2 导电媒质中的恒定电场分析',
+            desc: '恒定电场基本方程、电流连续性、电导计算',
+            knowledge: [
+                '<strong>恒定电场基本方程</strong>：∇ × E = 0（无旋），∇ · J = 0（无源），描述恒定电流产生的电场',
+                '<strong>电流连续性方程</strong>：∇ · J = 0，表示恒定电流的连续性，电流线闭合无中断',
+                '<strong>本构关系</strong>：J = σE，欧姆定律的微分形式，σ 为电导率（S/m）',
+                '<strong>电位满足拉普拉斯方程</strong>：∇²φ = 0（均匀导体中），恒定电场电位满足拉普拉斯方程',
+                '<strong>恒定电场与静电场的比拟</strong>：两种场都满足 ∇²φ = 0，边界条件形式相同，可用静电场方法求解恒定电场问题',
+                '<strong>比拟对应关系</strong>：E ↔ E，D ↔ J，ε ↔ σ，q ↔ I，C ↔ G（电导）',
+                '<strong>电导计算</strong>：G = I/U = σS/l（平行板），通过比拟法可由电容公式求电导',
+                '<strong>电阻计算</strong>：R = 1/G = U/I，单位欧姆(Ω)',
+                '<strong>边界条件</strong>：J₁ₙ = J₂ₙ（电流法向连续），E₁ₜ = E₂ₜ（电场切向连续）'
+            ],
+            examples: [
+                {
+                    title: '例题 3.3',
+                    question: '同轴电缆（内导体半径 a，外导体内半径 b，长 l，介质电导率 σ），求：(1) 绝缘电阻；(2) 漏电导。',
+                    solution: '<strong>方法一：直接积分</strong><br>设漏电流为 I，在半径 r 处电流密度：<br>J<sub>r</sub> = I/(2πrl)<br>E<sub>r</sub> = J<sub>r</sub>/σ = I/(2πσrl)<br><br>电压：<br>U = ∫[a,b] E<sub>r</sub> dr = I/(2πσl) · ln(b/a)<br><br><strong>(1) 绝缘电阻</strong>：<br><strong>R = U/I = ln(b/a)/(2πσl)</strong><br><br><strong>(2) 漏电导</strong>：<br><strong>G = 1/R = 2πσl/ln(b/a)</strong><br><br><strong>方法二：静电场比拟</strong><br>同轴电缆电容 C = 2πεl/ln(b/a)<br>比拟 C ↔ G，ε ↔ σ，得 G = 2πσl/ln(b/a) ✓'
+                },
+                {
+                    title: '例题 3.4',
+                    question: '半球形接地电极（半径 a）埋于地下（电导率 σ），求接地电阻。',
+                    solution: '<strong>分析</strong>：电流从半球流入大地，呈辐射状分布<br><br><strong>设电流为 I</strong>：<br>在半径 r 处（半球面面积 2πr²）：<br>J<sub>r</sub> = I/(2πr²)<br>E<sub>r</sub> = J<sub>r</sub>/σ = I/(2πσr²)<br><br><strong>电位（以无穷远为零电位）</strong>：<br>φ = ∫[a,∞] E<sub>r</sub> dr = I/(2πσa)<br><br><strong>接地电阻</strong>：<br><strong>R = φ/I = 1/(2πσa)</strong><br><br><strong>讨论</strong>：接地电阻与电极半径成反比，增大电极或改善土壤电导率可降低接地电阻。'
+                }
+            ]
+        },
+        'ch3-3': {
+            chapter: '第3章 静态电磁场及其边值问题的解',
+            title: '3.3 恒定磁场分析',
+            desc: '矢量磁位、电感、磁场能量',
+            knowledge: [
+                '<strong>恒定磁场基本方程</strong>：∇ · B = 0（无散），∇ × H = J（有旋），描述恒定电流产生的磁场',
+                '<strong>矢量磁位 A</strong>：B = ∇ × A，由于 ∇ · B = 0，可引入矢量磁位描述磁场',
+                '<strong>库仑规范</strong>：∇ · A = 0，简化矢量磁位的方程，使其满足泊松方程',
+                '<strong>矢量泊松方程</strong>：∇²A = -μJ，描述矢量磁位与电流源的关系',
+                '<strong>无限长直导线磁位</strong>：A = -(μI/2π)ln(r) e<sub>z</sub>，方向沿电流方向',
+                '<strong>电感定义</strong>：L = Ψ/I = (∮ A · dl)/I，表示线圈产生磁通的能力，单位亨利(H)',
+                '<strong>自感</strong>：线圈自身电流产生的磁链与电流之比，L = Ψ/I',
+                '<strong>互感</strong>：一个线圈电流在另一线圈产生的磁链与电流之比，M = Ψ₂₁/I₁ = Ψ₁₂/I₂',
+                '<strong>磁场能量</strong>：W<sub>m</sub> = (1/2)∫ A · J dV = (1/2)∫ H · B dV = (1/2)∫ μH² dV',
+                '<strong>磁场力（虚位移法）</strong>：F = +∂W<sub>m</sub>/∂g|I=const 或 F = -∂W<sub>m</sub>/∂g|Ψ=const',
+                '<strong>安培力</strong>：F = ∮ I dl × B（回路），f = J × B（体分布）'
+            ],
+            examples: [
+                {
+                    title: '例题 3.5',
+                    question: '求无限长直导线（电流 I）的矢量磁位 A（设 r = r₀ 处 A = 0）。',
+                    solution: '<strong>由安培环路定理</strong>：<br>B = μI/(2πr) e<sub>φ</sub><br><br><strong>由 B = ∇ × A</strong>：<br>在圆柱坐标系中，若 A = A<sub>z</sub>(r)e<sub>z</sub>：<br>B = -(dA<sub>z</sub>/dr)e<sub>φ</sub> = μI/(2πr)e<sub>φ</sub><br><br><strong>积分</strong>：<br>dA<sub>z</sub>/dr = -μI/(2πr)<br>A<sub>z</sub> = -(μI/2π)ln(r) + C<br><br><strong>由边界条件</strong> A(r₀) = 0：<br>C = (μI/2π)ln(r₀)<br><br><strong>结果</strong>：<br><strong>A = (μI/2π)ln(r₀/r) e<sub>z</sub></strong><br>方向与电流相同。'
+                },
+                {
+                    title: '例题 3.6',
+                    question: '同轴电缆（内导体半径 a，外导体内半径 b，外半径 c），求单位长度自感。',
+                    solution: '<strong>分三部分计算磁通</strong>：<br><br><strong>(1) 内导体中</strong>（r < a）：<br>H = Ir/(2πa²)<br>Ψ₁ = ∫[0,a] μ₀Ir²/(2πa²) dr = μ₀I/(8π)<br><br><strong>(2) 绝缘层中</strong>（a < r < b）：<br>H = I/(2πr)<br>Ψ₂ = ∫[a,b] μI/(2πr) dr = (μI/2π)ln(b/a)<br><br><strong>(3) 外导体中</strong>（b < r < c）：<br>外导体电流密度 J = -I/[π(c²-b²)]（方向与内导体相反）<br>由安培环路定理：H · 2πr = I - I(r²-b²)/(c²-b²)<br>H = I(c²-r²)/[2πr(c²-b²)]<br>Ψ₃ = ∫[b,c] μ₀IH(c²-r²)/[2πr(c²-b²)] dr<br>= (μ₀I/2π)[c²/(c²-b²)·ln(c/b) - 1/2]<br><br><strong>单位长度自感</strong>：<br><strong>L = (Ψ₁+Ψ₂+Ψ₃)/I = μ₀/(8π) + (μ/2π)ln(b/a) + (μ₀/2π)[c²/(c²-b²)·ln(c/b) - 1/2]</strong><br>第一项为内导体电感，第二项为主电感，第三项为外导体电感。'
+                }
+            ]
+        },
+        'ch3-4': {
+            chapter: '第3章 静态电磁场及其边值问题的解',
+            title: '3.4 静态场的边值问题及解的唯一性定理',
+            desc: '边值问题分类、唯一性定理',
+            knowledge: [
+                '<strong>边值问题</strong>：在给定区域内求解满足微分方程和边界条件的场函数',
+                '<strong>第一类边值问题（狄利克雷问题）</strong>：给定边界上的电位值 φ|ₛ = f₁(S)，如已知导体表面电位',
+                '<strong>第二类边值问题（诺伊曼问题）</strong>：给定边界上电位的法向导数 ∂φ/∂n|ₛ = f₂(S)，如已知表面电荷分布',
+                '<strong>第三类边值问题（混合问题）</strong>：部分边界给电位，部分边界给电位法向导数',
+                '<strong>唯一性定理</strong>：满足泊松方程（或拉普拉斯方程）和给定边界条件的解是唯一的',
+                '<strong>唯一性定理证明思路</strong>：假设有两个解 φ₁ 和 φ₂，令 Φ = φ₁ - φ₂，则 Φ 满足拉普拉斯方程和齐次边界条件，由格林定理可证 Φ = 0',
+                '<strong>唯一性定理的意义</strong>：① 保证解的唯一性；② 允许用不同方法求解；③ 验证解的正确性；④ 镜像法等效的理论基础',
+                '<strong>应用条件</strong>：适用于静电场、恒定电场、恒定磁场等静态场问题'
+            ],
+            examples: [
+                {
+                    title: '例题 3.7',
+                    question: '证明：在区域 V 内满足 ∇²φ = 0，在边界 S 上满足 φ|ₛ = 0 的唯一解是 φ ≡ 0。',
+                    solution: '<strong>应用格林第一恒等式</strong>：<br>∫∫∫ᵥ (φ∇²φ + |∇φ|²) dV = ∮ₛ φ(∂φ/∂n) dS<br><br><strong>代入条件</strong>：<br>∇²φ = 0（在 V 内）<br>φ = 0（在 S 上）<br><br><strong>得</strong>：<br>∫∫∫ᵥ |∇φ|² dV = 0<br><br><strong>因为 |∇φ|² ≥ 0</strong>，所以 ∇φ = 0<br>即 φ = 常数<br><br>又 φ|ₛ = 0，故 <strong>φ ≡ 0</strong><br><br><strong>证毕</strong> ✓'
+                },
+                {
+                    title: '例题 3.8',
+                    question: '已知导体球壳（内半径 a，外半径 b）内无电荷，内表面电位为 0，外表面电位为 U₀，求球壳内的电位分布。',
+                    solution: '<strong>分析</strong>：球对称，φ 只与 r 有关<br><br><strong>拉普拉斯方程</strong>（球坐标）：<br>(1/r²)d(r²dφ/dr)/dr = 0<br><br><strong>通解</strong>：<br>φ = C₁/r + C₂<br><br><strong>应用边界条件</strong>：<br>φ(a) = 0：C₁/a + C₂ = 0<br>φ(b) = U₀：C₁/b + C₂ = U₀<br><br><strong>解得</strong>：<br>C₁ = abU₀/(a-b)，C₂ = -bU₀/(a-b)<br><br><strong>结果</strong>：<br><strong>φ = (bU₀/(b-a))(1 - a/r)</strong><br><br>验证：满足拉普拉斯方程和边界条件，由唯一性定理，此解唯一。'
+                }
+            ]
+        },
+        'ch3-5': {
+            chapter: '第3章 静态电磁场及其边值问题的解',
+            title: '3.5 镜像法',
+            desc: '用镜像电荷/电流等效边界',
+            knowledge: [
+                '<strong>镜像法基本思想</strong>：用位于边界外的镜像电荷（或电流）等效边界上感应电荷（或电流）的作用，将复杂边界问题转化为无界空间问题',
+                '<strong>接地导体平面镜像（点电荷）</strong>：镜像电荷 q\' = -q，位于对称位置，距离平面相等',
+                '<strong>接地导体平面镜像（线电荷）</strong>：镜像线电荷 ρ<sub>l</sub>\' = -ρ<sub>l</sub>，位于对称位置',
+                '<strong>导体球面镜像</strong>：点电荷 q 距球心 d，镜像电荷 q\' = -qa/d，位于距球心 a²/d 处（a 为球半径）',
+                '<strong>导体圆柱面镜像（线电荷）</strong>：线电荷 ρ<sub>l</sub> 距轴心 d，镜像线电荷 ρ<sub>l</sub>\' = -ρ<sub>l</sub>，位于 a²/d 处（a 为柱半径）',
+                '<strong>介质平面镜像</strong>：点电荷在介质分界面上方，上下方各有一个镜像电荷，大小由介电常数比确定',
+                '<strong>镜像法适用条件</strong>：边界为无限大平面、球面、圆柱面等规则形状',
+                '<strong>镜像法的关键</strong>：保持原区域方程不变，边界条件满足，由唯一性定理保证解的正确性'
+            ],
+            examples: [
+                {
+                    title: '例题 3.9',
+                    question: '点电荷 q 位于接地导体平面上方 h 处，求：(1) 镜像电荷；(2) 导体表面感应电荷密度分布。',
+                    solution: '<strong>(1) 镜像电荷</strong>：<br>由对称性，镜像电荷 q\' = -q<br>位于平面下方 h 处（对称位置）<br><br><strong>(2) 感应电荷密度</strong>：<br>导体表面电场只有法向分量：<br>E<sub>n</sub> = -2qh/[4πε₀(h² + r²)^(3/2)]<br>（r 为到电荷垂足的距离）<br><br>σ = ε₀E<sub>n</sub> = <strong>-qh/[2π(h² + r²)^(3/2)]</strong><br><br><strong>验证</strong>：总感应电荷 = ∫ σ dS = -q ✓'
+                },
+                {
+                    title: '例题 3.10',
+                    question: '接地导体球（半径 a）外有点电荷 q，距球心 d（d > a），求：(1) 镜像电荷位置和大小；(2) 球外电位分布。',
+                    solution: '<strong>(1) 镜像电荷</strong>：<br>位置：d\' = a²/d（在球内，距球心）<br>大小：q\' = -qa/d<br><br><strong>(2) 球外电位</strong>：<br>φ = q/(4πε₀r₁) + q\'/(4πε₀r₂)<br>其中 r₁ 为到场点的距离（从 q），r₂ 为从 q\' 到场点的距离<br><br><strong>展开</strong>：<br><strong>φ = (1/4πε₀)[q/√(r²+d²-2rdcosθ) - (qa/d)/√(r²+(a²/d)²-2r(a²/d)cosθ)]</strong><br><br>验证：r = a 时，φ = 0，满足接地条件。'
+                }
+            ]
+        },
+        'ch3-6': {
+            chapter: '第3章 静态电磁场及其边值问题的解',
+            title: '3.6 分离变量法',
+            desc: '把偏微分方程分解为常微分方程',
+            knowledge: [
+                '<strong>分离变量法基本思想</strong>：假设解可表示为各坐标函数乘积的形式 φ(x,y,z) = X(x)Y(y)Z(z)，将偏微分方程分解为多个常微分方程',
+                '<strong>直角坐标系分离变量</strong>：设 φ = X(x)Y(y)，代入 ∇²φ = 0 得：(1/X)d²X/dx² + (1/Y)d²Y/dy² = 0，各项等于常数',
+                '<strong>分离常数</strong>：令 (1/X)d²X/dx² = -k²，(1/Y)d²Y/dy² = k²，得到两个常微分方程',
+                '<strong>通解形式</strong>：X(x) = Acos(kx) + Bsin(kx) 或 Ae^(kx) + Be^(-kx)，取决于边界条件',
+                '<strong>圆柱坐标系分离变量</strong>：设 φ = R(r)Φ(φ)，得到贝塞尔方程和三角函数方程',
+                '<strong>球坐标系分离变量</strong>：设 φ = R(r)Θ(θ)Φ(φ)，得到球贝塞尔方程、勒让德方程等',
+                '<strong>分离变量法步骤</strong>：① 选择坐标系；② 设分离变量形式；③ 代入方程分离；④ 求解常微分方程；⑤ 叠加通解；⑥ 由边界条件定系数',
+                '<strong>适用条件</strong>：边界与坐标面重合，边界条件可分离'
+            ],
+            examples: [
+                {
+                    title: '例题 3.11',
+                    question: '矩形区域（0≤x≤a，0≤y≤b）边界条件：x=0,a 时 φ=0；y=0 时 φ=0；y=b 时 φ=U₀sin(πx/a)，求区域内电位分布。',
+                    solution: '<strong>第一步：分离变量</strong><br>设 φ = X(x)Y(y)，代入 ∇²φ = 0：<br>X\'\'/X + Y\'\'/Y = 0<br><br><strong>第二步：求解 X(x)</strong><br>由 x=0,a 时 φ=0，得：<br>X(x) = sin(nπx/a)，n=1,2,3,...<br><br><strong>第三步：求解 Y(y)</strong><br>Y\'\' - (nπ/a)²Y = 0<br>Y(y) = Csinh(nπy/a)（满足 Y(0)=0）<br><br><strong>第四步：叠加并定系数</strong><br>φ = Σ Cₙsin(nπx/a)sinh(nπy/a)<br>由 y=b 时 φ=U₀sin(πx/a)，得 n=1，C₁=U₀/sinh(πb/a)<br><br><strong>结果</strong>：<br><strong>φ = U₀sin(πx/a)sinh(πy/a)/sinh(πb/a)</strong>'
+                },
+                {
+                    title: '例题 3.12',
+                    question: '无限长导体圆筒（半径 a）分成两半，上半电位 U₀，下半电位 -U₀，求筒内电位分布。',
+                    solution: '<strong>分析</strong>：轴对称问题，φ 与 z 无关，用圆柱坐标<br><br><strong>分离变量</strong>：φ = R(r)Φ(φ)<br>Φ方程：Φ\'\' + n²Φ = 0 → Φ = cos(nφ) 或 sin(nφ)<br>R方程：r²R\'\' + rR\' - n²R = 0 → R = rⁿ（r=0 有限）<br><br><strong>通解</strong>：<br>φ = Σ rⁿ(Aₙcos(nφ) + Bₙsin(nφ))<br><br><strong>由边界条件</strong> r=a：<br>φ(a,φ) = U₀（0<φ<π），-U₀（π<φ<2π）<br>这是奇函数，只有正弦项<br><br><strong>结果</strong>：<br><strong>φ = (4U₀/π)Σ[(r/a)ⁿ/n]sin(nφ)</strong>（n为奇数）'
+                }
+            ]
+        },
+        'ch3-7': {
+            chapter: '第3章 静态电磁场及其边值问题的解',
+            title: '3.7 有限差分法',
+            desc: '用差分近似微分、数值计算',
+            knowledge: [
+                '<strong>有限差分法基本思想</strong>：用差商近似代替微商，将微分方程转化为代数方程组，通过数值计算求解',
+                '<strong>一阶差分近似</strong>：∂φ/∂x ≈ (φ(x+h) - φ(x))/h（前向），≈ (φ(x) - φ(x-h))/h（后向），≈ (φ(x+h) - φ(x-h))/(2h)（中心）',
+                '<strong>二阶差分近似</strong>：∂²φ/∂x² ≈ (φ(x+h) - 2φ(x) + φ(x-h))/h²',
+                '<strong>五点差分格式（拉普拉斯方程）</strong>：<br>φ(i,j) = (1/4)[φ(i+1,j) + φ(i-1,j) + φ(i,j+1) + φ(i,j-1)]<br>即中心点电位等于四邻点电位的平均值',
+                '<strong>网格划分</strong>：将求解区域划分为矩形网格，节点处求近似解',
+                '<strong>边界条件处理</strong>：边界节点直接赋已知值，或用最接近的网格点近似',
+                '<strong>迭代求解方法</strong>：<br>① 雅可比迭代：同时更新所有内点<br>② 高斯-赛德尔迭代：使用最新值更新，收敛更快<br>③ 超松弛迭代(SOR)：加速收敛',
+                '<strong>收敛判据</strong>：|φ⁽ᵏ⁺¹⁾ - φ⁽ᵏ⁾| < ε（预设精度）',
+                '<strong>有限差分法特点</strong>：适用于任意形状边界，编程实现简单，是工程中最常用的数值方法之一'
+            ],
+            examples: [
+                {
+                    title: '例题 3.13',
+                    question: '用五点差分格式写出正方形区域（边长为 h）中心节点 φ₀ 与四邻点 φ₁,φ₂,φ₃,φ₄ 的关系式。',
+                    solution: '<strong>拉普拉斯方程</strong>：∇²φ = ∂²φ/∂x² + ∂²φ/∂y² = 0<br><br><strong>二阶差分近似</strong>：<br>∂²φ/∂x² ≈ (φ₁ - 2φ₀ + φ₃)/h²<br>∂²φ/∂y² ≈ (φ₂ - 2φ₀ + φ₄)/h²<br><br><strong>代入方程</strong>：<br>(φ₁ - 2φ₀ + φ₃)/h² + (φ₂ - 2φ₀ + φ₄)/h² = 0<br><br><strong>整理得五点差分格式</strong>：<br><strong>φ₀ = (1/4)(φ₁ + φ₂ + φ₃ + φ₄)</strong><br><br><strong>物理意义</strong>：无源区域任一点电位等于周围四点电位的平均值。'
+                },
+                {
+                    title: '例题 3.14',
+                    question: '正方形区域（0≤x≤1，0≤y≤1），边界电位：x=0 时 φ=0；x=1 时 φ=100；y=0 和 y=1 时 φ=0。用简单迭代法（h=0.25）求内部节点电位（迭代一次）。',
+                    solution: '<strong>网格划分</strong>：h=0.25，内部节点 3×3 共9点<br><br><strong>初始值</strong>：设所有内点 φ⁽⁰⁾ = 0<br><br><strong>第一次迭代</strong>（雅可比）：<br>φ₁⁽¹⁾ = (1/4)(0 + 0 + 0 + 0) = 0<br>φ₂⁽¹⁾ = (1/4)(0 + 0 + 0 + 0) = 0<br>φ₃⁽¹⁾ = (1/4)(100 + 0 + 0 + 0) = 25<br>...<br><br><strong>结果</strong>（第一行）：<br>φ(0.25,0.75) ≈ 0<br>φ(0.50,0.75) ≈ 0<br>φ(0.75,0.75) ≈ 25<br><br><strong>继续迭代</strong>直至收敛，最终得到精确数值解。'
+                }
+            ]
+        },
+        'ch4-1': {
+            chapter: '第4章 时变电磁场',
+            title: '4.1 波动方程',
+            desc: '无源理想介质中的波动方程、波速',
+            knowledge: [
+                '<strong>波动方程推导</strong>：由麦克斯韦方程组消去 E 或 H，得到二阶偏微分方程，描述电磁波的传播特性',
+                '<strong>无源理想介质中电场波动方程</strong>：∇²E - με(∂²E/∂t²) = 0，电场满足波动方程',
+                '<strong>无源理想介质中磁场波动方程</strong>：∇²H - με(∂²H/∂t²) = 0，磁场满足波动方程',
+                '<strong>波动方程形式</strong>：∇²u - (1/v²)(∂²u/∂t²) = 0，标准波动方程形式',
+                '<strong>波速（相速）</strong>：v = 1/√(με)，电磁波在介质中的传播速度',
+                '<strong>真空中波速</strong>：c = 1/√(μ₀ε₀) ≈ 3×10⁸ m/s，即光速',
+                '<strong>有源波动方程（非齐次）</strong>：∇²E - με(∂²E/∂t²) = μ(∂J/∂t) + ∇ρ/ε，考虑场源的影响',
+                '<strong>波动方程物理意义</strong>：时变电磁场以波的形式传播，电场和磁场相互激发形成电磁波'
+            ],
+            examples: [
+                {
+                    title: '例题 4.1',
+                    question: '证明在无源理想介质中，电场 E 满足波动方程 ∇²E - με(∂²E/∂t²) = 0。',
+                    solution: '<strong>证明</strong>：<br><br>由麦克斯韦方程组：<br>∇ × E = -∂B/∂t = -μ(∂H/∂t) ...①<br>∇ × H = ∂D/∂t = ε(∂E/∂t) ...②（无源区 J=0）<br><br><strong>对①取旋度</strong>：<br>∇ × (∇ × E) = -μ(∂/∂t)(∇ × H) = -με(∂²E/∂t²)<br><br><strong>利用矢量恒等式</strong>：<br>∇ × (∇ × E) = ∇(∇·E) - ∇²E = -∇²E（无源区 ∇·E = 0）<br><br><strong>整理得</strong>：<br>-∇²E = -με(∂²E/∂t²)<br><br><strong>∇²E - με(∂²E/∂t²) = 0</strong><br><br><strong>证毕</strong> ✓'
+                },
+                {
+                    title: '例题 4.2',
+                    question: '已知电磁波在某种介质中的传播速度为 2×10⁸ m/s，介质的相对磁导率 μᵣ = 1，求相对介电常数 εᵣ。',
+                    solution: '<strong>已知</strong>：<br>v = 2×10⁸ m/s，μᵣ = 1<br><br><strong>波速公式</strong>：<br>v = 1/√(με) = c/√(μᵣεᵣ)<br><br><strong>代入</strong>：<br>2×10⁸ = (3×10⁸)/√(1×εᵣ)<br><br><strong>解得</strong>：<br>√εᵣ = 3/2 = 1.5<br><strong>εᵣ = 2.25</strong><br><br><strong>讨论</strong>：该介质的介电常数大于真空，电磁波在其中传播速度小于光速。'
+                }
+            ]
+        },
+        'ch4-2': {
+            chapter: '第4章 时变电磁场',
+            title: '4.2 电磁场的位函数',
+            desc: '矢量位、标量位、达朗贝尔方程',
+            knowledge: [
+                '<strong>矢量位 A</strong>：B = ∇ × A，由于 ∇·B = 0，可引入矢量位描述磁感应强度',
+                '<strong>标量位 φ</strong>：E = -∇φ - ∂A/∂t，时变电场既有无旋分量（-∇φ）又有感应分量（-∂A/∂t）',
+                '<strong>洛伦兹规范</strong>：∇·A = -με(∂φ/∂t)，简化位函数方程，使 A 和 φ 解耦',
+                '<strong>库仑规范（静态场）</strong>：∇·A = 0，时变场中洛伦兹规范更常用',
+                '<strong>达朗贝尔方程（矢量位）</strong>：∇²A - με(∂²A/∂t²) = -μJ，非齐次波动方程',
+                '<strong>达朗贝尔方程（标量位）</strong>：∇²φ - με(∂²φ/∂t²) = -ρ/ε，非齐次波动方程',
+                '<strong>滞后位概念</strong>：t 时刻的场由 t-r/v 时刻的源决定，场滞后于源，体现电磁作用的有限传播速度',
+                '<strong>滞后位公式</strong>：φ(r,t) = (1/4πε)∫ ρ(r\',t-R/v)/R dV\'，其中 R = |r-r\'|',
+                '<strong>位函数的物理意义</strong>：将电磁场的六个分量转化为四个位函数（A 的三个分量 + φ），简化计算'
+            ],
+            examples: [
+                {
+                    title: '例题 4.3',
+                    question: '已知标量位 φ = 0，矢量位 A = A₀cos(ωt-kz)e<sub>x</sub>，求电场 E 和磁场 H。',
+                    solution: '<strong>求电场</strong>：<br>E = -∇φ - ∂A/∂t = -∂A/∂t<br>E = -∂/∂t[A₀cos(ωt-kz)e<sub>x</sub>]<br><strong>E = ωA₀sin(ωt-kz)e<sub>x</sub></strong><br><br><strong>求磁场</strong>：<br>B = ∇ × A = (∂A<sub>x</sub>/∂z)e<sub>y</sub> = kA₀sin(ωt-kz)e<sub>y</sub><br><strong>H = B/μ = (k/μ)A₀sin(ωt-kz)e<sub>y</sub></strong><br><br><strong>验证</strong>：∇ × E = -∂B/∂t ✓<br>波阻抗 η = E/H = ωμ/k = √(μ/ε) ✓'
+                },
+                {
+                    title: '例题 4.4',
+                    question: '证明在洛伦兹规范下，A 和 φ 满足达朗贝尔方程。',
+                    solution: '<strong>证明</strong>：<br><br>由麦克斯韦方程和位函数定义：<br>∇²A - ∇(∇·A) - με(∂²A/∂t²) = -μJ ...①<br><br><strong>代入洛伦兹规范</strong> ∇·A = -με(∂φ/∂t)：<br>∇²A - ∇(-με∂φ/∂t) - με(∂²A/∂t²) = -μJ<br><br>由 E = -∇φ - ∂A/∂t，得 ∇(∂φ/∂t) = -∂E/∂t - ∂²A/∂t²<br><br><strong>整理得</strong>：<br><strong>∇²A - με(∂²A/∂t²) = -μJ</strong><br><br>同理可证：<br><strong>∇²φ - με(∂²φ/∂t²) = -ρ/ε</strong><br><br><strong>证毕</strong> ✓'
+                }
+            ]
+        },
+        'ch4-3': {
+            chapter: '第4章 时变电磁场',
+            title: '4.3 电磁能量守恒定律',
+            desc: '坡印廷矢量、坡印廷定理',
+            knowledge: [
+                '<strong>坡印廷矢量（瞬时）</strong>：S = E × H，表示单位面积上电磁功率的流动方向和大小，单位 W/m²',
+                '<strong>坡印廷矢量方向</strong>：垂直于 E 和 H 所在平面，按右手螺旋定则确定',
+                '<strong>坡印廷定理（积分形式）</strong>：-∮ₛ S·dS = ∫ᵥ J·E dV + ∂/∂t∫ᵥ(½E·D + ½H·B)dV',
+                '<strong>坡印廷定理物理意义</strong>：流入闭合面的电磁功率 = 焦耳热损耗功率 + 电磁储能增加率',
+                '<strong>坡印廷定理（微分形式）</strong>：-∇·S = J·E + ∂w/∂t，其中 w = ½E·D + ½H·B 为能量密度',
+                '<strong>时谐场复坡印廷矢量</strong>：S̃ = Ẽ × H̃*，复数形式便于计算平均功率',
+                '<strong>时谐场平均坡印廷矢量</strong>：Sₐᵥ = ½Re(Ẽ × H̃*)，表示时间平均功率流密度',
+                '<strong>能量密度（时谐场）</strong>：wₐᵥ = ¼Re(Ẽ·D̃* + H̃·B̃*)，时间平均储能密度'
+            ],
+            examples: [
+                {
+                    title: '例题 4.5',
+                    question: '已知平面波 E = E₀cos(ωt-kz)e<sub>x</sub>，H = (E₀/η)cos(ωt-kz)e<sub>y</sub>，求坡印廷矢量和平均功率密度。',
+                    solution: '<strong>瞬时坡印廷矢量</strong>：<br>S = E × H = (E₀²/η)cos²(ωt-kz)e<sub>z</sub><br><br><strong>时间平均</strong>：<br>〈cos²(ωt-kz)〉= 1/2<br><strong>S<sub>av</sub> = (E₀²/2η)e<sub>z</sub></strong><br><br><strong>用复数法验证</strong>：<br>Ẽ = E₀e<sub>x</sub>，H̃ = (E₀/η)e<sub>y</sub><br>S<sub>av</sub> = ½Re(Ẽ × H̃*) = ½Re(E₀²/η)e<sub>z</sub> = (E₀²/2η)e<sub>z</sub> ✓'
+                },
+                {
+                    title: '例题 4.6',
+                    question: '同轴电缆（内半径 a，外半径 b）传输直流功率 P，求坡印廷矢量分布和通过介质截面的功率。',
+                    solution: '<strong>电场</strong>（径向）：<br>E = U/(rln(b/a))e<sub>r</sub><br><br><strong>磁场</strong>（切向）：<br>H = I/(2πr)e<sub>φ</sub><br><br><strong>坡印廷矢量</strong>：<br>S = E × H = UI/(2πr²ln(b/a))e<sub>z</sub><br><br><strong>通过介质截面的功率</strong>：<br>P = ∫∫ S·dS = ∫[a,b] UI/(2πr²ln(b/a)) · 2πr dr<br>= UI/(ln(b/a)) · ln(b/a) = <strong>UI</strong><br><br><strong>结论</strong>：功率沿轴向传输，与电路理论结果一致。'
+                }
+            ]
+        },
+        'ch4-4': {
+            chapter: '第4章 时变电磁场',
+            title: '4.4 时变电磁场的唯一性定理',
+            desc: '唯一解条件、定理意义',
+            knowledge: [
+                '<strong>时变场唯一性定理</strong>：在闭合区域 V 内，若 t=0 时刻的初始场分布给定，且 t>0 时边界上的切向电场或切向磁场给定，则区域内电磁场唯一确定',
+                '<strong>唯一解条件</strong>：① 区域内源分布（J, ρ）；② 初始时刻场分布（E(r,0), H(r,0)）；③ 边界上场分布（E<sub>t</sub> 或 H<sub>t</sub>）',
+                '<strong>初始条件</strong>：E(r,0) 和 H(r,0) 在 V 内处处给定',
+                '<strong>边界条件类型</strong>：① 给定切向电场 e<sub>n</sub> × E；② 给定切向磁场 e<sub>n</sub> × H；③ 部分边界给 E<sub>t</sub>，部分给 H<sub>t</sub>',
+                '<strong>唯一性定理证明思路</strong>：假设两组解，其差满足无源方程和齐次边界条件，证明差为零',
+                '<strong>唯一性定理意义</strong>：① 保证解的唯一性；② 允许用不同方法求解；③ 为数值计算提供理论基础；④ 验证解的正确性',
+                '<strong>与静态场区别</strong>：时变场需要初始条件，静态场只需边界条件',
+                '<strong>应用范围</strong>：适用于所有线性时变电磁场问题'
+            ],
+            examples: [
+                {
+                    title: '例题 4.7',
+                    question: '说明时变电磁场唯一性定理与静态场唯一性定理的主要区别。',
+                    solution: '<strong>静态场唯一性定理</strong>：<br>只需边界条件（狄利克雷、诺伊曼或混合）<br>解由边界条件唯一确定<br><br><strong>时变场唯一性定理</strong>：<br>需要<strong>三类条件</strong>：<br>① 区域内源分布 J, ρ<br>② 初始条件 E(r,0), H(r,0)<br>③ 边界条件（t>0 时的 E<sub>t</sub> 或 H<sub>t</sub>）<br><br><strong>关键区别</strong>：<br>时变场具有<strong>记忆性</strong>，t 时刻的场不仅取决于边界条件，还取决于初始状态和源的历史。<br><br><strong>物理原因</strong>：电磁波传播需要时间，场分布是累积效应的结果。'
+                },
+                {
+                    title: '例题 4.8',
+                    question: '在理想导体腔体中，若初始时刻腔内无电磁场，证明腔内永远无电磁场（无源情况下）。',
+                    solution: '<strong>证明</strong>：<br><br><strong>边界条件</strong>：<br>理想导体表面：<br>eₙ × E = 0（切向电场为零）<br>eₙ × H = Jₛ（切向磁场决定面电流）<br><br><strong>初始条件</strong>：<br>E(r,0) = 0，H(r,0) = 0<br><br><strong>无源条件</strong>：<br>J = 0，ρ = 0<br><br><strong>验证零解</strong>：<br>E = 0，H = 0 满足：<br>① 麦克斯韦方程<br>② 边界条件<br>③ 初始条件<br><br>由唯一性定理，<strong>零解是唯一解</strong>。<br><br><strong>结论</strong>：无初始场和无源时，理想导体腔内永远无电磁场。'
+                }
+            ]
+        },
+        'ch4-5': {
+            chapter: '第4章 时变电磁场',
+            title: '4.5 时谐电磁场',
+            desc: '复数表示法、复麦克斯韦方程、亥姆霍兹方程',
+            knowledge: [
+                '<strong>时谐场定义</strong>：场量随时间按正弦规律变化，E(r,t) = Re[Ẽ(r)e^(jωt)]，是工程中最常见的电磁场形式',
+                '<strong>相量表示法</strong>：用复振幅 Ẽ(r) 表示时谐场，时间因子 e^(jωt) 隐含',
+                '<strong>复麦克斯韦方程组</strong>：<br>∇ × Ẽ = -jωB̃<br>∇ × H̃ = J̃ + jωD̃<br>∇ · D̃ = ρ̃<br>∇ · B̃ = 0',
+                '<strong>复介电常数</strong>：ε̃ = ε\' - jε\'\' = ε - jσ/ω，考虑导体损耗，实部为储能，虚部为损耗',
+                '<strong>复磁导率</strong>：μ̃ = μ\' - jμ\'\'，磁性材料损耗',
+                '<strong>亥姆霍兹方程</strong>：∇²Ẽ + k²Ẽ = 0，其中 k = ω√(με) 为波数，是时谐场的波动方程',
+                '<strong>亥姆霍兹方程（有源）</strong>：∇²Ẽ + k²Ẽ = jωμJ̃ + ∇ρ̃/ε',
+                '<strong>复坡印廷矢量</strong>：S̃ = Ẽ × H̃*，实部为平均功率密度，虚部为无功功率密度',
+                '<strong>平均能量密度</strong>：wₑₐᵥ = ¼ε|Ẽ|²，wₘₐᵥ = ¼μ|H̃|²'
+            ],
+            examples: [
+                {
+                    title: '例题 4.9',
+                    question: '将时谐场 E = E₀cos(ωt-kz)e<sub>x</sub> 表示为复数形式，并求 ∇ × Ẽ。',
+                    solution: '<strong>复数形式</strong>：<br>E = Re[E₀e^(j(ωt-kz))e<sub>x</sub>]<br><strong>Ẽ = E₀e^(-jkz)e<sub>x</sub></strong><br><br><strong>求旋度</strong>：<br>∇ × Ẽ = | e<sub>x</sub> e<sub>y</sub> e<sub>z</sub> |<br>   | ∂/∂x ∂/∂y ∂/∂z |<br>   | E₀e^(-jkz) 0 0 |<br>= -∂/∂z(E₀e^(-jkz))e<sub>y</sub><br>= <strong>jkE₀e^(-jkz)e<sub>y</sub></strong><br><br><strong>验证</strong>：<br>∇ × Ẽ = -jωB̃ = -jωμH̃<br>与麦克斯韦方程一致 ✓'
+                },
+                {
+                    title: '例题 4.10',
+                    question: '已知海水的 σ = 4 S/m，εᵣ = 81，求频率为 1MHz 时的复介电常数，并判断海水是良导体还是良介质。',
+                    solution: '<strong>计算</strong>：<br>ε = εᵣε₀ = 81×8.854×10⁻¹² ≈ 7.17×10⁻¹⁰ F/m<br><br><strong>损耗角正切</strong>：<br>tanδ = σ/(ωε) = 4/(2π×10⁶×7.17×10⁻¹⁰)<br>≈ 4/0.045 ≈ 89<br><br><strong>复介电常数</strong>：<br>ε̃ = ε - jσ/ω = 7.17×10⁻¹⁰ - j(4/2π×10⁶)<br>= <strong>7.17×10⁻¹⁰ - j6.37×10⁻⁷ F/m</strong><br><br><strong>判断</strong>：<br>tanδ = 89 >> 1，虚部远大于实部<br><strong>海水在该频率下是良导体</strong>。'
+                }
+            ]
+        },
+        'ch5-1': {
+            chapter: '第5章 均匀平面波在无界空间中的传播',
+            title: '5.1 理想介质中的均匀平面波',
+            desc: 'TEM波特性、波阻抗、传播参数',
+            knowledge: [
+                '<strong>均匀平面波定义</strong>：等相位面为无限大平面，且平面上场强处处相等的电磁波，是最简单的电磁波形式',
+                '<strong>横电磁波（TEM波）</strong>：电场 E 和磁场 H 都垂直于传播方向，即 E⊥k，H⊥k，E⊥H，三者构成右手正交系',
+                '<strong>波阻抗</strong>：η = √(μ/ε) = E/H，表示电场与磁场振幅之比，单位欧姆(Ω)',
+                '<strong>真空波阻抗</strong>：η₀ = √(μ₀/ε₀) ≈ 377Ω ≈ 120π Ω，是常用常数',
+                '<strong>相位常数（波数）</strong>：β = ω√(με) = 2π/λ，表示单位长度上的相位变化，单位 rad/m',
+                '<strong>波长</strong>：λ = 2π/β = v/f，一个周期内波传播的距离',
+                '<strong>相速</strong>：v = ω/β = 1/√(με)，等相位面传播的速度',
+                '<strong>能量传播速度</strong>：vₑ = S/w = v，在理想介质中等于相速',
+                '<strong>E与H的关系</strong>：同相位变化，振幅比为 η，方向满足 E × H 指向传播方向'
+            ],
+            examples: [
+                {
+                    title: '例题 5.1',
+                    question: '频率为 100MHz 的均匀平面波在理想介质（εᵣ=4，μᵣ=1）中传播，求：(1) 波速；(2) 波长；(3) 波阻抗。',
+                    solution: '<strong>已知</strong>：f = 100MHz = 10⁸ Hz，εᵣ = 4，μᵣ = 1<br><br><strong>(1) 波速</strong>：<br>v = c/√(εᵣμᵣ) = (3×10⁸)/√4 = <strong>1.5×10⁸ m/s</strong><br><br><strong>(2) 波长</strong>：<br>λ = v/f = (1.5×10⁸)/(10⁸) = <strong>1.5 m</strong><br><br><strong>(3) 波阻抗</strong>：<br>η = η₀/√(εᵣ) = 377/2 = <strong>188.5 Ω</strong><br><br><strong>讨论</strong>：介质的介电常数越大，波速越慢，波长越短，波阻抗越低。'
+                },
+                {
+                    title: '例题 5.2',
+                    question: '已知真空中均匀平面波的电场 E = 10cos(6π×10⁸t - 2πz)e<sub>x</sub> V/m，求：(1) 频率、波长、相速；(2) 磁场 H。',
+                    solution: '<strong>(1) 参数计算</strong>：<br>比较标准形式 E = E₀cos(ωt - βz)<br>ω = 6π×10⁸ rad/s → <strong>f = ω/2π = 3×10⁸ Hz</strong><br>β = 2π rad/m → <strong>λ = 2π/β = 1 m</strong><br><strong>v = ω/β = 3×10⁸ m/s = c</strong>（真空光速）<br><br><strong>(2) 磁场</strong>：<br>H = (1/η₀)e<sub>z</sub> × E = (1/377)e<sub>z</sub> × 10cos(6π×10⁸t-2πz)e<sub>x</sub><br>= (10/377)cos(6π×10⁸t-2πz)e<sub>y</sub><br><strong>H ≈ 26.5cos(6π×10⁸t-2πz)e<sub>y</sub> mA/m</strong>'
+                }
+            ]
+        },
+        'ch5-2': {
+            chapter: '第5章 均匀平面波在无界空间中的传播',
+            title: '5.2 均匀平面波在导电媒质中的传播',
+            desc: '复介电常数、衰减常数、相移常数',
+            knowledge: [
+                '<strong>复介电常数</strong>：ε̃ = ε - jσ/ω = ε(1 - jtanδ)，其中 tanδ = σ/(ωε) 为损耗角正切',
+                '<strong>复波数（传播常数）</strong>：γ = α + jβ = jω√(με̃)，实部 α 为衰减常数，虚部 β 为相移常数',
+                '<strong>衰减常数 α</strong>：单位长度振幅衰减量，单位 Np/m，e^(-αz) 表示衰减因子',
+                '<strong>相移常数 β</strong>：单位长度相位变化量，单位 rad/m，决定波的相位传播',
+                '<strong>穿透深度（趋肤深度）</strong>：δ = 1/α，振幅衰减到表面值 1/e 时的传播距离',
+                '<strong>复波阻抗</strong>：η̃ = √(μ/ε̃) = |η̃|e^(jθ)，为复数，H 滞后于 E 相位角 θ',
+                '<strong>弱导电媒质条件</strong>：σ/(ωε) << 1，α ≈ (σ/2)√(μ/ε)，β ≈ ω√(με)',
+                '<strong>良导体条件</strong>：σ/(ωε) >> 1，α ≈ β ≈ √(πfμσ)，δ = 1/√(πfμσ)',
+                '<strong>色散</strong>：相速与频率有关，导致信号波形畸变',
+                '<strong>群速</strong>：vᵧ = dω/dβ，波包（信号）传播的速度，与相速不同'
+            ],
+            examples: [
+                {
+                    title: '例题 5.3',
+                    question: '铜的电导率 σ = 5.8×10⁷ S/m，μᵣ = 1，求频率为 1MHz 和 1GHz 时的趋肤深度。',
+                    solution: '<strong>良导体近似</strong>（验证：σ/(ωε₀) >> 1）：<br><br><strong>f = 1MHz 时</strong>：<br>δ = 1/√(πfμσ)<br>= 1/√(π×10⁶×4π×10⁻⁷×5.8×10⁷)<br>= 1/√(2.29×10⁸)<br>≈ <strong>6.6×10⁻⁵ m = 66 μm</strong><br><br><strong>f = 1GHz 时</strong>：<br>δ = 1/√(π×10⁹×4π×10⁻⁷×5.8×10⁷)<br>≈ <strong>2.1×10⁻⁶ m = 2.1 μm</strong><br><br><strong>结论</strong>：频率越高，趋肤深度越小，高频电流集中在导体表面。'
+                },
+                {
+                    title: '例题 5.4',
+                    question: '均匀平面波在海水（εᵣ=81，μᵣ=1，σ=4 S/m）中传播，频率 1MHz，求：(1) 衰减常数 α；(2) 相移常数 β；(3) 波阻抗 η̃。',
+                    solution: '<strong>判断</strong>：<br>tanδ = σ/(ωε) = 4/(2π×10⁶×81×8.854×10⁻¹²) ≈ 89 >> 1<br>海水为良导体<br><br><strong>(1) 衰减常数</strong>：<br>α = √(πfμσ) = √(π×10⁶×4π×10⁻⁷×4)<br>= √(1.58) ≈ <strong>1.26 Np/m</strong><br><br><strong>(2) 相移常数</strong>：<br>β ≈ α ≈ <strong>1.26 rad/m</strong><br><br><strong>(3) 波阻抗</strong>：<br>η̃ = √(jωμ/σ) = √(j2π×10⁶×4π×10⁻⁷/4)<br>= √(j0.197) = 0.314e^(j45°)<br><strong>η̃ ≈ 0.222(1+j) Ω</strong>'
+                }
+            ]
+        },
+        'ch5-3': {
+            chapter: '第5章 均匀平面波在无界空间中的传播',
+            title: '5.3 电磁波的极化',
+            desc: '线极化、圆极化、椭圆极化',
+            knowledge: [
+                '<strong>极化定义</strong>：电磁波传播过程中，电场矢量端点在垂直于传播方向的平面内随时间变化的轨迹形状',
+                '<strong>线极化（直线极化）</strong>：电场矢量端点轨迹为直线，两个正交分量相位差为 0 或 π',
+                '<strong>圆极化</strong>：电场矢量端点轨迹为圆，两个正交分量振幅相等，相位差为 ±π/2',
+                '<strong>左旋圆极化（LHC）</strong>：沿传播方向看，电场矢量逆时针旋转，满足 E<sub>y</sub> 超前 E<sub>x</sub> π/2',
+                '<strong>右旋圆极化（RHC）</strong>：沿传播方向看，电场矢量顺时针旋转，满足 E<sub>y</sub> 滞后 E<sub>x</sub> π/2',
+                '<strong>旋向判定方法</strong>：拇指指向传播方向，四指弯曲方向与电场旋转方向一致则为左旋，反之为右旋',
+                '<strong>椭圆极化</strong>：最一般情况，两个正交分量振幅不等或相位差不为 0、±π/2，轨迹为椭圆',
+                '<strong>极化比</strong>：描述椭圆极化的扁平程度和取向角度',
+                '<strong>工程应用</strong>：线极化用于广播电视，圆极化用于卫星通信，极化分集技术提高通信容量'
+            ],
+            examples: [
+                {
+                    title: '例题 5.5',
+                    question: '判断下列电磁波的极化类型：(1) E = E₀cos(ωt-βz)e<sub>x</sub> - E₀sin(ωt-βz)e<sub>y</sub>；(2) E = 3E₀cos(ωt-βz)e<sub>x</sub> + 4E₀cos(ωt-βz)e<sub>y</sub>。',
+                    solution: '<strong>(1) 分析</strong>：<br>E<sub>x</sub> = E₀cos(ωt-βz)<br>E<sub>y</sub> = -E₀sin(ωt-βz) = E₀cos(ωt-βz+π/2)<br><br>振幅相等，E<sub>y</sub> 超前 E<sub>x</sub> π/2<br>沿 +z 方向传播，E<sub>y</sub> 超前 → <strong>左旋圆极化</strong><br><br><strong>(2) 分析</strong>：<br>E<sub>x</sub> = 3E₀cos(ωt-βz)<br>E<sub>y</sub> = 4E₀cos(ωt-βz)<br><br>相位相同，合成电场方向固定<br>tanθ = E<sub>y</sub>/E<sub>x</sub> = 4/3<br><strong>线极化</strong>，极化方向与 x 轴夹角 arctan(4/3) ≈ 53.1°'
+                },
+                {
+                    title: '例题 5.6',
+                    question: '两个线极化波 E₁ = e<sub>x</sub>E₀e^(-jβz) 和 E₂ = e<sub>y</sub>E₀e^(-jβz+jφ) 合成，问 φ 取何值时分别为：(1) 线极化；(2) 左旋圆极化；(3) 右旋圆极化？',
+                    solution: '<strong>(1) 线极化</strong>：<br>要求两分量同相或反相<br><strong>φ = 0 或 π</strong><br><br><strong>(2) 左旋圆极化</strong>：<br>沿 +z 传播，E<sub>y</sub> 超前 E<sub>x</sub> π/2<br>e^(jφ) = j → <strong>φ = π/2</strong><br><br><strong>(3) 右旋圆极化</strong>：<br>沿 +z 传播，E<sub>y</sub> 滞后 E<sub>x</sub> π/2<br>e^(jφ) = -j → <strong>φ = -π/2 或 3π/2</strong><br><br><strong>验证</strong>：φ = π/2 时<br>E = E₀(e<sub>x</sub> + je<sub>y</sub>)e^(-jβz)，|E<sub>x</sub>|=|E<sub>y</sub>|，E<sub>y</sub> 超前 E<sub>x</sub> π/2，为左旋圆极化 ✓'
+                }
+            ]
+        },
+        'ch5-4': {
+            chapter: '第5章 均匀平面波在无界空间中的传播',
+            title: '5.4 均匀平面波在各向异性媒质中的传播',
+            desc: '磁化等离子体、磁化铁氧体、法拉第旋转',
+            knowledge: [
+                '<strong>各向异性媒质</strong>：介电常数或磁导率为张量，电磁特性与波的传播方向和偏振方向有关',
+                '<strong>磁化等离子体</strong>：外加恒定磁场的电离气体，电子在磁场中做回旋运动，介电常数为张量',
+                '<strong>等离子体频率</strong>：ωₚ = √(ne²/mε₀)，等离子体固有振荡频率，n 为电子密度',
+                '<strong>回旋频率</strong>：ωc = eB₀/m，电子在磁场中的回旋角频率',
+                '<strong>磁化等离子体中的传播特性</strong>：存在寻常波（O波）和非寻常波（X波），传播特性不同',
+                '<strong>磁化铁氧体</strong>：外加恒定磁场的铁氧体材料，磁导率为张量，具有非互易特性',
+                '<strong>双折射现象</strong>：在各向异性媒质中，不同极化的波有不同的相速和传播特性',
+                '<strong>法拉第旋转效应</strong>：线极化波在磁化等离子体或铁氧体中传播时，极化面发生旋转',
+                '<strong>法拉第旋转角</strong>：θ = (1/2)(β₊ - β₋)l，与传播距离成正比，与传播方向有关（非互易）',
+                '<strong>工程应用</strong>：法拉第旋转器、隔离器、环行器等微波器件'
+            ],
+            examples: [
+                {
+                    title: '例题 5.7',
+                    question: '线极化波在磁化铁氧体中传播 10cm，右旋圆极化波相移常数 β₊ = 200 rad/m，左旋圆极化波相移常数 β₋ = 180 rad/m，求极化面旋转角度。',
+                    solution: '<strong>法拉第旋转角公式</strong>：<br>θ = (1/2)(β₊ - β₋)l<br><br><strong>代入</strong>：<br>β₊ = 200 rad/m<br>β₋ = 180 rad/m<br>l = 0.1 m<br><br><strong>计算</strong>：<br>θ = (1/2)(200 - 180)×0.1<br>= (1/2)×20×0.1<br>= <strong>1 rad ≈ 57.3°</strong><br><br><strong>判断旋向</strong>：<br>β₊ > β₋，右旋波相速慢，极化面向右旋方向旋转。'
+                },
+                {
+                    title: '例题 5.8',
+                    question: '解释为什么法拉第旋转效应具有非互易性，并说明其在微波器件中的应用。',
+                    solution: '<strong>非互易性解释</strong>：<br>法拉第旋转角 θ = (1/2)(β₊ - β₋)l<br><br>当波沿 +z 方向传播时，旋转角为 θ<br>当波沿 -z 方向传播时，对于观察者而言，右旋变左旋，但 β₊ 和 β₋ 交换，<br>旋转角仍为 θ（相对于原方向同向旋转）<br><br>因此，往返一次总旋转角为 2θ，而不是 0<br><strong>这就是非互易性</strong><br><br><strong>应用</strong>：<br>① <strong>隔离器</strong>：利用铁氧体使正向波低损耗通过，反向波被吸收<br>② <strong>环行器</strong>：实现信号单向传输，端口间信号按固定方向环行<br>③ <strong>法拉第旋转器</strong>：控制极化面旋转角度'
+                }
+            ]
+        },
+        'ch6-1': {
+            chapter: '第6章 均匀平面波的反射与透射',
+            title: '6.1 均匀平面波对分界平面的垂直入射',
+            desc: '反射系数、透射系数、驻波比',
+            knowledge: [
+                '<strong>垂直入射</strong>：电磁波传播方向与分界面法线方向平行，即沿法线方向入射',
+                '<strong>反射系数 Γ</strong>：Γ = (η₂ - η₁)/(η₂ + η₁)，表示反射波电场与入射波电场之比',
+                '<strong>透射系数 τ</strong>：τ = 2η₂/(η₂ + η₁)，表示透射波电场与入射波电场之比',
+                '<strong>关系</strong>：1 + Γ = τ，能量守恒体现',
+                '<strong>理想导体边界</strong>：η₂ = 0，Γ = -1，τ = 0，发生全反射，无透射',
+                '<strong>纯驻波</strong>：理想导体表面，入射波与反射波叠加形成纯驻波，电场波节、磁场波腹',
+                '<strong>理想介质分界面</strong>：部分反射部分透射，形成行驻波（驻波+行波）',
+                '<strong>驻波比（SWR）</strong>：S = (1+|Γ|)/(1-|Γ|)，表示驻波的最大振幅与最小振幅之比',
+                '<strong>驻波比物理意义</strong>：S ≥ 1，S = 1 表示无反射（匹配），S = ∞ 表示全反射',
+                '<strong>波节点与波腹点</strong>：波节处振幅最小，波腹处振幅最大，相邻波节（或波腹）间距为 λ/2'
+            ],
+            examples: [
+                {
+                    title: '例题 6.1',
+                    question: '均匀平面波从空气（η₁ = η₀）垂直入射到理想导体表面，已知入射波电场 Eᵢ = 10e^(-jβz)e<sub>x</sub> V/m，求：(1) 反射系数；(2) 合成电场表达式；(3) 驻波比。',
+                    solution: '<strong>(1) 反射系数</strong>：<br>理想导体 η₂ = 0<br>Γ = (0 - η₀)/(0 + η₀) = <strong>-1</strong><br><br><strong>(2) 合成电场</strong>：<br>E<sub>r</sub> = ΓEᵢ = -10e^(jβz)e<sub>x</sub><br>E = Eᵢ + E<sub>r</sub> = 10(e^(-jβz) - e^(jβz))e<sub>x</sub><br>= -20jsin(βz)e<sub>x</sub><br>瞬时值：<strong>E = 20sin(βz)sin(ωt)e<sub>x</sub></strong><br><br><strong>(3) 驻波比</strong>：<br>|Γ| = 1<br>S = (1+1)/(1-1) = <strong>∞</strong><br><br><strong>结论</strong>：理想导体表面形成纯驻波，驻波比无穷大。'
+                },
+                {
+                    title: '例题 6.2',
+                    question: '均匀平面波从介质1（εᵣ₁=4）垂直入射到介质2（εᵣ₂=9），求：(1) 反射系数和透射系数；(2) 驻波比；(3) 入射功率有多少被反射，多少透射？',
+                    solution: '<strong>(1) 计算波阻抗</strong>：<br>η₁ = η₀/√4 = η₀/2 = 188.5Ω<br>η₂ = η₀/√9 = η₀/3 = 125.7Ω<br><br><strong>反射系数</strong>：<br>Γ = (η₂-η₁)/(η₂+η₁) = (125.7-188.5)/(125.7+188.5) = -62.8/314.2 ≈ <strong>-0.2</strong><br><br><strong>透射系数</strong>：<br>τ = 2η₂/(η₂+η₁) = 251.4/314.2 ≈ <strong>0.8</strong><br><br><strong>(2) 驻波比</strong>：<br>S = (1+0.2)/(1-0.2) = 1.2/0.8 = <strong>1.5</strong><br><br><strong>(3) 功率</strong>：<br>反射功率比 |Γ|² = 0.04 = <strong>4%</strong><br>透射功率比 1-|Γ|² = 0.96 = <strong>96%</strong>'
+                }
+            ]
+        },
+        'ch6-2': {
+            chapter: '第6章 均匀平面波的反射与透射',
+            title: '6.2 均匀平面波对多层介质分界平面的垂直入射',
+            desc: '等效波阻抗、匹配层、介质窗',
+            knowledge: [
+                '<strong>多层介质问题</strong>：电磁波穿过多个介质分界面，需考虑多次反射和透射',
+                '<strong>等效波阻抗</strong>：将多层介质等效为单一阻抗，便于分析反射特性',
+                '<strong>输入阻抗公式</strong>：Zᵢₙ(z) = η₂(η₃ + jη₂tan(β₂d))/(η₂ + jη₃tan(β₂d))，从界面看入的阻抗',
+                '<strong>四分之一波长匹配层</strong>：厚度 d = λ/4，阻抗 η₂ = √(η₁η₃)，可实现无反射匹配',
+                '<strong>匹配原理</strong>：λ/4 传输线变换器原理，将负载阻抗变换为与源阻抗匹配',
+                '<strong>半波长介质窗</strong>：厚度 d = λ/2，输入阻抗等于负载阻抗，实现全透射',
+                '<strong>窗口效应</strong>：半波长介质板对特定频率透明，可用作天线罩',
+                '<strong>多层结构递推</strong>：从最后一层向前逐层计算等效阻抗',
+                '<strong>周期性多层结构</strong>：布拉格反射镜、光子晶体等具有频率选择特性'
+            ],
+            examples: [
+                {
+                    title: '例题 6.3',
+                    question: '在空气（η₀）与介质（η = η₀/2）之间插入匹配层，求匹配层的厚度和阻抗。',
+                    solution: '<strong>已知</strong>：<br>η₁ = η₀（空气）<br>η₃ = η₀/2（介质）<br><br><strong>匹配条件</strong>：<br>厚度 d = λ₂/4（λ₂ 为匹配层中波长）<br>阻抗 η₂ = √(η₁η₃) = √(η₀ · η₀/2) = <strong>η₀/√2 ≈ 266.5Ω</strong><br><br><strong>验证</strong>：<br>从空气看入的输入阻抗：<br>Zᵢₙ = η₂²/η₃ = (η₀²/2)/(η₀/2) = η₀ ✓<br><br><strong>结论</strong>：插入 λ/4 匹配层（阻抗 η₀/√2）可实现空气到介质的无反射连接。'
+                },
+                {
+                    title: '例题 6.4',
+                    question: '天线罩用半波长介质板制作（εᵣ = 4），工作频率 3GHz，求：(1) 介质板厚度；(2) 证明此时无反射。',
+                    solution: '<strong>(1) 计算厚度</strong>：<br>f = 3GHz，λ₀ = c/f = 0.1m = 10cm<br>介质中波长 λ = λ₀/√εᵣ = 10/2 = 5cm<br>厚度 d = λ/2 = <strong>2.5cm</strong><br><br><strong>(2) 证明无反射</strong>：<br>输入阻抗公式：<br>Zᵢₙ = η(η₀ + jηtan(βd))/(η + jη₀tan(βd))<br><br>当 d = λ/2 时，βd = π，tan(π) = 0<br>Zᵢₙ = η · η₀/η = <strong>η₀</strong><br><br>输入阻抗等于空气阻抗，<strong>无反射</strong> ✓<br><br><strong>结论</strong>：半波长介质窗对特定频率完全透明。'
+                }
+            ]
+        },
+        'ch6-3': {
+            chapter: '第6章 均匀平面波的反射与透射',
+            title: '6.3 均匀平面波对理想介质分界平面的斜入射',
+            desc: '反射定律、折射定律、菲涅尔公式',
+            knowledge: [
+                '<strong>斜入射</strong>：电磁波以入射角 θᵢ（与法线夹角）射向分界面',
+                '<strong>入射面</strong>：由入射波传播方向与分界面法线构成的平面',
+                '<strong>反射定律</strong>：θᵣ = θᵢ，反射角等于入射角，入射波、反射波在同一平面内',
+                '<strong>折射定律（斯涅尔定律）</strong>：sinθᵢ/sinθₜ = √(ε₂μ₂/ε₁μ₁) = n₂/n₁，n 为折射率',
+                '<strong>垂直极化（s极化/TE波）</strong>：电场垂直于入射面，磁场在入射面内',
+                '<strong>平行极化（p极化/TM波）</strong>：电场在入射面内，磁场垂直于入射面',
+                '<strong>菲涅尔公式（垂直极化）</strong>：<br>Γ⊥ = (η₂cosθᵢ - η₁cosθₜ)/(η₂cosθᵢ + η₁cosθₜ)<br>τ⊥ = 2η₂cosθᵢ/(η₂cosθᵢ + η₁cosθₜ)',
+                '<strong>菲涅尔公式（平行极化）</strong>：<br>Γ∥ = (η₂cosθₜ - η₁cosθᵢ)/(η₂cosθₜ + η₁cosθᵢ)<br>τ∥ = 2η₂cosθᵢ/(η₂cosθₜ + η₁cosθᵢ)',
+                '<strong>布儒斯特角</strong>：平行极化波以特定角度入射时无反射，tanθᴮ = √(ε₂/ε₁)',
+                '<strong>全反射条件</strong>：从光密到光疏，θᵢ > θc（临界角），sinθc = √(ε₂/ε₁)（ε₁ > ε₂）'
+            ],
+            examples: [
+                {
+                    title: '例题 6.5',
+                    question: '均匀平面波从空气斜入射到介质（εᵣ=4）分界面，入射角 θᵢ = 30°，求：(1) 折射角；(2) 垂直极化波的反射系数。',
+                    solution: '<strong>(1) 折射角</strong>：<br>由斯涅尔定律：<br>sinθᵢ/sinθₜ = √εᵣ = 2<br>sinθₜ = sin30°/2 = 0.25<br><strong>θₜ ≈ 14.5°</strong><br><br><strong>(2) 垂直极化反射系数</strong>：<br>η₁ = η₀，η₂ = η₀/2<br>cosθᵢ = cos30° = 0.866<br>cosθₜ = cos14.5° = 0.968<br><br>Γ⊥ = (η₂cosθᵢ - η₁cosθₜ)/(η₂cosθᵢ + η₁cosθₜ)<br>= (0.5×0.866 - 1×0.968)/(0.5×0.866 + 1×0.968)<br>= (0.433 - 0.968)/(0.433 + 0.968)<br>= -0.535/1.401 ≈ <strong>-0.382</strong>'
+                },
+                {
+                    title: '例题 6.6',
+                    question: '光从玻璃（n₁=1.5）射向空气（n₂=1），求：(1) 布儒斯特角；(2) 临界角。',
+                    solution: '<strong>(1) 布儒斯特角</strong>：<br>tanθᴮ = n₂/n₁ = 1/1.5 = 0.667<br><strong>θᴮ ≈ 33.7°</strong><br><br>在此角度下，平行极化波无反射，全部透射。<br><br><strong>(2) 临界角</strong>：<br>sinθc = n₂/n₁ = 1/1.5 = 0.667<br><strong>θc ≈ 41.8°</strong><br><br>当入射角大于 41.8° 时，发生全反射，无透射波。<br><br><strong>注意</strong>：θᴮ < θc，布儒斯特角总是小于临界角。'
+                }
+            ]
+        },
+        'ch6-4': {
+            chapter: '第6章 均匀平面波的反射与透射',
+            title: '6.4 均匀平面波对理想导体平面的斜入射',
+            desc: 'TE驻波、TM驻波、表面波',
+            knowledge: [
+                '<strong>理想导体边界条件</strong>：切向电场为 0，即导体表面 E<sub>t</sub> = 0',
+                '<strong>垂直极化斜入射</strong>：电场垂直于入射面，在导体表面形成波节，形成 TE 驻波',
+                '<strong>平行极化斜入射</strong>：电场在入射面内，切向分量在导体表面形成波节，形成 TM 驻波',
+                '<strong>合成波特性</strong>：入射波与反射波叠加，沿界面方向传播，垂直于界面方向形成驻波分布',
+                '<strong>沿分界面传播</strong>：合成波沿界面（x方向）传播，相速度 v<sub>px</sub> = ω/βₓ = v/sinθᵢ',
+                '<strong>慢波特性</strong>：v<sub>px</sub> = v/sinθᵢ > v，相速度大于介质中光速，但能量传播速度小于光速',
+                '<strong>表面波</strong>：能量沿界面传播，垂直方向呈指数衰减（全反射时）',
+                '<strong>波导原理</strong>：两平行导体板间可引导电磁波传播，是波导的基础',
+                '<strong>应用</strong>：平行板波导、微带线、光纤等导波结构'
+            ],
+            examples: [
+                {
+                    title: '例题 6.7',
+                    question: '均匀平面波从空气以 θᵢ = 45° 斜入射到理想导体表面，入射波电场 Eᵢ = E₀e^(-jβ(xsinθᵢ+zcosθᵢ))e<sub>y</sub>，求合成电场。',
+                    solution: '<strong>分析</strong>：垂直极化（TE波）<br><br><strong>反射波</strong>：<br>Γ = -1（理想导体）<br>E<sub>r</sub> = -E₀e^(-jβ(xsinθᵢ-zcosθᵢ))e<sub>y</sub><br><br><strong>合成电场</strong>：<br>E = Eᵢ + E<sub>r</sub><br>= E₀e^(-jβxsinθᵢ)[e^(-jβzcosθᵢ) - e^(jβzcosθᵢ)]e<sub>y</sub><br>= -2jE₀e^(-jβxsinθᵢ)sin(βzcosθᵢ)e<sub>y</sub><br><br>瞬时值：<br><strong>E = 2E₀sin(βzcosθᵢ)sin(ωt - βxsinθᵢ)e<sub>y</sub></strong><br><br><strong>特点</strong>：<br>- z方向：驻波分布，z=0 处为波节<br>- x方向：行波传播，相速 v<sub>px</sub> = √2c'
+                },
+                {
+                    title: '例题 6.8',
+                    question: '两平行理想导体板间距 a = 5cm，中间为空气，TE波以 θᵢ = 30° 入射，求可传输的最低频率（截止频率）。',
+                    solution: '<strong>分析</strong>：<br>在波导中，垂直方向必须形成驻波，满足边界条件：<br>在 z=0 和 z=a 处，E<sub>y</sub> = 0（波节）<br><br><strong>驻波条件</strong>：<br>βz = βcosθᵢ · a = mπ，m=1,2,3,...<br><br><strong>最低模式</strong>（m=1）：<br>βcosθᵢ · a = π<br>(2π/λ)cos30° · 0.05 = π<br>λ = 2×0.05×0.866 = 0.0866m = 8.66cm<br><br><strong>截止频率</strong>：<br><strong>f<sub>c</sub> = c/λ = 3×10⁸/0.0866 ≈ 3.46 GHz</strong><br><br><strong>结论</strong>：低于此频率的 TE 波无法在波导中传播。'
+                }
+            ]
+        },
+        'ch6-5': {
+            chapter: '第6章 均匀平面波的反射与透射',
+            title: '6.5 均匀平面波在负折射率媒质表面上的反射和透射',
+            desc: '负折射率媒质、负折射现象',
+            knowledge: [
+                '<strong>负折射率媒质（左手材料）</strong>：介电常数 ε < 0 且磁导率 μ < 0 的人工电磁材料',
+                '<strong>基本特性</strong>：E、H、k 构成左手系，相速与能流方向相反',
+                '<strong>负折射现象</strong>：入射波和折射波在法线同侧，折射角为负值',
+                '<strong>斯涅尔定律修正</strong>：n₁sinθᵢ = -|n₂|sinθₜ（负折射率）',
+                '<strong>波阻抗</strong>：η = √(μ/ε) > 0，与常规介质相同，为正值',
+                '<strong>反射系数</strong>：与常规介质计算方式相同，但需注意波矢方向',
+                '<strong>完美透镜</strong>：平板负折射率材料可放大倏逝波，实现超分辨率成像',
+                '<strong>隐身 cloak</strong>：通过变换光学设计，使电磁波绕过物体传播',
+                '<strong>应用前景</strong>：超透镜、隐身技术、新型天线、微波器件等'
+            ],
+            examples: [
+                {
+                    title: '例题 6.9',
+                    question: '证明在负折射率媒质中，E、H、k 构成左手系（左手定则）。',
+                    solution: '<strong>证明</strong>：<br><br>在负折射率媒质中：<br>ε < 0，μ < 0<br><br><strong>由麦克斯韦方程</strong>：<br>k × E = ωμH<br>k × H = -ωεE<br><br>由于 μ < 0，k × E 与 H 反向<br>由于 ε < 0，k × H 与 E 同向<br><br><strong>分析方向关系</strong>：<br>设 k 沿 +z，E 沿 +x<br>则 k × E 沿 +y<br>但 μ < 0，所以 H 沿 -y<br><br>即：E × H = (+x) × (-y) = -z，与 k 反向<br><br><strong>结论</strong>：<br>E、H、k 构成左手系，<strong>相速（沿 k）与能流（沿 E×H）方向相反</strong>。<br><br><strong>证毕</strong> ✓'
+                },
+                {
+                    title: '例题 6.10',
+                    question: '光从空气（n₁=1）入射到负折射率材料（n₂=-2），入射角 θᵢ = 30°，求折射角并说明折射方向。',
+                    solution: '<strong>应用修正的斯涅尔定律</strong>：<br>n₁sinθᵢ = -|n₂|sinθₜ<br>1×sin30° = -2sinθₜ<br>0.5 = -2sinθₜ<br>sinθₜ = -0.25<br><strong>θₜ ≈ -14.5°</strong><br><br><strong>方向说明</strong>：<br>负号表示折射波与入射波在法线<strong>同侧</strong><br><br>示意图：<br>```<br>      空气(n₁=1)      |      负折射率(n₂=-2)<br>                    |<br>    入射波 ↘        |      ↙ 折射波（同侧）<br>            \       |     /<br>             \ 30°  |    / -14.5°<br>    ───────────\────┼───/──────────<br>                \   |  /<br>                 \  | /<br>                  \ |/<br>```<br><br><strong>结论</strong>：负折射现象使折射波与入射波位于法线同侧。'
+                }
+            ]
+        },
+        'ch7-1': {
+            chapter: '第7章 导行电磁波',
+            title: '7.1 导行电磁波概论',
+            desc: '导行波分类、传输条件、波导参数',
+            knowledge: [
+                '<strong>导行波定义</strong>：被限制在特定结构（波导、传输线）内传播的电磁波，能量沿轴向传输',
+                '<strong>TEM波（横电磁波）</strong>：E<sub>z</sub> = 0，H<sub>z</sub> = 0，电场和磁场都在横截面内，无纵向分量',
+                '<strong>TE波（横电波）</strong>：E<sub>z</sub> = 0，H<sub>z</sub> ≠ 0，电场无纵向分量，磁场有纵向分量',
+                '<strong>TM波（横磁波）</strong>：H<sub>z</sub> = 0，E<sub>z</sub> ≠ 0，磁场无纵向分量，电场有纵向分量',
+                '<strong>截止频率 f<sub>c</sub></strong>：波导能传输某模式的最低频率，低于此频率波迅速衰减',
+                '<strong>截止波长 λ<sub>c</sub></strong>：λ<sub>c</sub> = v/f<sub>c</sub>，波导能传输的最大波长',
+                '<strong>传输条件</strong>：f > f<sub>c</sub> 或 λ < λ<sub>c</sub>，工作频率必须高于截止频率',
+                '<strong>波导波长 λ<sub>g</sub></strong>：λ<sub>g</sub> = λ/√(1-(f<sub>c</sub>/f)²) = λ/√(1-(λ/λ<sub>c</sub>)²)，大于自由空间波长',
+                '<strong>相速 v<sub>p</sub></strong>：v<sub>p</sub> = ω/β = v/√(1-(f<sub>c</sub>/f)²) > v，大于介质中光速',
+                '<strong>群速 v<sub>g</sub></strong>：v<sub>g</sub> = dω/dβ = v√(1-(f<sub>c</sub>/f)²) < v，能量传播速度',
+                '<strong>关系</strong>：v<sub>p</sub> · v<sub>g</sub> = v²，相速与群速的乘积等于介质中光速的平方'
+            ],
+            examples: [
+                {
+                    title: '例题 7.1',
+                    question: '某波导的截止频率为 10GHz，工作频率为 15GHz，求：(1) 波导波长；(2) 相速和群速（介质为空气）。',
+                    solution: '<strong>已知</strong>：f<sub>c</sub> = 10GHz，f = 15GHz<br><br><strong>(1) 自由空间波长</strong>：<br>λ = c/f = 3×10⁸/(15×10⁹) = 0.02m = 2cm<br><br><strong>波导波长</strong>：<br>λ<sub>g</sub> = λ/√(1-(f<sub>c</sub>/f)²) = 2/√(1-(10/15)²)<br>= 2/√(1-0.444) = 2/0.745 ≈ <strong>2.68 cm</strong><br><br><strong>(2) 相速和群速</strong>：<br>v<sub>p</sub> = c/√(1-(f<sub>c</sub>/f)²) = 3×10⁸/0.745 ≈ <strong>4.02×10⁸ m/s</strong><br>v<sub>g</sub> = c√(1-(f<sub>c</sub>/f)²) = 3×10⁸×0.745 ≈ <strong>2.24×10⁸ m/s</strong><br><br><strong>验证</strong>：v<sub>p</sub> · v<sub>g</sub> = 4.02×2.24×10¹⁶ ≈ 9×10¹⁶ = c² ✓'
+                },
+                {
+                    title: '例题 7.2',
+                    question: '证明在波导中相速 v<sub>p</sub> 大于光速 c，并说明这是否违反相对论。',
+                    solution: '<strong>证明</strong>：<br>v<sub>p</sub> = ω/β = c/√(1-(f<sub>c</sub>/f)²)<br><br>由于 f > f<sub>c</sub>，所以 (f<sub>c</sub>/f)² < 1<br>√(1-(f<sub>c</sub>/f)²) < 1<br><br>因此 v<sub>p</sub> = c/√(1-(f<sub>c</sub>/f)²) > c<br><br><strong>不违反相对论</strong>：<br>① <strong>相速不是能量传播速度</strong>，只是等相位面的移动速度<br>② 能量以<strong>群速 v<sub>g</sub></strong> 传播，v<sub>g</sub> < c<br>③ 相速超光速是波的干涉效应，不传递信息<br>④ 信息传播速度不超过群速，而 v<sub>g</sub> < c<br><br><strong>结论</strong>：相速超光速是波动现象，与相对论不矛盾。'
+                }
+            ]
+        },
+        'ch7-2': {
+            chapter: '第7章 导行电磁波',
+            title: '7.2 矩形波导',
+            desc: 'TE/TM模式、主模TE₁₀、截止波长',
+            knowledge: [
+                '<strong>矩形波导结构</strong>：截面为矩形的空心金属管，宽边 a，窄边 b（通常 a = 2b）',
+                '<strong>不能传输TEM波</strong>：空心波导无法维持TEM波所需的电荷分布，只能传输TE或TM波',
+                '<strong>TEₘₙ 模式</strong>：m 表示宽边半波变化数，n 表示窄边半波变化数',
+                '<strong>TMₘₙ 模式</strong>：m、n 均不能为 0，最低模式为 TM₁₁',
+                '<strong>主模 TE₁₀</strong>：截止频率最低、场结构最简单、最常用的工作模式',
+                '<strong>TE₁₀ 截止波长</strong>：λ<sub>c</sub>(TE₁₀) = 2a，仅与宽边尺寸有关',
+                '<strong>TE₁₀ 截止频率</strong>：f<sub>c</sub> = c/(2a)',
+                '<strong>单模传输条件</strong>：a < λ < 2a 或 f<sub>c</sub>(TE₁₀) < f < f<sub>c</sub>(TE₂₀)，只传输TE₁₀模',
+                '<strong>TE₁₀ 场结构</strong>：E<sub>y</sub> 沿 x 正弦分布，沿 y 均匀；H<sub>x</sub>、H<sub>z</sub> 相应分布',
+                '<strong>壁电流分布</strong>：宽边中央电流最大（纵向），窄边电流横向',
+                '<strong>衰减</strong>：导体壁损耗引起，与频率、表面电阻有关',
+                '<strong>功率容量</strong>：与波导尺寸、工作频率、击穿场强有关'
+            ],
+            examples: [
+                {
+                    title: '例题 7.3',
+                    question: '标准矩形波导 BJ-100（a = 22.86mm，b = 10.16mm），求：(1) TE₁₀ 模的截止频率；(2) 单模传输的频率范围。',
+                    solution: '<strong>(1) TE₁₀ 截止频率</strong>：<br>f<sub>c</sub>(TE₁₀) = c/(2a) = 3×10⁸/(2×0.02286)<br>= 3×10⁸/0.04572 ≈ <strong>6.56 GHz</strong><br><br><strong>(2) 单模传输范围</strong>：<br>需满足：f<sub>c</sub>(TE₁₀) < f < f<sub>c</sub>(TE₂₀)<br><br>f<sub>c</sub>(TE₂₀) = c/a = 2f<sub>c</sub>(TE₁₀) ≈ 13.12 GHz<br>f<sub>c</sub>(TE₀₁) = c/(2b) = 3×10⁸/(2×0.01016) ≈ 14.76 GHz<br><br><strong>单模范围</strong>：<strong>6.56 GHz < f < 13.12 GHz</strong><br>通常取 8.2-12.4 GHz（X波段）'
+                },
+                {
+                    title: '例题 7.4',
+                    question: '矩形波导（a = 3cm，b = 1.5cm）传输 TE₁₀ 模，工作波长 λ = 5cm，求波导波长和相速。',
+                    solution: '<strong>已知</strong>：<br>a = 3cm，λ = 5cm<br><br><strong>截止波长</strong>：<br>λ<sub>c</sub>(TE₁₀) = 2a = 6cm<br><br><strong>验证传输条件</strong>：<br>λ = 5cm < λ<sub>c</sub> = 6cm ✓，可以传输<br><br><strong>波导波长</strong>：<br>λ<sub>g</sub> = λ/√(1-(λ/λ<sub>c</sub>)²) = 5/√(1-(5/6)²)<br>= 5/√(1-0.694) = 5/0.553 ≈ <strong>9.04 cm</strong><br><br><strong>相速</strong>：<br>v<sub>p</sub> = c/√(1-(λ/λ<sub>c</sub>)²) = 3×10⁸/0.553 ≈ <strong>5.42×10⁸ m/s</strong>'
+                }
+            ]
+        },
+        'ch7-3': {
+            chapter: '第7章 导行电磁波',
+            title: '7.3 圆柱形波导',
+            desc: '圆波导模式、TE₁₁主模、TE₀₁/TM₀₁特性',
+            knowledge: [
+                '<strong>圆柱形波导结构</strong>：截面为圆形的空心金属管，半径为 a',
+                '<strong>柱坐标系分析</strong>：采用 (r, φ, z) 坐标，场量用贝塞尔函数描述',
+                '<strong>TEₘₙ 模式</strong>：m 表示沿圆周变化数，n 表示沿径向零点数',
+                '<strong>TMₘₙ 模式</strong>：m 可以为 0，n 表示沿径向零点数',
+                '<strong>主模 TE₁₁</strong>：截止频率最低，λ<sub>c</sub>(TE₁₁) = 3.41a，极化简并（两个正交模式）',
+                '<strong>TE₀₁ 模式</strong>：λ<sub>c</sub>(TE₀₁) = 1.64a，圆对称，衰减随频率增加而减小，用于远距离传输',
+                '<strong>TM₀₁ 模式</strong>：λ<sub>c</sub>(TM₀₁) = 2.61a，圆对称，轴线上电场最强',
+                '<strong>截止波长公式</strong>：λ<sub>c</sub> = 2πa/p<sub>mn</sub>，p<sub>mn</sub> 为贝塞尔函数根',
+                '<strong>与矩形波导比较</strong>：圆波导加工方便，但存在极化简并，常用于旋转关节',
+                '<strong>应用</strong>：雷达旋转关节、远距离波导通信（TE₀₁）、谐振腔'
+            ],
+            examples: [
+                {
+                    title: '例题 7.5',
+                    question: '圆柱形波导半径 a = 2cm，求：(1) 主模 TE₁₁ 的截止频率；(2) 若工作频率为 5GHz，能传输哪些模式？',
+                    solution: '<strong>(1) TE₁₁ 截止频率</strong>：<br>λ<sub>c</sub>(TE₁₁) = 3.41a = 3.41×2 = 6.82cm<br>f<sub>c</sub>(TE₁₁) = c/λ<sub>c</sub> = 3×10⁸/0.0682 ≈ <strong>4.40 GHz</strong><br><br><strong>(2) 可传输模式</strong>：<br>计算各模式截止频率：<br>f<sub>c</sub>(TE₀₁) = c/(1.64a) = 3×10⁸/(0.0328) ≈ 9.15 GHz<br>f<sub>c</sub>(TM₀₁) = c/(2.61a) = 3×10⁸/(0.0522) ≈ 5.75 GHz<br>f<sub>c</sub>(TE₂₁) = c/(2.06a) ≈ 7.28 GHz<br><br>工作频率 5GHz 时：<br>f > f<sub>c</sub>(TE₁₁) = 4.40 GHz ✓<br>f < f<sub>c</sub>(TM₀₁) = 5.75 GHz<br><br><strong>只能传输 TE₁₁ 模</strong>（单模工作）'
+                },
+                {
+                    title: '例题 7.6',
+                    question: '为什么 TE₀₁ 模适合远距离波导传输？说明其特点。',
+                    solution: '<strong>TE₀₁ 模的特点</strong>：<br><br>① <strong>圆对称性</strong>：<br>场分布与 φ 无关，旋转对称，无偏振问题<br><br>② <strong>壁电流特性</strong>：<br>只有 φ 方向电流，无纵向电流，导体损耗小<br><br>③ <strong>衰减特性</strong>：<br>衰减常数 α ∝ f^(-3/2)，<strong>频率越高衰减越小</strong><br>这与一般模式相反（一般模式 α 随 f 增加）<br><br>④ <strong>应用</strong>：<br>毫米波波导通信，利用高频率低衰减特性<br>可实现几十公里无中继传输<br><br><strong>缺点</strong>：不是主模，需要模式滤波器抑制其他模式'
+                }
+            ]
+        },
+        'ch7-4': {
+            chapter: '第7章 导行电磁波',
+            title: '7.4 同轴波导',
+            desc: 'TEM主模、高次模、单模传输条件',
+            knowledge: [
+                '<strong>同轴波导结构</strong>：内导体（半径 a）+ 外导体（内半径 b）+ 介质填充',
+                '<strong>可传输TEM波</strong>：同轴结构可维持径向电场和环向磁场，支持TEM模',
+                '<strong>TEM波特性</strong>：无截止频率，f<sub>c</sub> = 0，可传输直流到高频',
+                '<strong>TEM波阻抗</strong>：Z<sub>0</sub> = (η/2π)ln(b/a) = (60/√ε<sub>r</sub>)ln(b/a) Ω',
+                '<strong>主模为TEM</strong>：最低阶模式，无纵向场分量',
+                '<strong>高次模 TE₁₁</strong>：第一个高次模，λ<sub>c</sub> ≈ π(a+b)，存在截止频率',
+                '<strong>高次模 TM₀₁</strong>：λ<sub>c</sub> ≈ 2(b-a)，截止频率较高',
+                '<strong>单模传输条件</strong>：λ > π(a+b) 或 f < c/(π(a+b)√ε<sub>r</sub>)，只传输TEM模',
+                '<strong>尺寸设计</strong>：通常取 b/a ≈ 2.3（对应特性阻抗 50Ω）或 3.5（对应 75Ω）',
+                '<strong>应用</strong>：同轴电缆、连接器、射频传输线、天线馈线'
+            ],
+            examples: [
+                {
+                    title: '例题 7.7',
+                    question: '同轴线内半径 a = 0.5mm，外半径 b = 2mm，填充介质 ε<sub>r</sub> = 2.1，求：(1) 特性阻抗；(2) 保证单模传输的最高频率。',
+                    solution: '<strong>(1) 特性阻抗</strong>：<br>Z<sub>0</sub> = (60/√ε<sub>r</sub>)ln(b/a)<br>= (60/√2.1)ln(2/0.5)<br>= (60/1.45)ln(4)<br>= 41.4×1.386 ≈ <strong>57.4 Ω</strong><br><br><strong>(2) 单模传输最高频率</strong>：<br>第一个高次模 TE₁₁ 截止波长：<br>λ<sub>c</sub> ≈ π(a+b) = π×2.5mm = 7.85mm<br><br>截止频率：<br>f<sub>c</sub> = c/(λ<sub>c</sub>√ε<sub>r</sub>) = 3×10⁸/(7.85×10⁻³×√2.1)<br>= 3×10⁸/(11.37×10⁻³) ≈ <strong>26.4 GHz</strong><br><br><strong>单模范围</strong>：f < 26.4 GHz'
+                },
+                {
+                    title: '例题 7.8',
+                    question: '设计 50Ω 同轴线，外半径 b = 5mm，空气填充（ε<sub>r</sub> = 1），求内半径 a。',
+                    solution: '<strong>已知</strong>：<br>Z<sub>0</sub> = 50Ω，b = 5mm，ε<sub>r</sub> = 1<br><br><strong>由阻抗公式</strong>：<br>Z<sub>0</sub> = 60ln(b/a)<br>50 = 60ln(5/a)<br><br><strong>求解</strong>：<br>ln(5/a) = 50/60 = 0.833<br>5/a = e^0.833 = 2.30<br>a = 5/2.30 ≈ <strong>2.17 mm</strong><br><br><strong>验证</strong>：<br>b/a = 5/2.17 ≈ 2.3<br>这是标准同轴线的常用比值<br><br><strong>结论</strong>：内半径约为 2.17mm'
+                }
+            ]
+        },
+        'ch7-5': {
+            chapter: '第7章 导行电磁波',
+            title: '7.5 谐振腔',
+            desc: '电磁储能、谐振频率、品质因数',
+            knowledge: [
+                '<strong>谐振腔作用</strong>：电磁能量存储、频率选择、滤波、振荡器',
+                '<strong>与LC回路比较</strong>：谐振腔适用于微波频段，Q值高，体积小',
+                '<strong>矩形谐振腔</strong>：由矩形波导两端短路形成，尺寸 a×b×d',
+                '<strong>圆柱谐振腔</strong>：由圆波导两端短路形成，半径 a，长度 d',
+                '<strong>谐振模式 TEₘₙp</strong>：m、n 为横向模式数，p 为纵向半波数',
+                '<strong>谐振模式 TMₘₙp</strong>：m、n 为横向模式数，p 为纵向半波数（p≠0）',
+                '<strong>矩形腔谐振频率</strong>：fₘₙₚ = (c/2)√((m/a)²+(n/b)²+(p/d)²)',
+                '<strong>主模 TE₁₀₁</strong>：矩形腔常用模式，场结构简单，Q值较高',
+                '<strong>品质因数 Q</strong>：Q = ωW/Pᴸ，储能与损耗之比，表示选频特性',
+                '<strong>Q值意义</strong>：Q 越高，带宽越窄，选择性越好，储能效率越高',
+                '<strong>无载Q与有载Q</strong>：无载Q只考虑腔体损耗，有载Q考虑耦合负载影响'
+            ],
+            examples: [
+                {
+                    title: '例题 7.9',
+                    question: '矩形谐振腔尺寸 a = 2cm，b = 1cm，d = 3cm，求 TE₁₀₁ 模的谐振频率。',
+                    solution: '<strong>谐振频率公式</strong>：<br>fₘₙₚ = (c/2)√((m/a)²+(n/b)²+(p/d)²)<br><br><strong>TE₁₀₁ 模</strong>（m=1，n=0，p=1）：<br>f₁₀₁ = (3×10⁸/2)√((1/0.02)²+(0/0.01)²+(1/0.03)²)<br>= 1.5×10⁸√(2500+0+1111)<br>= 1.5×10⁸√3611<br>= 1.5×10⁸×60.1<br>≈ <strong>9.02 GHz</strong><br><br><strong>讨论</strong>：改变腔体尺寸可精确调节谐振频率。'
+                },
+                {
+                    title: '例题 7.10',
+                    question: '圆柱谐振腔半径 a = 2cm，长度 d = 3cm，求 TM₀₁₀ 模的谐振频率。',
+                    solution: '<strong>TM₀₁₀ 模谐振频率</strong>：<br>f = (c/2π√εᵣ)(p₀₁/a)<br><br>其中 p₀₁ = 2.405（J₀(x) 的第一个根）<br><br><strong>计算</strong>：<br>f = (3×10⁸/(2π))×(2.405/0.02)<br>= 4.77×10⁷×120.25<br>≈ <strong>5.74 GHz</strong><br><br><strong>注</strong>：TM₀₁₀ 模的谐振频率与腔长 d 无关，只与半径有关。<br>这种模式称为"单模腔"，频率稳定性好。'
+                }
+            ]
+        },
+        'ch7-6': {
+            chapter: '第7章 导行电磁波',
+            title: '7.6 传输线',
+            desc: '电报方程、特性阻抗、阻抗匹配',
+            knowledge: [
+                '<strong>分布参数模型</strong>：传输线用单位长度参数描述：R（电阻）、L（电感）、C（电容）、G（电导）',
+                '<strong>电报方程</strong>：∂V/∂z = -(R+jωL)I，∂I/∂z = -(G+jωC)V，描述电压电流沿线变化',
+                '<strong>传播常数 γ</strong>：γ = √((R+jωL)(G+jωC)) = α + jβ，α 为衰减常数，β 为相移常数',
+                '<strong>特性阻抗 Z₀</strong>：Z₀ = √((R+jωL)/(G+jωC))，行波电压与电流之比',
+                '<strong>无耗传输线</strong>：R = G = 0，Z₀ = √(L/C)，γ = jω√(LC) = jβ',
+                '<strong>输入阻抗</strong>：Zᵢₙ(z) = Z₀(Zᴸ+jZ₀tan(βl))/(Z₀+jZᴸtan(βl))，与位置有关',
+                '<strong>反射系数 Γ</strong>：Γ = (Zᴸ-Z₀)/(Zᴸ+Z₀)，负载处电压反射波与入射波之比',
+                '<strong>三种工作状态</strong>：<br>① 行波：Zᴸ = Z₀，Γ = 0，无反射<br>② 驻波：Zᴸ = 0/∞/±jX，|Γ| = 1，全反射<br>③ 行驻波：0 < |Γ| < 1，部分反射',
+                '<strong>λ/4 阻抗变换器</strong>：Z₀\' = √(Z₀Zᴸ)，用于实数负载匹配',
+                '<strong>短路/开路支节</strong>：利用短路线或开路线的纯电抗特性进行调谐匹配',
+                '<strong>史密斯圆图</strong>：图解法进行阻抗变换和匹配设计'
+            ],
+            examples: [
+                {
+                    title: '例题 7.11',
+                    question: '无耗传输线特性阻抗 Z₀ = 50Ω，负载 Zᴸ = 100Ω，线长 l = λ/4，求输入阻抗。',
+                    solution: '<strong>方法：λ/4 阻抗变换</strong><br><br>对于 λ/4 传输线：<br>Zᵢₙ = Z₀²/Zᴸ<br><br><strong>计算</strong>：<br>Zᵢₙ = 50²/100 = 2500/100 = <strong>25Ω</strong><br><br><strong>验证（用公式）</strong>：<br>Zᵢₙ = Z₀(Zᴸ+jZ₀tan(βl))/(Z₀+jZᴸtan(βl))<br>βl = (2π/λ)×(λ/4) = π/2，tan(π/2) → ∞<br>Zᵢₙ = Z₀×(jZ₀)/(jZᴸ) = Z₀²/Zᴸ = 25Ω ✓<br><br><strong>结论</strong>：λ/4 线具有阻抗倒置作用。'
+                },
+                {
+                    title: '例题 7.12',
+                    question: '传输线 Z₀ = 50Ω，负载 Zᴸ = 25+j25Ω，用短路支节进行匹配，求支节位置和长度。',
+                    solution: '<strong>步骤</strong>：<br><br>① <strong>归一化负载</strong>：<br>zᴸ = Zᴸ/Z₀ = 0.5+j0.5<br><br>② <strong>在史密斯圆图上</strong>：<br>找到 g = 1 的等电导圆与负载反射系数圆的交点<br>得到两个解，取靠近负载的解<br><br>③ <strong>支节位置 d</strong>：<br>从负载向源方向旋转到 g=1 点<br>d ≈ <strong>0.114λ</strong><br><br>④ <strong>支节长度 l</strong>：<br>需要抵消的电纳 b ≈ -0.72<br>短路支节提供 +j0.72<br>l ≈ <strong>0.348λ</strong><br><br><strong>结论</strong>：在距负载 0.114λ 处并联短路支节，支节长 0.348λ。'
+                }
+            ]
+        },
+        'ch8-1': {
+            chapter: '第8章 电磁辐射',
+            title: '8.1 滞后位',
+            desc: '滞后位物理意义、达朗贝尔方程、远场近似',
+            knowledge: [
+                '<strong>滞后位物理意义</strong>：t 时刻的场由 t-r/v 时刻的源决定，场滞后于源，体现电磁作用的有限传播速度',
+                '<strong>标量滞后位</strong>：φ(r,t) = (1/4πε)∫ ρ(r\',t-R/v)/R dV\'，R = |r-r\'| 为源点到场点的距离',
+                '<strong>矢量滞后位</strong>：A(r,t) = (μ/4π)∫ J(r\',t-R/v)/R dV\'，与电流源相关',
+                '<strong>达朗贝尔方程</strong>：∇²A - με(∂²A/∂t²) = -μJ，∇²φ - με(∂²φ/∂t²) = -ρ/ε',
+                '<strong>近区条件</strong>：r << λ，场与静态场类似，称为感应场或准静态场',
+                '<strong>远区条件</strong>：r >> λ，辐射场占主导，称为辐射场或远场',
+                '<strong>远场近似</strong>：R ≈ r - r\'·e<sub>r</sub>，1/R ≈ 1/r，相位因子 e^(-jkR) ≈ e^(-jkr)e^(jkr\'·e<sub>r</sub>)',
+                '<strong>辐射场特性</strong>：E、H 正交，与传播方向垂直，幅度与 1/r 成正比',
+                '<strong>滞后位的工程意义</strong>：天线辐射分析的基础，计算任意分布源的辐射场'
+            ],
+            examples: [
+                {
+                    title: '例题 8.1',
+                    question: '已知电流元 Idl 在远区产生的矢量位 A = (μ₀Idl/4πr)e^(-jkr)e<sub>z</sub>，求辐射电场和磁场。',
+                    solution: '<strong>求磁场</strong>：<br>H = (1/μ₀)∇ × A<br>在远区，保留 1/r 项：<br>H ≈ (jkr × A)/(μ₀r) = (jkIdl/4πr)sinθ e^(-jkr)e<sub>φ</sub><br><strong>H = j(Idl/2λr)sinθ e^(-jkr)e<sub>φ</sub></strong><br><br><strong>求电场</strong>：<br>E = η₀H × e<sub>r</sub> = η₀j(Idl/2λr)sinθ e^(-jkr)e<sub>θ</sub><br><strong>E = j(η₀Idl/2λr)sinθ e^(-jkr)e<sub>θ</sub></strong><br><br><strong>特点</strong>：<br>- TEM波：E⊥H⊥r<br>- 幅度 ∝ 1/r<br>- 方向性：sinθ，垂直于电流最强'
+                },
+                {
+                    title: '例题 8.2',
+                    question: '频率为 100MHz 的电磁波，求近区与远区的分界距离（通常取 r = λ/2π 为分界）。',
+                    solution: '<strong>计算波长</strong>：<br>λ = c/f = 3×10⁸/(100×10⁶) = 3m<br><br><strong>分界距离</strong>：<br>r = λ/2π = 3/(2π) ≈ <strong>0.477 m ≈ 48 cm</strong><br><br><strong>区域划分</strong>：<br>- <strong>近区</strong>：r < 48cm，感应场为主<br>- <strong>远区</strong>：r > 48cm，辐射场为主<br><br><strong>工程意义</strong>：<br>天线测试应在远区进行，确保测量的是辐射场而非感应场。'
+                }
+            ]
+        },
+        'ch8-2': {
+            chapter: '第8章 电磁辐射',
+            title: '8.2 电偶极子的辐射',
+            desc: '电流元辐射、近区场、远区场、辐射方向图',
+            knowledge: [
+                '<strong>电偶极子模型</strong>：短电流元 Idl，长度 l << λ，电流 I 均匀分布',
+                '<strong>近区场（感应场）</strong>：r << λ，场以 1/r³、1/r² 衰减，电抗性，储能为主，无净辐射功率',
+                '<strong>近区电场</strong>：E<sub>r</sub> ≈ (2p/4πε₀r³)cosθ，E<sub>θ</sub> ≈ (p/4πε₀r³)sinθ，p = Idl/jω 为电偶极矩',
+                '<strong>近区磁场</strong>：H<sub>φ</sub> ≈ (Idl/4πr²)sinθ，与静态场类似',
+                '<strong>远区场（辐射场）</strong>：r >> λ，场以 1/r 衰减，TEM波，有净辐射功率',
+                '<strong>远区电场</strong>：E<sub>θ</sub> = j(η₀Idl/2λr)sinθ e^(-jkr)，垂直于传播方向',
+                '<strong>远区磁场</strong>：H<sub>φ</sub> = j(Idl/2λr)sinθ e^(-jkr)，与 E<sub>θ</sub> 正交',
+                '<strong>辐射方向图</strong>：F(θ) = sinθ，呈"8"字形，垂直于轴线（θ=90°）辐射最强',
+                '<strong>辐射功率</strong>：P = (I²/2)(80π²)(l/λ)²，与 (l/λ)² 成正比',
+                '<strong>辐射电阻</strong>：Rᵣ = 80π²(l/λ)²，表征辐射能力，单位欧姆',
+                '<strong>辐射电阻意义</strong>：将辐射功率等效为电阻消耗，Rᵣ 越大辐射能力越强'
+            ],
+            examples: [
+                {
+                    title: '例题 8.3',
+                    question: '电偶极子长度 l = 0.1λ，电流 I = 1A，求：(1) 辐射电阻；(2) 辐射功率；(3) θ = 30° 方向远区电场幅度。',
+                    solution: '<strong>(1) 辐射电阻</strong>：<br>Rᵣ = 80π²(l/λ)² = 80π²(0.1)²<br>= 80×9.87×0.01 ≈ <strong>7.9 Ω</strong><br><br><strong>(2) 辐射功率</strong>：<br>P = (I²/2)Rᵣ = (1/2)×7.9 ≈ <strong>3.95 W</strong><br><br><strong>(3) 远区电场</strong>：<br>|E<sub>θ</sub>| = (η₀Idl/2λr)sinθ<br>= (120π×1×0.1/2r)sin30°<br>= (6π/r)×0.5 = <strong>3π/r V/m</strong><br><br>在 r = 1km 处：|E<sub>θ</sub>| ≈ 9.42 mV/m'
+                },
+                {
+                    title: '例题 8.4',
+                    question: '比较电偶极子在近区和远区的场特性差异。',
+                    solution: '<strong>近区场（r << λ）</strong>：<br><br>① <strong>衰减特性</strong>：<br>E ∝ 1/r³，H ∝ 1/r²<br><br>② <strong>场结构</strong>：<br>类似静态场，E 有径向和横向分量<br><br>③ <strong>能量</strong>：<br>储能为主，电场与磁场相位差 90°<br>平均坡印廷矢量为零，无净辐射<br><br>④ <strong>物理本质</strong>：<br>准静态场，束缚场<br><br><strong>远区场（r >> λ）</strong>：<br><br>① <strong>衰减特性</strong>：<br>E、H 均 ∝ 1/r<br><br>② <strong>场结构</strong>：<br>TEM波，E⊥H⊥r<br><br>③ <strong>能量</strong>：<br>辐射功率，E、H 同相<br>平均坡印廷矢量不为零<br><br>④ <strong>物理本质</strong>：<br>辐射场，脱离源的电磁波'
+                }
+            ]
+        },
+        'ch8-3': {
+            chapter: '第8章 电磁辐射',
+            title: '8.3 电与磁的对偶性',
+            desc: '对偶原理、对偶变换、简化分析',
+            knowledge: [
+                '<strong>对偶原理</strong>：电磁场方程具有对称性，可通过变量替换将电基本振子问题转换为磁基本振子问题',
+                '<strong>对偶变换规则</strong>：<br>E → H，H → -E<br>ε → μ，μ → ε<br>η → 1/η<br>电荷 q → 磁荷 qₘ<br>电流 I → 磁流 Iᵐ',
+                '<strong>电基本振子</strong>：电流元 Idl，产生电场 E<sub>θ</sub>、磁场 H<sub>φ</sub>',
+                '<strong>磁基本振子</strong>：磁流元 Iᵐ dl，产生磁场 H<sub>θ</sub>、电场 E<sub>φ</sub>',
+                '<strong>对偶性应用</strong>：已知电偶极子辐射场，通过对偶变换直接得到磁偶极子辐射场',
+                '<strong>对偶性意义</strong>：减少重复计算，统一理解电磁现象',
+                '<strong>注意</strong>：对偶性在自由空间成立，在有源区域需考虑电荷守恒',
+                '<strong>推广</strong>：对偶性可应用于天线、波导、散射等多种电磁问题'
+            ],
+            examples: [
+                {
+                    title: '例题 8.5',
+                    question: '利用对偶原理，由电偶极子远区场推导磁偶极子（小电流环）的远区场。',
+                    solution: '<strong>电偶极子远区场</strong>：<br>E<sub>θ</sub> = j(η₀Idl/2λr)sinθ e^(-jkr)<br>H<sub>φ</sub> = j(Idl/2λr)sinθ e^(-jkr)<br><br><strong>对偶变换</strong>：<br>E → H，H → -E，η₀ → 1/η₀<br>Idl → Iᵐ dl<br><br><strong>磁偶极子场</strong>：<br>H<sub>θ</sub> = j(Iᵐ dl/2λη₀r)sinθ e^(-jkr)<br>-E<sub>φ</sub> = j(Iᵐ dl/2λr)sinθ e^(-jkr)<br><br><strong>结果</strong>：<br><strong>H<sub>θ</sub> = j(Iᵐ dl/2λη₀r)sinθ e^(-jkr)</strong><br><strong>E<sub>φ</sub> = -j(Iᵐ dl/2λr)sinθ e^(-jkr)</strong><br><br><strong>注</strong>：磁偶极矩 pₘ = μIS，S 为环面积。'
+                },
+                {
+                    title: '例题 8.6',
+                    question: '说明对偶原理在电磁学中的应用价值。',
+                    solution: '<strong>应用价值</strong>：<br><br>① <strong>简化计算</strong>：<br>只需计算一种情况，另一种通过对偶变换得到<br>如：电偶极子 ↔ 磁偶极子<br><br>② <strong>统一理解</strong>：<br>揭示电磁现象的对称性和内在联系<br><br>③ <strong>工程应用</strong>：<br>- 互补天线（缝隙天线与振子天线）<br>- 巴俾涅原理（Babinet\'s principle）<br>- 频率选择表面设计<br><br>④ <strong>理论意义</strong>：<br>验证麦克斯韦方程组的对称性<br>为磁单极子理论提供数学基础<br><br>⑤ <strong>数值计算</strong>：<br>减少编程工作量，提高代码复用性'
+                }
+            ]
+        },
+        'ch8-4': {
+            chapter: '第8章 电磁辐射',
+            title: '8.4 磁偶极子的辐射',
+            desc: '小电流环辐射、方向图、应用',
+            knowledge: [
+                '<strong>磁偶极子模型</strong>：小电流环，半径 a << λ，电流 I 均匀分布',
+                '<strong>磁偶极矩</strong>：pₘ = μIS = μIπa²，S 为环面积，方向由右手定则确定',
+                '<strong>远区电场</strong>：E<sub>φ</sub> = -(η₀pₘ/2λr)sinθ e^(-jkr) = -(η₀k²IS/4πr)sinθ e^(-jkr)',
+                '<strong>远区磁场</strong>：H<sub>θ</sub> = (pₘ/2λη₀r)sinθ e^(-jkr) = (k²IS/4πr)sinθ e^(-jkr)',
+                '<strong>场结构</strong>：与电偶极子对偶，E<sub>φ</sub> 和 H<sub>θ</sub> 互换位置',
+                '<strong>辐射方向图</strong>：F(θ) = sinθ，与电偶极子相同，呈"8"字形',
+                '<strong>辐射功率</strong>：P = (μ₀pₘ²ω⁴)/(12πc³) = (I²/2)(320π⁴)(S/λ²)²',
+                '<strong>辐射电阻</strong>：Rᵣ = 320π⁴(S/λ²)² = 31.2(k²S)²，与 (S/λ²)² 成正比',
+                '<strong>与电偶极子比较</strong>：磁偶极子辐射能力比电偶极子弱（相同尺寸时）',
+                '<strong>应用</strong>：小型天线（AM收音机）、RFID标签、近场通信(NFC)、磁场探头'
+            ],
+            examples: [
+                {
+                    title: '例题 8.7',
+                    question: '小电流环半径 a = 1cm，电流 I = 1A，频率 f = 100MHz，求：(1) 磁偶极矩；(2) 辐射电阻；(3) 辐射功率。',
+                    solution: '<strong>(1) 磁偶极矩</strong>：<br>S = πa² = π×(0.01)² = 3.14×10⁻⁴ m²<br>pₘ = μ₀IS = 4π×10⁻⁷×1×3.14×10⁻⁴<br>= <strong>3.95×10⁻¹⁰ Wb·m</strong><br><br><strong>(2) 辐射电阻</strong>：<br>λ = c/f = 3m<br>Rᵣ = 320π⁴(S/λ²)² = 320×97.4×(3.14×10⁻⁴/9)²<br>= 31168×(3.49×10⁻⁵)² ≈ <strong>0.038 Ω</strong><br><br><strong>(3) 辐射功率</strong>：<br>P = (I²/2)Rᵣ = 0.5×0.038 ≈ <strong>0.019 W = 19 mW</strong><br><br><strong>讨论</strong>：小环辐射能力很弱，适合近场应用。'
+                },
+                {
+                    title: '例题 8.8',
+                    question: '比较电偶极子（l = λ/10）和磁偶极子（周长 2πa = λ/10）的辐射电阻比。',
+                    solution: '<strong>电偶极子</strong>：<br>Rᵣ(e) = 80π²(l/λ)² = 80π²(0.1)² = 7.9 Ω<br><br><strong>磁偶极子</strong>：<br>2πa = 0.1λ → a = 0.1λ/2π<br>S = πa² = π(0.1λ/2π)² = 0.01λ²/4π<br><br>Rᵣ(m) = 320π⁴(S/λ²)² = 320π⁴(0.01/4π)²<br>= 320π⁴×(2.53×10⁻⁴)²<br>= 320×97.4×6.4×10⁻⁸ ≈ <strong>0.002 Ω</strong><br><br><strong>比值</strong>：<br>Rᵣ(e)/Rᵣ(m) = 7.9/0.002 ≈ <strong>3950</strong><br><br><strong>结论</strong>：相同电尺寸时，电偶极子辐射能力远强于磁偶极子。'
+                }
+            ]
+        },
+        'ch8-5': {
+            chapter: '第8章 电磁辐射',
+            title: '8.5 天线的基本参数',
+            desc: '方向图、方向性系数、增益、效率',
+            knowledge: [
+                '<strong>辐射方向图</strong>：描述天线辐射强度随空间角度的变化，通常用归一化场强或功率表示',
+                '<strong>主瓣</strong>：辐射最强的波瓣，包含最大辐射方向',
+                '<strong>旁瓣</strong>：除主瓣外的其他波瓣，通常希望尽量小以减少干扰',
+                '<strong>后瓣</strong>：与主瓣方向相反的波瓣',
+                '<strong>零陷</strong>：辐射为零的方向，用于抑制特定方向的信号',
+                '<strong>半功率波瓣宽度（HPBW）</strong>：辐射功率下降到最大值一半时的角度范围',
+                '<strong>方向性系数 D</strong>：D = 4π/Ω_A = Pₘₐₓ/Pₐᵥg，最大辐射强度与平均辐射强度之比',
+                '<strong>天线效率 η</strong>：η = Pᵣ/Pᵢₙ = Rᵣ/(Rᵣ+Rˡ)，辐射功率与输入功率之比',
+                '<strong>天线增益 G</strong>：G = ηD，综合考虑方向性和效率',
+                '<strong>输入阻抗 Zᵢₙ</strong>：天线输入端的电压与电流之比，通常希望与馈线匹配',
+                '<strong>极化特性</strong>：天线辐射电磁波的极化方式（线极化、圆极化、椭圆极化）',
+                '<strong>带宽</strong>：天线性能满足要求的频率范围',
+                '<strong>有效长度 lᵉ</strong>：将天线等效为电流均匀分布的短天线时的等效长度'
+            ],
+            examples: [
+                {
+                    title: '例题 8.9',
+                    question: '某天线辐射方向图 F(θ) = cos²θ（0 ≤ θ ≤ π/2），求方向性系数 D。',
+                    solution: '<strong>方向性系数公式</strong>：<br>D = 4π/∫∫|F(θ,φ)|²sinθ dθdφ<br><br><strong>计算分母</strong>：<br>∫[0,2π]dφ ∫[0,π/2]cos⁴θ sinθ dθ<br>= 2π × [-cos⁵θ/5][0,π/2]<br>= 2π × (1/5) = 2π/5<br><br><strong>方向性系数</strong>：<br>D = 4π/(2π/5) = <strong>10</strong><br><br><strong>转换为 dB</strong>：<br>D(dB) = 10lg(10) = <strong>10 dB</strong>'
+                },
+                {
+                    title: '例题 8.10',
+                    question: '天线输入功率 10W，效率 η = 0.8，方向性系数 D = 15，求：(1) 辐射功率；(2) 增益；(3) 在最大辐射方向 r = 1km 处的功率密度。',
+                    solution: '<strong>(1) 辐射功率</strong>：<br>Pᵣ = ηPᵢₙ = 0.8×10 = <strong>8 W</strong><br><br><strong>(2) 增益</strong>：<br>G = ηD = 0.8×15 = <strong>12</strong><br>或 G(dB) = 10lg(12) ≈ <strong>10.8 dB</strong><br><br><strong>(3) 功率密度</strong>：<br>Sₘₐₓ = GPᵢₙ/(4πr²)<br>= 12×10/(4π×(1000)²)<br>= 120/(1.256×10⁷)<br>≈ <strong>9.55 μW/m²</strong>'
+                }
+            ]
+        },
+        'ch8-6': {
+            chapter: '第8章 电磁辐射',
+            title: '8.6 对称天线',
+            desc: '对称振子、半波天线、电流分布',
+            knowledge: [
+                '<strong>对称天线结构</strong>：直导线从中心馈电，两臂对称，总长度 2l',
+                '<strong>电流分布</strong>：近似正弦分布 I(z) = Iᵐ sin[k(l-|z|)]，在端点为零，中心最大',
+                '<strong>半波对称天线</strong>：总长度 2l = λ/2，最常用，性能优良',
+                '<strong>半波天线电流分布</strong>：I(z) = Iᵐ cos(kz)，中心 I = Iᵐ，端点 I = 0',
+                '<strong>半波天线辐射场</strong>：E<sub>θ</sub> = j(η₀Iᵐ/2πr)e^(-jkr)(cos(π/2 cosθ)/sinθ)',
+                '<strong>半波天线方向图</strong>：F(θ) = cos(π/2 cosθ)/sinθ，比电偶极子略宽',
+                '<strong>半波天线半功率宽度</strong>：约 78°，电偶极子为 90°',
+                '<strong>半波天线方向性系数</strong>：D ≈ 1.64（2.15 dB）',
+                '<strong>半波天线辐射电阻</strong>：Rᵣ ≈ 73Ω',
+                '<strong>半波天线输入阻抗</strong>：Zᵢₙ ≈ 73 + j43Ω（谐振时虚部为0）',
+                '<strong>全波天线</strong>：2l = λ，方向性更强，但阻抗特性较差',
+                '<strong>短振子</strong>：2l << λ，电流近似三角形分布，辐射电阻小'
+            ],
+            examples: [
+                {
+                    title: '例题 8.11',
+                    question: '半波对称天线工作频率 300MHz，求：(1) 天线长度；(2) 若中心电流 Iᵐ = 1A，求辐射功率。',
+                    solution: '<strong>(1) 天线长度</strong>：<br>λ = c/f = 3×10⁸/(300×10⁶) = 1m<br>半波天线长度 = λ/2 = <strong>0.5 m = 50 cm</strong><br><br><strong>(2) 辐射功率</strong>：<br>P = (Iᵐ²/2)Rᵣ = (1/2)×73 = <strong>36.5 W</strong><br><br><strong>讨论</strong>：半波天线是实际应用中最常用的天线形式，阻抗适中，便于匹配。'
+                },
+                {
+                    title: '例题 8.12',
+                    question: '比较半波天线与电偶极子的方向性系数和半功率波瓣宽度。',
+                    solution: '<strong>电偶极子</strong>：<br>D = 1.5（1.76 dB）<br>HPBW = 90°<br><br><strong>半波天线</strong>：<br>D = 1.64（2.15 dB）<br>HPBW ≈ 78°<br><br><strong>比较</strong>：<br>① 半波天线方向性略强于电偶极子<br>② 半波天线波瓣略窄<br>③ 半波天线增益提高约 0.4 dB<br><br><strong>原因</strong>：<br>半波天线电流分布更集中于中心，有效辐射区域相对集中。'
+                }
+            ]
+        },
+        'ch8-7': {
+            chapter: '第8章 电磁辐射',
+            title: '8.7 天线阵',
+            desc: '均匀直线阵、方向图相乘原理、波束控制',
+            knowledge: [
+                '<strong>天线阵概念</strong>：由多个相同天线（阵元）按一定规律排列组成，用于增强方向性和增益',
+                '<strong>均匀直线阵</strong>：N 个阵元等间距 d 排列在直线上',
+                '<strong>阵因子</strong>：描述阵列本身的方向性，与阵元类型无关',
+                '<strong>均匀直线阵因子</strong>：AF(ψ) = sin(Nψ/2)/sin(ψ/2)，其中 ψ = kdcosθ + β，β 为阵元间相位差',
+                '<strong>方向图相乘原理</strong>：总方向图 = 元因子 × 阵因子，分别计算后相乘',
+                '<strong>主瓣指向</strong>：由阵元间相位差 β 控制，cosθ₀ = -β/(kd)',
+                '<strong>侧射阵（Broadside）</strong>：β = 0，主瓣垂直于阵列轴（θ = 90°）',
+                '<strong>端射阵（End-fire）</strong>：β = -kd，主瓣沿阵列轴（θ = 0° 或 180°）',
+                '<strong>栅瓣</strong>：当 d > λ 时出现，造成能量分散，应避免',
+                '<strong>阵元间距选择</strong>：通常取 d = λ/2，平衡方向性和栅瓣抑制',
+                '<strong>应用</strong>：相控阵雷达、基站天线、卫星通信、射电望远镜'
+            ],
+            examples: [
+                {
+                    title: '例题 8.13',
+                    question: '5元均匀直线阵，间距 d = λ/2，求：(1) 侧射时的主瓣宽度；(2) 端射时的主瓣指向。',
+                    solution: '<strong>(1) 侧射阵（β = 0）</strong>：<br>ψ = (2π/λ)(λ/2)cosθ = πcosθ<br><br>主瓣在 θ = 90°，第一零点在 ψ = ±2π/N = ±0.4π<br>πcosθ = ±0.4π → cosθ = ±0.4<br>θ ≈ 66.4° 或 113.6°<br><br>主瓣宽度 ≈ 113.6° - 66.4° = <strong>47.2°</strong><br><br><strong>(2) 端射阵（β = -kd = -π）</strong>：<br>ψ = πcosθ - π = π(cosθ - 1)<br><br>主瓣在 ψ = 0，即 cosθ = 1，<strong>θ = 0°</strong><br>指向阵列轴正方向。'
+                },
+                {
+                    title: '例题 8.14',
+                    question: '相控阵天线间距 d = λ/2，要使主瓣指向 θ₀ = 30°，求阵元间需要的相位差。',
+                    solution: '<strong>由主瓣指向公式</strong>：<br>cosθ₀ = -β/(kd)<br><br><strong>已知</strong>：<br>θ₀ = 30°，cos30° = 0.866<br>d = λ/2，kd = π<br><br><strong>求解</strong>：<br>0.866 = -β/π<br>β = -0.866π ≈ <strong>-2.72 rad ≈ -156°</strong><br><br><strong>物理意义</strong>：<br>后一个阵元比前一个阵元相位滞后 156°，波前倾斜 30°。<br><br><strong>应用</strong>：相控阵雷达通过改变 β 实现波束快速扫描。'
+                }
+            ]
+        },
+        'ch8-8': {
+            chapter: '第8章 电磁辐射',
+            title: '8.8 口径场辐射',
+            desc: '惠更斯元、平面口径、口径效率',
+            knowledge: [
+                '<strong>口径天线</strong>：通过开口面（口径）辐射电磁波的天线，如喇叭天线、抛物面天线',
+                '<strong>惠更斯原理</strong>：波前上每一点都可视为次级波源，向四周辐射',
+                '<strong>惠更斯元</strong>：口径面上的微小面元，作为次级辐射源',
+                '<strong>惠更斯元辐射场</strong>：dE = j(k/2πr)(1+cosθ)/2 × Eₐ dS e^(-jkr)，Eₐ 为口径场',
+                '<strong>口径场积分</strong>：总辐射场为口径上所有惠更斯元辐射场的叠加积分',
+                '<strong>平面口径远场</strong>：E = j(ke^(-jkr)/2πr)(1+cosθ)/2 × ∫∫ Eₐ e^(jkr\'·e<sub>r</sub>) dS',
+                '<strong>均匀分布口径</strong>：口径场均匀分布，方向性最高，但副瓣较大',
+                '<strong>锥削分布口径</strong>：口径场从中心向边缘逐渐减小，可降低副瓣',
+                '<strong>口径效率</strong>：ηₐ = |∫∫ Eₐ dS|²/(S∫∫|Eₐ|²dS)，均匀分布时 ηₐ = 1',
+                '<strong>相位误差影响</strong>：口径场相位不均匀会降低增益、展宽主瓣',
+                '<strong>应用</strong>：喇叭天线（波导开口）、抛物面天线（反射面）、透镜天线'
+            ],
+            examples: [
+                {
+                    title: '例题 8.15',
+                    question: '矩形口径 a × b，口径场均匀分布 Eₐ = E₀，求远区辐射场和方向性系数近似表达式。',
+                    solution: '<strong>远区辐射场</strong>：<br>E = j(ke^(-jkr)/2πr)(1+cosθ)/2 E₀ab × sinc(kasinθcosφ/2) × sinc(kbsinθsinφ/2)<br><br>其中 sinc(x) = sin(x)/x<br><br><strong>E面（φ = 0）方向图</strong>：<br>Fᴱ(θ) = (1+cosθ)/2 × sinc(kasinθ/2)<br><br><strong>H面（φ = 90°）方向图</strong>：<br>Fᴴ(θ) = (1+cosθ)/2 × sinc(kbsinθ/2)<br><br><strong>方向性系数</strong>（θ 小时）：<br>D ≈ 4πab/λ² = <strong>4π × 口径面积/λ²</strong>'
+                },
+                {
+                    title: '例题 8.16',
+                    question: '抛物面天线口径直径 D = 1m，工作频率 10GHz，口径效率 ηₐ = 0.6，求天线增益。',
+                    solution: '<strong>已知</strong>：<br>D = 1m，f = 10GHz，ηₐ = 0.6<br><br><strong>波长</strong>：<br>λ = c/f = 3×10⁸/(10×10⁹) = 0.03m = 3cm<br><br><strong>口径面积</strong>：<br>A = π(D/2)² = π×0.25 = 0.785 m²<br><br><strong>增益公式</strong>：<br>G = ηₐ × 4πA/λ²<br>= 0.6 × 4π × 0.785/(0.03)²<br>= 0.6 × 4π × 0.785/0.0009<br>= 0.6 × 10966<br>≈ <strong>6580</strong><br><br><strong>分贝表示</strong>：<br>G(dB) = 10lg(6580) ≈ <strong>38.2 dB</strong>'
+                }
+            ]
+        }
+    };
+
+    // 课程代码
+    const COURSE_CODE = 'ee';
+    
+    // 章节结构定义：每个章节包含哪些小章节
+    const CHAPTER_STRUCTURE = {
+        '第0章': ['ch0-1'],
+        '第1章': ['ch1-1', 'ch1-2', 'ch1-3', 'ch1-4', 'ch1-5', 'ch1-6', 'ch1-7'],
+        '第2章': ['ch2-1', 'ch2-2', 'ch2-3', 'ch2-4', 'ch2-5', 'ch2-6', 'ch2-7'],
+        '第3章': ['ch3-1', 'ch3-2', 'ch3-3', 'ch3-4', 'ch3-5', 'ch3-6', 'ch3-7'],
+        '第4章': ['ch4-1', 'ch4-2', 'ch4-3', 'ch4-4', 'ch4-5'],
+        '第5章': ['ch5-1', 'ch5-2', 'ch5-3', 'ch5-4'],
+        '第6章': ['ch6-1', 'ch6-2', 'ch6-3', 'ch6-4', 'ch6-5'],
+        '第7章': ['ch7-1', 'ch7-2', 'ch7-3', 'ch7-4', 'ch7-5', 'ch7-6'],
+        '第8章': ['ch8-1', 'ch8-2', 'ch8-3', 'ch8-4', 'ch8-5', 'ch8-6', 'ch8-7']
+    };
+    
+    // 获取所有小章节ID
+    function getAllChapterIds() {
+        return Object.keys(chapterDetails);
+    }
+    
+    // 获取所有章节名称
+    function getAllMainChapters() {
+        return Object.keys(CHAPTER_STRUCTURE);
+    }
+    
+    // 检查某个章节是否全部完成
+    function isMainChapterCompleted(chapterName) {
+        const subChapters = CHAPTER_STRUCTURE[chapterName];
+        if (!subChapters || subChapters.length === 0) return false;
+        return subChapters.every(subId => isChapterCompleted(subId));
+    }
+    
+    // 获取已完成的主章节数量
+    function getCompletedMainChaptersCount() {
+        return Object.keys(CHAPTER_STRUCTURE).filter(chapterName => isMainChapterCompleted(chapterName)).length;
+    }
+    
+    // 获取总主章节数量
+    function getTotalMainChaptersCount() {
+        return Object.keys(CHAPTER_STRUCTURE).length;
+    }
+    
+    // 本地存储键名
+    function getStorageKey() {
+        return `chapter_progress_${COURSE_CODE}`;
+    }
+    
+    // 从本地存储获取进度数据
+    function getLocalProgress() {
+        try {
+            const data = localStorage.getItem(getStorageKey());
+            return data ? JSON.parse(data) : {};
+        } catch (e) {
+            console.error('读取本地存储失败:', e);
+            return {};
+        }
+    }
+    
+    // 保存进度到本地存储
+    function saveLocalProgress(chapterId, isCompleted, chapterName) {
+        try {
+            const progress = getLocalProgress();
+            progress[chapterId] = {
+                is_completed: isCompleted,
+                chapter_name: chapterName,
+                completed_at: isCompleted ? new Date().toISOString() : null,
+                course_code: COURSE_CODE
+            };
+            localStorage.setItem(getStorageKey(), JSON.stringify(progress));
+            updateProgressSummary();
+            updateNavIndicators();
+        } catch (e) {
+            console.error('保存到本地存储失败:', e);
+        }
+    }
+    
+    // 检查章节是否已完成
+    function isChapterCompleted(chapterId) {
+        const progress = getLocalProgress();
+        return progress[chapterId] && progress[chapterId].is_completed;
+    }
+    
+    // 更新进度汇总面板
+    function updateProgressSummary() {
+        // 基于主章节（大章节）计算进度
+        const totalMainChapters = getTotalMainChaptersCount();
+        const completedMainChapters = getCompletedMainChaptersCount();
+        const rate = totalMainChapters > 0 ? Math.round((completedMainChapters / totalMainChapters) * 100) : 0;
+        const remaining = totalMainChapters - completedMainChapters;
+        
+        // 同时统计小章节完成情况（用于显示详情）
+        const allSubIds = getAllChapterIds();
+        const completedSubChapters = allSubIds.filter(id => isChapterCompleted(id)).length;
+        
+        document.getElementById('completedCount').textContent = completedMainChapters;
+        document.getElementById('totalCount').textContent = totalMainChapters;
+        document.getElementById('remainingCount').textContent = remaining;
+        document.getElementById('progressPercentage').textContent = rate + '%';
+        document.getElementById('progressBarFill').style.width = rate + '%';
+        
+        // 更新触发按钮上的进度指示器
+        const toggleBtn = document.getElementById('progressToggleBtn');
+        if (completedMainChapters > 0) {
+            toggleBtn.classList.add('has-progress');
+        } else {
+            toggleBtn.classList.remove('has-progress');
+        }
+        
+        // 更新当前学习位置
+        updateCurrentModule(totalMainChapters, completedMainChapters);
+        
+        // 更新主章节导航的完成标记
+        updateMainChapterIndicators();
+    }
+    
+    // 更新当前学习位置显示
+    function updateCurrentModule(totalMainChapters, completedMainChapters) {
+        const currentModuleName = document.getElementById('currentModuleName');
+        const currentModuleStatus = document.getElementById('currentModuleStatus');
+        
+        if (completedMainChapters === 0) {
+            currentModuleName.textContent = '尚未开始';
+            currentModuleStatus.textContent = '等待学习';
+            currentModuleStatus.className = 'current-module-status pending';
+        } else if (completedMainChapters === totalMainChapters) {
+            currentModuleName.textContent = '全部完成';
+            currentModuleStatus.textContent = '恭喜完成所有章节！';
+            currentModuleStatus.className = 'current-module-status';
+        } else {
+            // 找到第一个未完成的主章节
+            const nextMainChapter = Object.keys(CHAPTER_STRUCTURE).find(chapterName => !isMainChapterCompleted(chapterName));
+            if (nextMainChapter) {
+                currentModuleName.textContent = nextMainChapter;
+                currentModuleStatus.textContent = '学习中';
+                currentModuleStatus.className = 'current-module-status pending';
+            }
+        }
+    }
+    
+    // 更新主章节导航的完成标记
+    function updateMainChapterIndicators() {
+        document.querySelectorAll('.doc-nav-header').forEach(header => {
+            const chapterName = header.textContent.trim().split('\n')[0].trim();
+            if (CHAPTER_STRUCTURE[chapterName]) {
+                const isCompleted = isMainChapterCompleted(chapterName);
+                header.style.borderLeft = isCompleted ? '4px solid #28a745' : '4px solid transparent';
+                header.style.background = isCompleted ? 'rgba(40, 167, 69, 0.1)' : 'transparent';
+            }
+        });
+    }
+    
+    // 进度栏面板控制
+    const progressPanel = document.getElementById('chapterProgressPanel');
+    const progressToggleBtn = document.getElementById('progressToggleBtn');
+    const progressCloseBtn = document.getElementById('progressCloseBtn');
+    const progressOverlay = document.getElementById('progressOverlay');
+    const PANEL_STORAGE_KEY = 'chapterProgressPanel_' + COURSE_CODE + '_visible';
+    
+    // 打开进度面板
+    function openProgressPanel() {
+        progressPanel.classList.add('show');
+        progressOverlay.classList.add('show');
+        localStorage.setItem(PANEL_STORAGE_KEY, 'true');
+    }
+    
+    // 关闭进度面板
+    function closeProgressPanel() {
+        progressPanel.classList.remove('show');
+        progressOverlay.classList.remove('show');
+        localStorage.setItem(PANEL_STORAGE_KEY, 'false');
+    }
+    
+    // 切换进度面板
+    function toggleProgressPanel() {
+        if (progressPanel.classList.contains('show')) {
+            closeProgressPanel();
+        } else {
+            openProgressPanel();
+        }
+    }
+    
+    // 事件监听
+    progressToggleBtn.addEventListener('click', toggleProgressPanel);
+    progressCloseBtn.addEventListener('click', closeProgressPanel);
+    progressOverlay.addEventListener('click', closeProgressPanel);
+    
+    // ESC键关闭面板
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && progressPanel.classList.contains('show')) {
+            closeProgressPanel();
+        }
+    });
+    
+    // 页面加载时恢复面板状态
+    function restorePanelState() {
+        const isVisible = localStorage.getItem(PANEL_STORAGE_KEY);
+        if (isVisible === 'true') {
+            openProgressPanel();
+        }
+    }
+    
+    // 更新导航栏完成标记
+    function updateNavIndicators() {
+        document.querySelectorAll('.doc-nav-list li a').forEach(link => {
+            const chapterId = link.getAttribute('href').substring(1);
+            const existingIndicator = link.querySelector('.nav-completed-indicator');
+            
+            if (isChapterCompleted(chapterId)) {
+                if (!existingIndicator) {
+                    const indicator = document.createElement('span');
+                    indicator.className = 'nav-completed-indicator';
+                    indicator.innerHTML = '✓';
+                    link.appendChild(indicator);
+                }
+            } else if (existingIndicator) {
+                existingIndicator.remove();
+            }
+        });
+    }
+    
+    // 发送进度到后端
+    async function syncProgressToServer(chapterId, isCompleted, chapterName) {
+        try {
+            console.log(`🔄 正在同步进度到服务器: ${chapterId} (${isCompleted ? '完成' : '未完成'})`);
+            const response = await fetch('/api/chapter-progress/update/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                },
+                body: JSON.stringify({
+                    chapter_id: `${COURSE_CODE}/${chapterId}`,
+                    chapter_name: chapterName,
+                    course_code: COURSE_CODE,
+                    is_completed: isCompleted
+                })
+            });
+            const result = await response.json();
+            if (result.success) {
+                console.log('✅ 进度同步成功:', result.message, result.data);
+                // 触发全局事件通知其他页面数据已更新
+                window.dispatchEvent(new CustomEvent('chapterProgressUpdated', {
+                    detail: { course: COURSE_CODE, chapterId, isCompleted, timestamp: Date.now() }
+                }));
+                // 使用 BroadcastChannel 通知其他页面
+                notifyOtherPages({ course: COURSE_CODE, chapterId, isCompleted });
+            } else {
+                console.error('❌ 进度同步失败:', result.message);
+                // 同步失败时标记需要重新同步
+                markForRetry(chapterId, isCompleted, chapterName);
+            }
+        } catch (error) {
+            console.error('❌ 同步请求失败:', error);
+            // 网络错误时标记需要重新同步
+            markForRetry(chapterId, isCompleted, chapterName);
+        }
+    }
+    
+    // 标记需要重试同步的章节
+    function markForRetry(chapterId, isCompleted, chapterName) {
+        const retryKey = `${COURSE_CODE}_retry_queue`;
+        const retryQueue = JSON.parse(localStorage.getItem(retryKey) || '[]');
+        retryQueue.push({ chapterId, isCompleted, chapterName, timestamp: Date.now() });
+        localStorage.setItem(retryKey, JSON.stringify(retryQueue));
+        console.log('⏳ 已标记为待重试同步');
+    }
+    
+    // 重试同步失败的章节
+    async function retryFailedSyncs() {
+        const retryKey = `${COURSE_CODE}_retry_queue`;
+        const retryQueue = JSON.parse(localStorage.getItem(retryKey) || '[]');
+        if (retryQueue.length === 0) return;
+        
+        console.log(`🔄 开始重试 ${retryQueue.length} 个失败的同步...`);
+        const failed = [];
+        
+        for (const item of retryQueue) {
+            try {
+                const response = await fetch('/api/chapter-progress/update/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCsrfToken()
+                    },
+                    body: JSON.stringify({
+                        chapter_id: `${COURSE_CODE}/${item.chapterId}`,
+                        chapter_name: item.chapterName,
+                        course_code: COURSE_CODE,
+                        is_completed: item.isCompleted
+                    })
+                });
+                const result = await response.json();
+                if (!result.success) {
+                    failed.push(item);
+                }
+            } catch (error) {
+                failed.push(item);
+            }
+        }
+        
+        localStorage.setItem(retryKey, JSON.stringify(failed));
+        if (failed.length === 0) {
+            console.log('✅ 所有失败同步已重试成功');
+        } else {
+            console.log(`⚠️ 仍有 ${failed.length} 个同步失败，将在下次页面加载时重试`);
+        }
+    }
+    
+    // 获取CSRF Token
+    function getCsrfToken() {
+        const name = 'csrftoken';
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    // 从服务器加载进度数据
+    async function loadProgressFromServer() {
+        try {
+            const response = await fetch(`/api/chapter-progress/?course=${COURSE_CODE}`);
+            const result = await response.json();
+            if (result.success && result.data && result.data.progress_list) {
+                const serverProgress = result.data.progress_list;
+                const localProgress = getLocalProgress();
+                let hasUpdate = false;
+                
+                // 合并服务器数据和本地数据
+                serverProgress.forEach(item => {
+                    const chapterId = item.chapter_id.replace(`${COURSE_CODE}/`, '');
+                    if (!localProgress[chapterId] || 
+                        (item.is_completed && !localProgress[chapterId].is_completed)) {
+                        localProgress[chapterId] = {
+                            is_completed: item.is_completed,
+                            chapter_name: item.chapter_name,
+                            completed_at: item.completed_at,
+                            course_code: item.course_code
+                        };
+                        hasUpdate = true;
+                    }
+                });
+                
+                if (hasUpdate) {
+                    localStorage.setItem(getStorageKey(), JSON.stringify(localProgress));
+                }
+                
+                updateProgressSummary();
+                updateNavIndicators();
+            }
+        } catch (error) {
+            console.error('从服务器加载进度失败:', error);
+        }
+    }
+    
+    // 批量同步本地数据到服务器
+    async function batchSyncToServer() {
+        const progress = getLocalProgress();
+        const progressData = Object.keys(progress).map(chapterId => ({
+            chapter_id: `${COURSE_CODE}/${chapterId}`,
+            chapter_name: progress[chapterId].chapter_name,
+            course_code: COURSE_CODE,
+            is_completed: progress[chapterId].is_completed,
+            completed_at: progress[chapterId].completed_at
+        }));
+        
+        if (progressData.length === 0) return;
+        
+        try {
+            const response = await fetch('/api/chapter-progress/sync/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                },
+                body: JSON.stringify({ progress_data: progressData })
+            });
+            const result = await response.json();
+            if (result.success) {
+                console.log('批量同步成功:', result.message);
+            }
+        } catch (error) {
+            console.error('批量同步失败:', error);
+        }
+    }
+    
+    // 切换章节完成状态
+    function toggleChapterCompletion(chapterId, chapterName) {
+        const isCompleted = !isChapterCompleted(chapterId);
+        saveLocalProgress(chapterId, isCompleted, chapterName);
+        syncProgressToServer(chapterId, isCompleted, chapterName);
+        updateCompletionButton(chapterId, chapterName);
+    }
+    
+    // 更新完成按钮状态
+    function updateCompletionButton(chapterId, chapterName) {
+        const btn = document.getElementById('btnComplete');
+        const statusDiv = document.getElementById('completionStatus');
+        const isCompleted = isChapterCompleted(chapterId);
+        
+        if (btn) {
+            btn.className = isCompleted ? 'btn-complete completed' : 'btn-complete';
+            btn.innerHTML = isCompleted ? 
+                '<span>✓</span> 已完成' : 
+                '<span>○</span> 标记为已完成';
+        }
+        
+        if (statusDiv) {
+            statusDiv.className = isCompleted ? 'completion-status completed' : 'completion-status';
+            statusDiv.innerHTML = isCompleted ? 
+                '<span class="completion-status-icon">✓</span> <span>本节已完成学习</span>' :
+                '<span class="completion-status-icon">○</span> <span>本节尚未完成</span>';
+        }
+    }
+
+    function loadChapter(chapterId) {
+        const mainContent = document.querySelector('.doc-main');
+        
+        const data = chapterDetails[chapterId];
+        if (data) {
+            const isCompleted = isChapterCompleted(chapterId);
+            const completionSection = `
+                <div class="chapter-completion-section">
+                    <div class="completion-status ${isCompleted ? 'completed' : ''}" id="completionStatus">
+                        <span class="completion-status-icon">${isCompleted ? '✓' : '○'}</span>
+                        <span>${isCompleted ? '本节已完成学习' : '本节尚未完成'}</span>
+                    </div>
+                    <br>
+                    <button class="btn-complete ${isCompleted ? 'completed' : ''}" id="btnComplete" onclick="toggleChapterCompletion('${chapterId}', '${data.title}')">
+                        <span>${isCompleted ? '✓' : '○'}</span>
+                        ${isCompleted ? '已完成' : '标记为已完成'}
+                    </button>
+                </div>
+            `;
+            
+            // 第0章教材介绍 - 特殊布局
+            if (data.isIntro) {
+                mainContent.innerHTML = `
+                    <div class="chapter-content">
+                        <div class="chapter-header">
+                            <div class="chapter-number">${data.chapter}</div>
+                            <h1 class="chapter-title">${data.title}</h1>
+                        </div>
+                        <p class="doc-desc">${data.desc}</p>
+                        ${data.content}
+                        ${completionSection}
+                    </div>
+                `;
+                return;
+            }
+            
+            let knowledgeHTML = data.knowledge.map(k => `<li>${k}</li>`).join('');
+            let examplesHTML = data.examples.map((ex, idx) => `
+                <div class="example-box">
+                    <div class="example-header">${ex.title}</div>
+                    <div class="example-content">
+                        <div class="example-question"><strong>题目：</strong>${ex.question}</div>
+                        <div class="example-solution">
+                            <div class="solution-label">解析</div>
+                            <div class="solution-content">${ex.solution}</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            mainContent.innerHTML = `
+                <div class="chapter-content">
+                    <div class="chapter-header">
+                        <div class="chapter-number">${data.chapter}</div>
+                        <h1 class="chapter-title">${data.title}</h1>
+                    </div>
+                    <p class="doc-desc">${data.desc}</p>
+                    
+                    <div class="knowledge-section">
+                        <h2 class="knowledge-title">核心知识点</h2>
+                        <ul class="knowledge-list">
+                            ${knowledgeHTML}
+                        </ul>
+                    </div>
+                    
+                    <div class="example-section">
+                        <h2 class="example-title">典型例题</h2>
+                        ${examplesHTML}
+                    </div>
+                    
+                    ${completionSection}
+                </div>
+            `;
+        }
+    }
+    
+    // BroadcastChannel 实例
+    let bc = null;
+    if ('BroadcastChannel' in window) {
+        bc = new BroadcastChannel('chapter_progress_channel');
+        console.log('✅ BroadcastChannel 已启用');
+    }
+    
+    // 通知其他页面进度已更新
+    function notifyOtherPages(data) {
+        const message = { type: 'progress_updated', timestamp: Date.now(), ...data };
+        
+        // 使用 BroadcastChannel
+        if (bc) {
+            bc.postMessage(message);
+            console.log('📢 已通过 BroadcastChannel 通知其他页面');
+        }
+        
+        // 同时使用 localStorage 作为备选（兼容不支持 BroadcastChannel 的浏览器）
+        localStorage.setItem('chapter_progress_sync', JSON.stringify(message));
+        setTimeout(() => localStorage.removeItem('chapter_progress_sync'), 1000);
+    }
+    
+    // 监听来自其他页面的更新通知
+    if ('BroadcastChannel' in window) {
+        bc.onmessage = function(event) {
+            console.log('📢 收到其他页面的更新通知:', event.data);
+            if (event.data && event.data.type === 'progress_updated' && event.data.course !== COURSE_CODE) {
+                // 其他课程的进度更新了，可以选择刷新当前课程数据或显示提示
+                console.log('🔄 其他课程进度已更新，可切换查看');
+            }
+        };
+    } else {
+        // 使用 localStorage 作为备选
+        window.addEventListener('storage', function(event) {
+            if (event.key === 'chapter_progress_sync' && event.newValue) {
+                try {
+                    const data = JSON.parse(event.newValue);
+                    if (data.type === 'progress_updated' && data.course !== COURSE_CODE) {
+                        console.log('🔄 其他课程进度已更新(localStorage)，可切换查看');
+                    }
+                } catch (e) {
+                    console.error('解析通知数据失败:', e);
+                }
+            }
+        });
+    }
+    
+    // 页面加载时初始化
+    document.addEventListener('DOMContentLoaded', function() {
+        // 先重试之前失败的同步
+        retryFailedSyncs().then(() => {
+            // 然后从服务器加载最新进度
+            loadProgressFromServer();
+        });
+        
+        // 恢复进度面板状态
+        restorePanelState();
+        
+        // 页面关闭前批量同步数据
+        window.addEventListener('beforeunload', function() {
+            batchSyncToServer();
+        });
+        
+        // 定期重试失败的同步（每30秒）
+        setInterval(retryFailedSyncs, 30000);
+        
+        // 同步按钮点击事件
+        const syncBtn = document.getElementById('syncToServerBtn');
+        const syncStatus = document.getElementById('syncStatus');
+        if (syncBtn) {
+            syncBtn.addEventListener('click', async function() {
+                syncBtn.disabled = true;
+                syncBtn.style.opacity = '0.7';
+                syncStatus.textContent = '正在同步...';
+                syncStatus.style.color = '#3b82f6';
+                
+                try {
+                    await batchSyncToServer();
+                    syncStatus.textContent = '✓ 同步成功';
+                    syncStatus.style.color = '#10b981';
+                    
+                    // 3秒后清除状态
+                    setTimeout(() => {
+                        syncStatus.textContent = '';
+                    }, 3000);
+                } catch (error) {
+                    syncStatus.textContent = '✗ 同步失败，请重试';
+                    syncStatus.style.color = '#ef4444';
+                } finally {
+                    syncBtn.disabled = false;
+                    syncBtn.style.opacity = '1';
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

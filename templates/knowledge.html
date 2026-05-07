@@ -1,0 +1,367 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}课程中心 - 电磁场与微波技术{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --crimson: #8B0000;
+        --off-white: #FAFAFA;
+        --transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    /* 覆盖body和html背景 - 使用渐变实现左右颜色衔接 */
+    html, body {
+        background: linear-gradient(to right, #fafafa 50%, #f5f5f5 50%) !important;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .course-split-container {
+        display: flex;
+        min-height: calc(100vh - 60px);
+        width: 100%;
+        overflow: hidden;
+    }
+    
+    .course-panel {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        padding: 100px 60px 60px;
+        position: relative;
+        transition: var(--transition);
+        cursor: pointer;
+        overflow: hidden;
+        text-decoration: none;
+        box-sizing: border-box;
+        min-height: calc(100vh - 60px);
+    }
+    
+    .course-panel:hover {
+        flex: 1.15;
+    }
+    
+    /* 左侧 - 电磁场与电磁波 */
+    .course-panel-left {
+        background-color: #fafafa;
+        border-right: 1px solid #e8e8e8;
+    }
+    
+    /* 右侧 - 微波技术与工程 */
+    .course-panel-right {
+        background-color: #f5f5f5;
+    }
+    
+    /* SVG 图案容器 */
+    .motif-container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.03;
+        transition: var(--transition);
+        pointer-events: none;
+        width: 100%;
+        height: 100%;
+    }
+    
+    .course-panel:hover .motif-container {
+        opacity: 0.08;
+        transform: translate(-50%, -50%) scale(1.05);
+    }
+    
+    .motif-container svg {
+        width: 70%;
+        height: 70%;
+        max-width: 500px;
+        max-height: 500px;
+    }
+    
+    .course-number {
+        position: absolute;
+        top: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 13px;
+        font-weight: 300;
+        color: #999;
+        letter-spacing: 3px;
+        font-family: 'Cormorant Garamond', 'Times New Roman', serif;
+        z-index: 2;
+        white-space: nowrap;
+    }
+    
+    .course-label {
+        font-size: 10px;
+        font-weight: 600;
+        color: #888;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+        margin-top: 20px;
+        margin-bottom: 40px;
+        font-family: 'Inter', sans-serif;
+        z-index: 2;
+        transition: var(--transition);
+        white-space: nowrap;
+    }
+    
+    .course-title {
+        font-size: 48px;
+        font-weight: 300;
+        color: #1a1a1a;
+        line-height: 1.3;
+        margin-bottom: 25px;
+        text-align: center;
+        font-family: 'Noto Serif SC', 'Cormorant Garamond', serif;
+        letter-spacing: 6px;
+        z-index: 2;
+    }
+    
+    .course-title-accent {
+        color: var(--crimson);
+        font-style: italic;
+        font-weight: 400;
+    }
+    
+    .course-desc {
+        font-size: 13px;
+        color: #777;
+        line-height: 2;
+        text-align: center;
+        max-width: 300px;
+        margin-bottom: 40px;
+        font-weight: 300;
+        letter-spacing: 0.5px;
+        font-family: 'Inter', sans-serif;
+        z-index: 2;
+    }
+    
+    .course-btn {
+        display: inline-block;
+        padding: 14px 40px;
+        border: 1px solid #333;
+        background: transparent;
+        color: #333;
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 3px;
+        text-decoration: none;
+        transition: all 0.4s ease;
+        position: relative;
+        overflow: hidden;
+        z-index: 2;
+        font-family: 'Inter', sans-serif;
+        margin-top: auto;
+        margin-bottom: 60px;
+    }
+    
+    .course-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: #333;
+        transition: left 0.4s ease;
+        z-index: -1;
+    }
+    
+    .course-btn:hover {
+        color: #fff;
+    }
+    
+    .course-btn:hover::before {
+        left: 0;
+    }
+    
+    .course-panel-right .course-btn {
+        border-color: var(--crimson);
+        color: var(--crimson);
+    }
+    
+    .course-panel-right .course-btn::before {
+        background: var(--crimson);
+    }
+    
+    .course-panel-right .course-btn:hover {
+        color: #fff;
+        border-color: var(--crimson);
+    }
+    
+    .course-panel-left:hover .course-label {
+        color: #333;
+    }
+    
+    .course-panel-right:hover .course-label {
+        color: var(--crimson);
+    }
+    
+    /* 响应式 */
+    @media (max-width: 1200px) {
+        .course-panel {
+            padding: 80px 40px 50px;
+        }
+        
+        .course-title {
+            font-size: 40px;
+            letter-spacing: 4px;
+        }
+        
+        .course-desc {
+            font-size: 12px;
+            max-width: 260px;
+        }
+    }
+    
+    @media (max-width: 1024px) {
+        .course-split-container {
+            flex-direction: column;
+            height: auto;
+            min-height: calc(100vh - 60px);
+        }
+        
+        .course-panel {
+            min-height: 50vh;
+            padding: 60px 40px;
+        }
+        
+        .course-panel:hover {
+            flex: 1;
+        }
+        
+        .course-panel-left {
+            border-right: none;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        
+        .course-title {
+            font-size: 36px;
+        }
+        
+        .course-number {
+            top: 30px;
+        }
+        
+        .motif-container svg {
+            width: 50%;
+            height: 50%;
+        }
+    }
+    
+    @media (max-width: 640px) {
+        .course-panel {
+            padding: 50px 30px;
+        }
+        
+        .course-title {
+            font-size: 28px;
+            letter-spacing: 3px;
+        }
+        
+        .course-label {
+            font-size: 9px;
+            letter-spacing: 2px;
+        }
+        
+        .course-desc {
+            font-size: 12px;
+            max-width: 240px;
+        }
+        
+        .course-btn {
+            padding: 12px 30px;
+            font-size: 11px;
+            letter-spacing: 2px;
+        }
+    }
+</style>
+
+<div class="course-split-container">
+    <!-- 左侧 - 电磁场与电磁波 -->
+    <a href="{% url 'knowledge_ee' %}" class="course-panel course-panel-left">
+        <!-- 电磁场 SVG 图案：同心圆 + 十字线 -->
+        <div class="motif-container">
+            <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+                <!-- 同心圆 -->
+                <circle cx="200" cy="200" r="180" fill="none" stroke="#8B0000" stroke-width="0.8"/>
+                <circle cx="200" cy="200" r="140" fill="none" stroke="#8B0000" stroke-width="0.8"/>
+                <circle cx="200" cy="200" r="100" fill="none" stroke="#8B0000" stroke-width="0.8"/>
+                <circle cx="200" cy="200" r="60" fill="none" stroke="#8B0000" stroke-width="0.8"/>
+                <circle cx="200" cy="200" r="25" fill="none" stroke="#8B0000" stroke-width="0.8"/>
+                <!-- 十字线 -->
+                <line x1="200" y1="10" x2="200" y2="390" stroke="#8B0000" stroke-width="0.6"/>
+                <line x1="10" y1="200" x2="390" y2="200" stroke="#8B0000" stroke-width="0.6"/>
+                <!-- 对角线 -->
+                <line x1="58" y1="58" x2="342" y2="342" stroke="#8B0000" stroke-width="0.5"/>
+                <line x1="342" y1="58" x2="58" y2="342" stroke="#8B0000" stroke-width="0.5"/>
+                <!-- 中心点 -->
+                <circle cx="200" cy="200" r="4" fill="#8B0000"/>
+            </svg>
+        </div>
+        <span class="course-number">01</span>
+        <div class="course-label">Theoretical Foundation</div>
+        <h2 class="course-title">
+            电磁场与<br><span class="course-title-accent">电磁波</span>
+        </h2>
+        <p class="course-desc">
+            从麦克斯韦方程组揭示宇宙的奥秘，<br>
+            构建对物理场论最深邃的直觉与理解。
+        </p>
+        <span class="course-btn">进入课程体系</span>
+    </a>
+    
+    <!-- 右侧 - 微波技术与工程 -->
+    <a href="{% url 'knowledge_mw' %}" class="course-panel course-panel-right">
+        <!-- 微波技术 SVG 图案：矩形、传输线、虚线圆 -->
+        <div class="motif-container">
+            <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+                <!-- 外框矩形 -->
+                <rect x="50" y="50" width="300" height="300" fill="none" stroke="#8B0000" stroke-width="0.8"/>
+                <!-- 内框矩形 -->
+                <rect x="100" y="100" width="200" height="200" fill="none" stroke="#8B0000" stroke-width="0.6"/>
+                <!-- 中心矩形 -->
+                <rect x="150" y="150" width="100" height="100" fill="none" stroke="#8B0000" stroke-width="0.8"/>
+                <!-- 水平传输线 -->
+                <line x1="50" y1="200" x2="150" y2="200" stroke="#8B0000" stroke-width="1"/>
+                <line x1="250" y1="200" x2="350" y2="200" stroke="#8B0000" stroke-width="1"/>
+                <!-- 垂直传输线 -->
+                <line x1="200" y1="50" x2="200" y2="150" stroke="#8B0000" stroke-width="1"/>
+                <line x1="200" y1="250" x2="200" y2="350" stroke="#8B0000" stroke-width="1"/>
+                <!-- 虚线圆（波导示意） -->
+                <circle cx="200" cy="200" r="120" fill="none" stroke="#8B0000" stroke-width="0.5" stroke-dasharray="8,6"/>
+                <circle cx="200" cy="200" r="80" fill="none" stroke="#8B0000" stroke-width="0.5" stroke-dasharray="6,4"/>
+                <!-- 连接点 -->
+                <rect x="145" y="195" width="10" height="10" fill="#8B0000"/>
+                <rect x="195" y="145" width="10" height="10" fill="#8B0000"/>
+                <rect x="245" y="195" width="10" height="10" fill="#8B0000"/>
+                <rect x="195" y="245" width="10" height="10" fill="#8B0000"/>
+                <!-- 角落装饰 -->
+                <rect x="70" y="70" width="15" height="15" fill="none" stroke="#8B0000" stroke-width="0.5"/>
+                <rect x="315" y="70" width="15" height="15" fill="none" stroke="#8B0000" stroke-width="0.5"/>
+                <rect x="70" y="315" width="15" height="15" fill="none" stroke="#8B0000" stroke-width="0.5"/>
+                <rect x="315" y="315" width="15" height="15" fill="none" stroke="#8B0000" stroke-width="0.5"/>
+            </svg>
+        </div>
+        <span class="course-number">02</span>
+        <div class="course-label">Engineering Application</div>
+        <h2 class="course-title">
+            微波<br><span class="course-title-accent">工程</span>
+        </h2>
+        <p class="course-desc">
+            从理论到高频系统的工程实践，<br>
+            掌握现代无线通信系统的核心设计方法。
+        </p>
+        <span class="course-btn">进入课程体系</span>
+    </a>
+</div>
+
+{% endblock %}

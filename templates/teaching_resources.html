@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}教学资源 - 电磁场与微波技术精品课程{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* 页面整体布局 */
+    .resources-page {
+        min-height: calc(100vh - 76px);
+        background-color: #f8f9fa;
+        padding: 40px 0;
+    }
+
+    .container-main {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    /* 页面标题 */
+    .page-title {
+        font-size: 32px;
+        font-weight: bold;
+        color: #C20E0E;
+        margin-bottom: 40px;
+        padding-bottom: 15px;
+        border-bottom: 3px solid #C20E0E;
+        display: inline-block;
+    }
+
+    /* 资源卡片网格 */
+    .resource-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 30px;
+    }
+
+    /* 资源卡片 */
+    .resource-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 40px 30px;
+        text-align: center;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        border: 1px solid #e8e8e8;
+        cursor: pointer;
+        display: block;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .resource-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 30px rgba(194, 14, 14, 0.2);
+        border-color: #C20E0E;
+    }
+
+    /* 图标样式 */
+    .resource-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff5f5;
+        border-radius: 50%;
+    }
+
+    .resource-icon i {
+        font-size: 40px;
+        color: #C20E0E;
+    }
+
+    /* 标题 */
+    .resource-title {
+        font-size: 22px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 15px;
+    }
+
+    /* 描述文字 */
+    .resource-desc {
+        font-size: 14px;
+        color: #666;
+        line-height: 1.8;
+    }
+
+    /* 响应式适配 */
+    @media (max-width: 992px) {
+        .resource-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 576px) {
+        .resource-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="resources-page">
+    <div class="container-main">
+        <h1 class="page-title">教学资源</h1>
+
+        <div class="resource-grid">
+            <!-- 教材与讲义 -->
+            <a href="{% url 'knowledge' %}" class="resource-card">
+                <div class="resource-icon">
+                    <i class="bi bi-book"></i>
+                </div>
+                <div class="resource-title">教材与讲义</div>
+                <div class="resource-desc">
+                    选用国家级规划教材，配套自编精品讲义，提供中英文参考资料
+                </div>
+            </a>
+
+            <!-- 仿真平台 -->
+            <a href="{% url 'simulation_platform' %}" class="resource-card">
+                <div class="resource-icon">
+                    <i class="bi bi-laptop"></i>
+                </div>
+                <div class="resource-title">仿真平台介绍</div>
+                <div class="resource-desc">
+                    提供常用仿真软件的使用介绍
+                </div>
+            </a>
+
+            <!-- 习题与案例 -->
+            <a href="{% url 'exercises_cases' %}" class="resource-card">
+                <div class="resource-icon">
+                    <i class="bi bi-journal-check"></i>
+                </div>
+                <div class="resource-title">习题与案例</div>
+                <div class="resource-desc">
+                    精选配套分级练习题和解析
+                </div>
+            </a>
+
+            <!-- 学习资源 -->
+            <a href="{% url 'learning_resources' %}" class="resource-card">
+                <div class="resource-icon">
+                    <i class="bi bi-journal-bookmark-fill"></i>
+                </div>
+                <div class="resource-title">学习资源</div>
+                <div class="resource-desc">
+                    本电磁场与电磁波学习材料含全套 PPT 等核心资源，助力拓展学习
+                </div>
+            </a>
+
+            <!-- 错题本（原实验平台） -->
+            <a href="{% url 'error_notebook' %}" class="resource-card">
+                <div class="resource-icon">
+                    <i class="bi bi-journal-x"></i>
+                </div>
+                <div class="resource-title">错题本</div>
+                <div class="resource-desc">
+                    自动收录错题，智能分类整理，支持错题重做与知识点强化训练
+                </div>
+            </a>
+
+            <!-- 在线答疑 -->
+            <a href="{% url 'community' %}" class="resource-card">
+                <div class="resource-icon">
+                    <i class="bi bi-people"></i>
+                </div>
+                <div class="resource-title">在线答疑</div>
+                <div class="resource-desc">
+                    学习社区实时答疑
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,2852 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}微波技术与工程 - 课程学习{% endblock %}
+
+{% block content %}
+<style>
+    .mw-container {
+        display: flex;
+        min-height: calc(100vh - 60px);
+        background: #fff;
+    }
+    
+    .mw-sidebar {
+        width: 280px;
+        border-right: 1px solid #e5e5e5;
+        padding: 30px 0;
+        position: fixed;
+        height: 100%;
+        overflow-y: auto;
+        background: #fafafa;
+    }
+    
+    .mw-logo {
+        padding: 0 25px 25px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+        letter-spacing: 1px;
+    }
+    
+    .mw-logo span {
+        color: #C20E0E;
+    }
+    
+    .mw-nav-section {
+        margin-bottom: 25px;
+    }
+    
+    .mw-nav-header {
+        padding: 10px 25px;
+        font-size: 12px;
+        font-weight: 700;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .mw-nav-header .num {
+        font-size: 11px;
+        color: #999;
+    }
+    
+    .mw-nav-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .mw-nav-list li a {
+        display: block;
+        padding: 10px 25px;
+        color: #333;
+        text-decoration: none;
+        font-size: 14px;
+        border-left: 3px solid transparent;
+        transition: all 0.2s;
+    }
+    
+    .mw-nav-list li a:hover,
+    .mw-nav-list li a.active {
+        background: #fff;
+        border-left-color: #C20E0E;
+        color: #C20E0E;
+    }
+    
+    .mw-main {
+        margin-left: 280px;
+        flex: 1;
+        padding: 50px 60px;
+        max-width: 900px;
+    }
+    
+    .mw-placeholder {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 60vh;
+        text-align: center;
+    }
+    
+    .mw-placeholder-icon {
+        width: 80px;
+        height: 80px;
+        border: 2px solid #e0e0e0;
+        border-radius: 50%;
+    }
+    
+    /* 章节完成度样式 */
+    .chapter-completion-section {
+        margin-top: 50px;
+        padding: 30px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        text-align: center;
+    }
+    .completion-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 16px;
+        color: #495057;
+        margin-bottom: 20px;
+    }
+    .completion-status.completed {
+        color: #28a745;
+    }
+    .completion-status-icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+    }
+    .completion-status.completed .completion-status-icon {
+        background: #28a745;
+        color: white;
+    }
+    .completion-status:not(.completed) .completion-status-icon {
+        background: #dee2e6;
+        color: #6c757d;
+    }
+    .btn-complete {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 30px;
+        border: 2px solid #C20E0E;
+        background: transparent;
+        color: #C20E0E;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        border-radius: 25px;
+        transition: all 0.3s ease;
+    }
+    .btn-complete:hover {
+        background: #C20E0E;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(194, 14, 14, 0.3);
+    }
+    .btn-complete.completed {
+        background: #28a745;
+        border-color: #28a745;
+        color: white;
+    }
+    .btn-complete.completed:hover {
+        background: #218838;
+        border-color: #218838;
+    }
+    .btn-complete:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+    /* 可隐藏式进度栏组件样式 */
+    .progress-toggle-btn {
+        position: fixed;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        background: linear-gradient(135deg, #C20E0E, #e74c3c);
+        color: white;
+        border: none;
+        border-radius: 8px 0 0 8px;
+        padding: 15px 10px;
+        cursor: pointer;
+        z-index: 101;
+        box-shadow: -2px 0 15px rgba(194, 14, 14, 0.3);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        min-width: 40px;
+    }
+    .progress-toggle-btn:hover {
+        padding-right: 15px;
+        box-shadow: -4px 0 20px rgba(194, 14, 14, 0.4);
+    }
+    .progress-toggle-btn.has-progress::after {
+        content: '';
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 8px;
+        height: 8px;
+        background: #10b981;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.7; transform: scale(1.2); }
+    }
+    .progress-toggle-btn svg {
+        width: 20px;
+        height: 20px;
+    }
+    .chapter-progress-panel {
+        position: fixed;
+        right: -320px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 280px;
+        background: white;
+        border-radius: 12px 0 0 12px;
+        box-shadow: -4px 0 30px rgba(0,0,0,0.15);
+        z-index: 102;
+        transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+    }
+    .chapter-progress-panel.show {
+        right: 0;
+    }
+    .progress-panel-header {
+        background: linear-gradient(135deg, #C20E0E, #e74c3c);
+        color: white;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .progress-panel-title {
+        font-size: 14px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .progress-close-btn {
+        background: rgba(255,255,255,0.2);
+        border: none;
+        color: white;
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+    }
+    .progress-close-btn:hover {
+        background: rgba(255,255,255,0.3);
+    }
+    .progress-panel-body {
+        padding: 20px;
+    }
+    .progress-overview {
+        text-align: center;
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    .progress-percentage {
+        font-size: 36px;
+        font-weight: 700;
+        color: #C20E0E;
+        line-height: 1;
+        margin-bottom: 5px;
+    }
+    .progress-label {
+        font-size: 12px;
+        color: #999;
+    }
+    .progress-bar-container {
+        width: 100%;
+        height: 10px;
+        background: #f0f0f0;
+        border-radius: 5px;
+        overflow: hidden;
+        margin: 15px 0;
+    }
+    .progress-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #C20E0E, #e74c3c);
+        border-radius: 5px;
+        transition: width 0.5s ease;
+    }
+    .progress-stats {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 15px;
+    }
+    .progress-stat-item {
+        text-align: center;
+    }
+    .progress-stat-value {
+        font-size: 20px;
+        font-weight: 600;
+        color: #333;
+    }
+    .progress-stat-label {
+        font-size: 11px;
+        color: #999;
+        margin-top: 2px;
+    }
+    .current-module {
+        margin-top: 20px;
+    }
+    .current-module-title {
+        font-size: 12px;
+        color: #666;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .current-module-card {
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        border-radius: 8px;
+        padding: 12px 15px;
+        border-left: 3px solid #C20E0E;
+    }
+    .current-module-name {
+        font-size: 13px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 4px;
+    }
+    .current-module-status {
+        font-size: 11px;
+        color: #28a745;
+    }
+    .current-module-status.pending {
+        color: #f59e0b;
+    }
+    .progress-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.3);
+        z-index: 100;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+    .progress-overlay.show {
+        opacity: 1;
+        visibility: visible;
+    }
+    /* 移动端适配 */
+    @media (max-width: 768px) {
+        .progress-toggle-btn {
+            padding: 12px 8px;
+            min-width: 36px;
+        }
+        .progress-toggle-btn span {
+            display: none;
+        }
+        .chapter-progress-panel {
+            width: 260px;
+            right: -280px;
+        }
+    }
+    .nav-completed-indicator {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 18px;
+        height: 18px;
+        background: #28a745;
+        color: white;
+        border-radius: 50%;
+        font-size: 10px;
+        margin-left: 8px;
+    }
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 30px;
+        color: #C20E0E;
+        font-size: 32px;
+    }
+    
+    .mw-placeholder-title {
+        font-size: 28px;
+        font-weight: 300;
+        color: #1a1a1a;
+        margin-bottom: 15px;
+        font-family: 'Noto Serif SC', serif;
+    }
+    
+    .mw-placeholder-desc {
+        font-size: 14px;
+        color: #999;
+        line-height: 1.8;
+        max-width: 400px;
+    }
+    
+    .mw-back-link {
+        margin-top: 40px;
+        padding: 12px 30px;
+        border: 1px solid #C20E0E;
+        color: #C20E0E;
+        text-decoration: none;
+        font-size: 13px;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+    }
+    
+    .mw-back-link:hover {
+        background: #C20E0E;
+        color: #fff;
+    }
+    
+    /* 首页封面样式 - 与knowledge_ee.html保持一致 */
+    .mw-home-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: calc(100vh - 200px);
+        text-align: center;
+        padding: 60px 40px;
+    }
+    .mw-home-subtitle {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 3px;
+        color: #C20E0E;
+        text-transform: uppercase;
+        margin-bottom: 30px;
+    }
+    .mw-home-title {
+        font-size: 72px;
+        font-weight: 400;
+        color: #111;
+        line-height: 1.2;
+        margin-bottom: 10px;
+    }
+    .mw-home-title .highlight {
+        color: #C20E0E;
+        font-style: italic;
+        font-weight: 300;
+    }
+    .mw-home-divider {
+        width: 1px;
+        height: 80px;
+        background: #ddd;
+        margin: 40px 0;
+    }
+    .mw-home-footer-text {
+        font-size: 10px;
+        letter-spacing: 2px;
+        color: #999;
+        text-transform: uppercase;
+        line-height: 1.8;
+    }
+    
+    /* 微波技术特色装饰元素 */
+    .mw-wave-decoration {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 400px;
+        height: 400px;
+        opacity: 0.03;
+        pointer-events: none;
+    }
+    
+    /* 响应式设计 */
+    @media (max-width: 768px) {
+        .mw-home-title {
+            font-size: 48px;
+        }
+        .mw-home-content {
+            padding: 40px 20px;
+        }
+    }
+</style>
+
+<div class="mw-container">
+    <!-- 侧边栏 -->
+    <aside class="mw-sidebar">
+        <div class="mw-logo">
+            <span>MW</span> / COURSE
+        </div>
+        
+        <nav>
+            <div class="mw-nav-section">
+                <div class="mw-nav-header">
+                    第0章 教材介绍
+                    <span class="num">00</span>
+                </div>
+                <ul class="mw-nav-list">
+                    <li><a href="#ch0-1">0.1 教材概述</a></li>
+                </ul>
+            </div>
+
+            <div class="mw-nav-section">
+                <div class="mw-nav-header">
+                    第1章 微波工程概述
+                    <span class="num">01</span>
+                </div>
+                <ul class="mw-nav-list">
+                    <li><a href="#ch1-1">1.1 微波频段的定义与特点</a></li>
+                    <li><a href="#ch1-2">1.2 微波技术的应用领域</a></li>
+                    <li><a href="#ch1-3">1.3 微波分析方法：场论、传输线理论、电路理论</a></li>
+                    <li><a href="#ch1-4">1.4 微波系统的基本组成</a></li>
+                </ul>
+            </div>
+            
+            <div class="mw-nav-section">
+                <div class="mw-nav-header">
+                    第2章 传输线理论
+                    <span class="num">02</span>
+                </div>
+                <ul class="mw-nav-list">
+                    <li><a href="#ch2-1">2.1 分布参数电路模型</a></li>
+                    <li><a href="#ch2-2">2.2 传输线方程及其解</a></li>
+                    <li><a href="#ch2-3">2.3 特性阻抗与传播常数</a></li>
+                    <li><a href="#ch2-4">2.4 相速、群速与色散</a></li>
+                    <li><a href="#ch2-5">2.5 输入阻抗、反射系数与驻波比</a></li>
+                    <li><a href="#ch2-6">2.6 阻抗匹配与匹配网络</a></li>
+                    <li><a href="#ch2-7">2.7 传输线的瞬态响应</a></li>
+                </ul>
+            </div>
+            
+            <div class="mw-nav-section">
+                <div class="mw-nav-header">
+                    第3章 射频网络理论
+                    <span class="num">03</span>
+                </div>
+                <ul class="mw-nav-list">
+                    <li><a href="#ch3-1">3.1 二端口网络参数：Z、Y、ABCD、h</a></li>
+                    <li><a href="#ch3-2">3.2 散射参数（S 参数）</a></li>
+                    <li><a href="#ch3-3">3.3 多端口网络与信号流图</a></li>
+                    <li><a href="#ch3-4">3.4 网络等效变换</a></li>
+                    <li><a href="#ch3-5">3.5 网络的损耗、互易与对称性</a></li>
+                </ul>
+            </div>
+            
+            <div class="mw-nav-section">
+                <div class="mw-nav-header">
+                    第4章 传输线与波导
+                    <span class="num">04</span>
+                </div>
+                <ul class="mw-nav-list">
+                    <li><a href="#ch4-1">4.1 平行双线传输线</a></li>
+                    <li><a href="#ch4-2">4.2 同轴线</a></li>
+                    <li><a href="#ch4-3">4.3 微带线与带状线</a></li>
+                    <li><a href="#ch4-4">4.4 矩形波导</a></li>
+                    <li><a href="#ch4-5">4.5 圆柱形波导</a></li>
+                    <li><a href="#ch4-6">4.6 介质波导与光纤</a></li>
+                    <li><a href="#ch4-7">4.7 传输线损耗与衰减</a></li>
+                </ul>
+            </div>
+            
+            <div class="mw-nav-section">
+                <div class="mw-nav-header">
+                    第5章 微波谐振器
+                    <span class="num">05</span>
+                </div>
+                <ul class="mw-nav-list">
+                    <li><a href="#ch5-1">5.1 谐振器的基本参数</a></li>
+                    <li><a href="#ch5-2">5.2 传输线型谐振器</a></li>
+                    <li><a href="#ch5-3">5.3 矩形谐振腔</a></li>
+                    <li><a href="#ch5-4">5.4 圆柱形谐振腔</a></li>
+                    <li><a href="#ch5-5">5.5 微带谐振器</a></li>
+                    <li><a href="#ch5-6">5.6 介质谐振器</a></li>
+                    <li><a href="#ch5-7">5.7 品质因数 Q 与等效电路</a></li>
+                </ul>
+            </div>
+            
+            <div class="mw-nav-section">
+                <div class="mw-nav-header">
+                    第6章 微波无源元件
+                    <span class="num">06</span>
+                </div>
+                <ul class="mw-nav-list">
+                    <li><a href="#ch6-1">6.1 衰减器与移相器</a></li>
+                    <li><a href="#ch6-2">6.2 匹配负载与短路器</a></li>
+                    <li><a href="#ch6-3">6.3 定向耦合器</a></li>
+                    <li><a href="#ch6-4">6.4 功率分配器 / 合成器</a></li>
+                    <li><a href="#ch6-5">6.5 微波滤波器</a></li>
+                    <li><a href="#ch6-6">6.6 环行器与隔离器</a></li>
+                    <li><a href="#ch6-7">6.7 开关与移相器</a></li>
+                </ul>
+            </div>
+            
+            <div class="mw-nav-section">
+                <div class="mw-nav-header">
+                    第7章 微波有源器件
+                    <span class="num">07</span>
+                </div>
+                <ul class="mw-nav-list">
+                    <li><a href="#ch7-1">7.1 微波二极管</a></li>
+                    <li><a href="#ch7-2">7.2 微波双极晶体管</a></li>
+                    <li><a href="#ch7-3">7.3 场效应晶体管（FET、MESFET、HEMT）</a></li>
+                    <li><a href="#ch7-4">7.4 有源器件小信号等效模型</a></li>
+                    <li><a href="#ch7-5">7.5 有源器件非线性模型</a></li>
+                </ul>
+            </div>
+            
+            <div class="mw-nav-section">
+                <div class="mw-nav-header">
+                    第8章 微波放大器设计
+                    <span class="num">08</span>
+                </div>
+                <ul class="mw-nav-list">
+                    <li><a href="#ch8-1">8.1 放大器的功率与增益</a></li>
+                    <li><a href="#ch8-2">8.2 稳定性判别</a></li>
+                    <li><a href="#ch8-3">8.3 噪声与噪声系数</a></li>
+                    <li><a href="#ch8-4">8.4 小信号放大器设计</a></li>
+                    <li><a href="#ch8-5">8.5 功率放大器设计</a></li>
+                    <li><a href="#ch8-6">8.6 宽带与低噪声放大器</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+    
+    <!-- 主内容区 -->
+    <main class="mw-main">
+        <!-- 首页 - 课程封面 -->
+        <div id="mw-home-content" class="mw-home-content">
+            <!-- 微波波纹装饰SVG -->
+            <svg class="mw-wave-decoration" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- 同心圆表示微波传播 -->
+                <circle cx="200" cy="200" r="50" stroke="#C20E0E" stroke-width="1"/>
+                <circle cx="200" cy="200" r="80" stroke="#C20E0E" stroke-width="1"/>
+                <circle cx="200" cy="200" r="110" stroke="#C20E0E" stroke-width="1"/>
+                <circle cx="200" cy="200" r="140" stroke="#C20E0E" stroke-width="1"/>
+                <circle cx="200" cy="200" r="170" stroke="#C20E0E" stroke-width="1"/>
+                <!-- 中心点 -->
+                <circle cx="200" cy="200" r="8" fill="#C20E0E"/>
+                <!-- 传输线示意 -->
+                <line x1="50" y1="200" x2="150" y2="200" stroke="#C20E0E" stroke-width="2"/>
+                <line x1="250" y1="200" x2="350" y2="200" stroke="#C20E0E" stroke-width="2"/>
+                <!-- S参数示意 -->
+                <text x="100" y="190" font-size="12" fill="#C20E0E" font-family="serif">S₁₁</text>
+                <text x="280" y="190" font-size="12" fill="#C20E0E" font-family="serif">S₂₁</text>
+            </svg>
+            
+            <div class="mw-home-subtitle">Department of Microwave Engineering</div>
+            <h1 class="mw-home-title">微波技术</h1>
+            <h1 class="mw-home-title"><span class="highlight">与工程</span></h1>
+            <div class="mw-home-divider"></div>
+            <div class="mw-home-footer-text">
+                High Frequency Systems · RF Design Excellence ·<br>
+                Engineering Innovation
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- 进度栏触发按钮 -->
+<button class="progress-toggle-btn" id="progressToggleBtn" aria-label="查看课程进度">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+    </svg>
+    <span>进度</span>
+</button>
+
+<!-- 进度栏遮罩层 -->
+<div class="progress-overlay" id="progressOverlay"></div>
+
+<!-- 可隐藏式章节进度面板 -->
+<div class="chapter-progress-panel" id="chapterProgressPanel">
+    <div class="progress-panel-header">
+        <div class="progress-panel-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            课程进度
+        </div>
+        <button class="progress-close-btn" id="progressCloseBtn" aria-label="关闭进度面板">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+    </div>
+    <div class="progress-panel-body">
+        <!-- 进度概览 -->
+        <div class="progress-overview">
+            <div class="progress-percentage" id="progressPercentage">0%</div>
+            <div class="progress-label">总体完成度</div>
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="progressBarFill" style="width: 0%"></div>
+            </div>
+            <div class="progress-stats">
+                <div class="progress-stat-item">
+                    <div class="progress-stat-value" id="completedCount">0</div>
+                    <div class="progress-stat-label">已完成</div>
+                </div>
+                <div class="progress-stat-item">
+                    <div class="progress-stat-value" id="totalCount">0</div>
+                    <div class="progress-stat-label">总章节</div>
+                </div>
+                <div class="progress-stat-item">
+                    <div class="progress-stat-value" id="remainingCount">0</div>
+                    <div class="progress-stat-label">待学习</div>
+                </div>
+            </div>
+        </div>
+        <!-- 当前学习模块 -->
+        <div class="current-module">
+            <div class="current-module-title">当前学习位置</div>
+            <div class="current-module-card">
+                <div class="current-module-name" id="currentModuleName">尚未开始</div>
+                <div class="current-module-status pending" id="currentModuleStatus">等待学习</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 侧边栏导航点击处理
+    document.querySelectorAll('.mw-nav-list li a').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // 更新激活状态
+            document.querySelectorAll('.mw-nav-list li a').forEach(l => l.classList.remove('active'));
+            this.classList.add('active');
+            
+            // 获取章节ID
+            const chapterId = this.getAttribute('href').substring(1);
+            loadChapter(chapterId);
+        });
+    });
+    
+    // 章节详细内容
+    const chapterDetails = {
+        'ch0-1': {
+            chapter: '第0章 教材介绍',
+            title: '0.1 教材概述',
+            desc: '《微波工程》精品教材介绍',
+            isIntro: true,
+            content: `
+                <div class="intro-book-section">
+                    <div class="intro-book-cover">
+                        <img src="{% static 'image/mw_cover.png' %}" alt="微波工程教材封面" class="book-cover-img">
+                    </div>
+                    <div class="intro-book-content">
+                        <p>今天，随着智能手机、物联网、无人自动驾驶、WiFi、RFID、卫星通信、全球定位系统、超宽带无线电和雷达系统、环境微波遥感系统等无线通信技术的迅速发展，微波与射频技术面临许多新的挑战，了解微波工程基础知识并将这些知识创造性地应用于实践领域的工程人员前景光明。</p>
+                        <p style="margin-top: 15px;">为此，选用了由美国马萨诸塞大学 David M. Pozar 教授编著的《微波工程》教材，以供各高校选用或参考（主要针对高年级本科生和一年级研究生）。</p>
+                        <p style="margin-top: 15px;">本教材自出版以来在全球畅销不衰，截至目前已经发展到第四版，每个版本都针对教师和读者的大量反馈信息进行了内容完善和更新，引起了全球读者的巨大反响。本教材的主要特色如下：</p>
+                        <p style="margin-top: 15px;">内容全面、取材新颖。例如在原有基础上，本版新增了有源电路、噪声、非线性效应和无线系统的一些内容，这些教学内容在当今无线通信技术飞速发展的形势下，增加了新的活力。</p>
+                        <p style="margin-top: 15px;">重视理论分析和基本物理概念的阐述，但更重视实际工程应用，例如平面结构电路和元件设计。</p>
+                        <p style="margin-top: 15px;">不过多涉及复杂电磁场的计算分析，但强调应用背后的基本原理解释和过程分析，以便工程师更好地理解和掌握有关设计。</p>
+                        <p style="margin-top: 15px;">此外，教师和学生还可在 Wiley 公司的网站上获得与教材有关的其他资源，如 PPT、实验手册等，并为教师提供所有习题的在线题解手册。</p>
+                    </div>
+                </div>
+            `
+        },
+        'ch1-1': {
+            chapter: '第1章 微波工程概述',
+            title: '1.1 微波频段的定义与特点',
+            desc: '微波频段划分、波长频率关系及微波的基本特性',
+            knowledge: [
+                '<strong>微波频率范围</strong>：通常指 300MHz ~ 300GHz 的电磁波，对应波长 1m ~ 1mm',
+                '<strong>频段划分</strong>：UHF(300MHz-3GHz)、SHF(3-30GHz)、EHF(30-300GHz)，常用字母表示如 L、S、C、X、Ku、K、Ka 波段',
+                '<strong>波长频率关系</strong>：λ = c/f，其中 c = 3×10⁸ m/s 为光速，λ 为波长，f 为频率',
+                '<strong>似光性</strong>：微波波长与物体尺寸可比拟，具有直线传播、反射、折射等光学特性',
+                '<strong>穿透性</strong>：能穿透电离层，用于卫星通信；能穿透云层、烟雾，具有全天候工作能力',
+                '<strong>量子特性</strong>：微波光子能量低（10⁻⁵~10⁻² eV），不足以破坏分子结构，可用于遥感、医疗',
+                '<strong>频带宽</strong>：微波频段占整个无线电频谱的 99% 以上，信息容量大',
+                '<strong>元器件尺寸</strong>：微波波长与电路尺寸可比拟，需采用分布参数分析，电路元件具有频率特性'
+            ],
+            examples: [
+                {
+                    title: '例题 1.1',
+                    question: '计算频率为 10GHz 的微波在自由空间中的波长，并判断其所属频段。',
+                    solution: '<strong>第一步：计算波长</strong><br>λ = c/f = (3×10⁸ m/s)/(10×10⁹ Hz) = 0.03 m = 3 cm = 30 mm<br><br><strong>第二步：判断频段</strong><br>10GHz 位于 8-12GHz 范围，属于 <strong>X 波段</strong><br><br><strong>应用</strong>：X波段广泛应用于雷达、卫星通信等领域'
+                },
+                {
+                    title: '例题 1.2',
+                    question: '某微波器件工作波长为 5cm，求其工作频率，并说明该频段的主要应用。',
+                    solution: '<strong>第一步：计算频率</strong><br>f = c/λ = (3×10⁸ m/s)/(0.05 m) = 6×10⁹ Hz = 6 GHz<br><br><strong>第二步：判断频段</strong><br>6GHz 位于 4-8GHz 范围，属于 <strong>C 波段</strong><br><br><strong>主要应用</strong>：<br>• 卫星通信（上下行链路）<br>• 微波中继通信<br>• 5G 移动通信（部分频段）<br>• 天气雷达'
+                }
+            ]
+        },
+        'ch1-2': {
+            chapter: '第1章 微波工程概述',
+            title: '1.2 微波技术的应用领域',
+            desc: '微波技术在通信、雷达、医疗等领域的广泛应用',
+            knowledge: [
+                '<strong>通信领域</strong>：卫星通信、微波中继通信、移动通信（4G/5G）、WiFi、蓝牙等',
+                '<strong>雷达系统</strong>：军事雷达（预警、火控、导航）、民用雷达（气象、交通、遥感）',
+                '<strong>电子对抗</strong>：电子侦察、电子干扰、电子防御，现代战争的关键技术',
+                '<strong>微波加热</strong>：微波炉（2.45GHz），利用水分子共振产生热量，加热均匀快速',
+                '<strong>医疗应用</strong>：微波治疗（肿瘤热疗）、微波成像、微波理疗',
+                '<strong>科学研究</strong>：射电天文（探测宇宙微波背景辐射）、等离子体加热（核聚变研究）',
+                '<strong>工业应用</strong>：微波干燥、微波烧结、微波杀菌、橡胶硫化',
+                '<strong>遥感探测</strong>：微波遥感（穿透云层）、合成孔径雷达（SAR）、土壤湿度测量'
+            ],
+            examples: [
+                {
+                    title: '例题 1.3',
+                    question: '为什么微波炉通常采用 2.45GHz 的频率？',
+                    solution: '<strong>原因分析</strong>：<br><br>1. <strong>水分子共振</strong>：2.45GHz 对应水分子偶极子的转动频率，能有效激发水分子振动产生热量<br><br>2. <strong>穿透深度适中</strong>：该频率下微波在食物中的穿透深度约 2-3cm，既能加热表面也能加热内部<br><br>3. <strong>国际免许可频段</strong>：ISM（工业、科学、医疗）频段，无需申请频率许可<br><br>4. <strong>磁控管技术成熟</strong>：该频率的磁控管效率高、成本低、易于制造<br><br>5. <strong>避免干扰</strong>：与通信频段错开，减少电磁干扰'
+                },
+                {
+                    title: '例题 1.4',
+                    question: '比较微波中继通信与光纤通信的优缺点。',
+                    solution: '<strong>微波中继通信优点</strong>：<br>• 建设周期短，无需铺设线路<br>• 跨越复杂地形（山区、河流、海洋）<br>• 易于部署和迁移<br>• 抗电磁干扰能力较强<br><br><strong>微波中继通信缺点</strong>：<br>• 受天气影响（雨衰、大气折射）<br>• 需要视距传播，中继站间距有限（约 50km）<br>• 频谱资源紧张<br>• 存在窃听风险<br><br><strong>适用场景</strong>：地形复杂地区、临时通信、广播电视传输、海岛通信'
+                }
+            ]
+        },
+        'ch1-3': {
+            chapter: '第1章 微波工程概述',
+            title: '1.3 微波分析方法：场论、传输线理论、电路理论',
+            desc: '微波分析的三种主要理论方法及其适用范围',
+            knowledge: [
+                '<strong>场论方法（电磁场理论）</strong>：基于麦克斯韦方程组，严格求解电磁场分布，适用于任意结构',
+                '<strong>麦克斯韦方程组</strong>：∇×E = -∂B/∂t，∇×H = J + ∂D/∂t，∇·D = ρ，∇·B = 0',
+                '<strong>场论适用场景</strong>：波导、谐振腔、天线等结构复杂或边界条件复杂的器件分析',
+                '<strong>传输线理论</strong>：将微波传输系统视为分布参数电路，用电压、电流、阻抗描述',
+                '<strong>传输线基本参数</strong>：特性阻抗 Z₀、传播常数 γ = α + jβ、相速度 v<sub>p</sub>',
+                '<strong>传输线适用场景</strong>：传输线、连接器、阻抗匹配网络等一维传输系统',
+                '<strong>电路理论</strong>：集总参数电路分析，使用 R、L、C 元件和网络参数',
+                '<strong>微波网络理论</strong>：S 参数（散射参数）分析，描述多端口网络的反射和传输特性',
+                '<strong>三种方法的关系</strong>：电路理论是传输线理论的低频近似，传输线理论是场论的简化形式'
+            ],
+            examples: [
+                {
+                    title: '例题 1.5',
+                    question: '分析同轴电缆应采用哪种理论方法？说明理由。',
+                    solution: '<strong>推荐方法：传输线理论</strong><br><br><strong>理由</strong>：<br>1. <strong>结构特点</strong>：同轴电缆是一维传输结构，电磁波沿轴向传播<br><br>2. <strong>TEM 模式</strong>：同轴电缆传输横电磁波，可用电压、电流描述<br><br>3. <strong>参数易测</strong>：特性阻抗 Z<sub>0</sub> = (60/√ε<sub>r</sub>)ln(b/a) 可直接计算<br><br>4. <strong>工程实用</strong>：便于分析反射、驻波、阻抗匹配等工程问题<br><br><strong>补充</strong>：当分析同轴电缆的横截面场分布或高次模时，需使用场论方法'
+                },
+                {
+                    title: '例题 1.6',
+                    question: '为什么微波频段不能直接使用集总参数电路理论？',
+                    solution: '<strong>核心原因：波长与电路尺寸可比拟</strong><br><br>1. <strong>相位变化显著</strong>：当电路尺寸 > λ/10 时，电压电流相位沿电路变化明显，不能视为集总参数<br><br>2. <strong>分布参数效应</strong>：导线呈现电感和电阻分布特性，导体间呈现电容和电导分布特性<br><br>3. <strong>电磁波传播</strong>：信号以波的形式传播，存在传播延迟和反射现象<br><br>4. <strong>集总参数条件</strong>：l << λ（电路尺寸远小于波长），低频电路满足，微波电路不满足<br><br><strong>示例</strong>：1GHz 时 λ = 30cm，一个 3cm 的导线已不能视为集总参数'
+                }
+            ]
+        },
+        'ch1-4': {
+            chapter: '第1章 微波工程概述',
+            title: '1.4 微波系统的基本组成',
+            desc: '微波系统的典型架构和各部分功能',
+            knowledge: [
+                '<strong>微波信号源</strong>：产生所需频率和功率的微波信号，如固态振荡器、磁控管、速调管',
+                '<strong>固态源优点</strong>：体积小、重量轻、寿命长、电压低、可集成、频率稳定度高',
+                '<strong>电真空器件</strong>：功率大、效率高，用于雷达发射机、加速器等大功率场合',
+                '<strong>传输系统</strong>：将微波信号从源传输到负载，包括同轴线、波导、微带线等',
+                '<strong>无源元件</strong>：定向耦合器、功率分配器、滤波器、隔离器、衰减器、移相器',
+                '<strong>有源器件</strong>：放大器（低噪声、功率）、混频器、检波器、调制器、开关',
+                '<strong>天线系统</strong>：实现导波与空间波的转换，包括喇叭天线、抛物面天线、阵列天线',
+                '<strong>测量系统</strong>：频谱分析仪、网络分析仪、功率计、频率计，用于系统调试和测试',
+                '<strong>系统集成</strong>：现代微波系统趋向小型化、集成化，采用 MMIC、LTCC、SiP 技术'
+            ],
+            examples: [
+                {
+                    title: '例题 1.7',
+                    question: '设计一个微波通信接收机的基本框图，说明各部分功能。',
+                    solution: '<strong>接收机框图</strong>：天线 → 低噪声放大器(LNA) → 混频器 → 中频放大器 → 解调器 → 基带处理<br><br><strong>各部分功能</strong>：<br>• <strong>天线</strong>：接收空间电磁波，转换为导波信号<br>• <strong>LNA</strong>：低噪声放大，提高接收灵敏度，噪声系数 NF < 1dB<br>• <strong>混频器</strong>：将射频信号下变频到中频，便于处理<br>• <strong>本振</strong>：提供混频所需的本振信号，决定接收频道<br>• <strong>中放</strong>：中频信号放大，实现主要增益和选择性<br>• <strong>解调器</strong>：从载波中提取基带信号<br>• <strong>基带处理</strong>：信号恢复、解码、输出'
+                },
+                {
+                    title: '例题 1.8',
+                    question: '比较固态功率放大器与磁控管的优缺点。',
+                    solution: '<strong>固态功率放大器（SSPA）</strong>：<br>优点：线性度好、频带宽、噪声低、寿命长、体积小、可集成<br>缺点：单管功率低（< 100W）、效率较低（20-40%）、高频大功率困难<br><br><strong>磁控管</strong>：<br>优点：功率大（kW-MW 级）、效率高（70-80%）、成本低<br>缺点：线性度差、噪声大、寿命短、体积大、需要高压电源<br><br><strong>选择原则</strong>：<br>• 通信系统（需线性）：选 SSPA<br>• 雷达、微波炉（需大功率）：选磁控管<br>• 现代趋势：固态功率合成技术替代电真空器件'
+                }
+            ]
+        },
+        'ch2-1': {
+            chapter: '第2章 传输线理论',
+            title: '2.1 分布参数电路模型',
+            desc: '传输线的分布参数特性及等效电路模型',
+            knowledge: [
+                '<strong>分布参数概念</strong>：传输线的电阻、电感、电容、电导沿线路均匀分布',
+                '<strong>单位长度参数</strong>：R（Ω/m）、L（H/m）、C（F/m）、G（S/m）',
+                '<strong>传输线等效电路</strong>：将传输线分割为无数小段，每段用集总参数 Γ 型或 T 型网络表示',
+                '<strong>电报方程基础</strong>：基尔霍夫电压定律和电流定律应用于微分单元',
+                '<strong>电压方程</strong>：∂v/∂z = -Ri - L∂i/∂t，表示电压降由电阻压降和电感压降组成',
+                '<strong>电流方程</strong>：∂i/∂z = -Gv - C∂v/∂t，表示电流减小由漏导电流和电容电流组成',
+                '<strong>无损耗线</strong>：R = 0，G = 0，简化为 ∂v/∂z = -L∂i/∂t，∂i/∂z = -C∂v/∂t',
+                '<strong>低频近似</strong>：当频率很低时，分布参数可近似为集总参数',
+                '<strong>同轴线参数</strong>：L = (μ/2π)ln(b/a)，C = 2πε/ln(b/a)，其中 a、b 为内外半径'
+            ],
+            examples: [
+                {
+                    title: '例题 2.1',
+                    question: '某同轴电缆单位长度参数为：L = 0.25 μH/m，C = 100 pF/m，R = 0.1 Ω/m，G = 1 μS/m。计算其在 1GHz 时的特性阻抗近似值。',
+                    solution: '<strong>分析</strong>：1GHz 时，ωL = 2π×10⁹×0.25×10⁻⁶ = 1570 Ω/m >> R = 0.1 Ω/m<br>ωC = 2π×10⁹×100×10⁻¹² = 0.628 S/m >> G = 10⁻⁶ S/m<br>可近似为无损耗线<br><br><strong>计算特性阻抗</strong>：<br>Z₀ ≈ √(L/C) = √(0.25×10⁻⁶/100×10⁻¹²)<br>= √(2500) = 50 Ω<br><br><strong>结论</strong>：该同轴电缆特性阻抗约为 50Ω，是标准射频阻抗'
+                },
+                {
+                    title: '例题 2.2',
+                    question: '证明无损耗传输线的相速度 v<sub>p</sub> = 1/√(LC) = c/√ε<sub>r</sub>。',
+                    solution: '<strong>证明过程</strong>：<br><br>1. <strong>无损耗电报方程</strong>：<br>∂v/∂z = -L∂i/∂t  ... (1)<br>∂i/∂z = -C∂v/∂t  ... (2)<br><br>2. <strong>对(1)求z偏导，对(2)求t偏导</strong>：<br>∂²v/∂z² = -L∂²i/∂z∂t<br>∂²i/∂t∂z = -C∂²v/∂t²<br><br>3. <strong>消去 i</strong>：<br>∂²v/∂z² = LC∂²v/∂t²<br><br>4. <strong>波动方程标准形式</strong>：<br>∂²v/∂z² = (1/v<sub>p</sub>²)∂²v/∂t²<br><br>5. <strong>比较得</strong>：<br>v<sub>p</sub> = 1/√(LC) = 1/√(με) = c/√ε<sub>r</sub><br><br><strong>证毕</strong> ✓'
+                }
+            ]
+        },
+        'ch2-2': {
+            chapter: '第2章 传输线理论',
+            title: '2.2 传输线方程及其解',
+            desc: '传输线电报方程的推导与通解形式',
+            knowledge: [
+                '<strong>时域电报方程</strong>：∂v/∂z = -Ri - L∂i/∂t，∂i/∂z = -Gv - C∂v/∂t',
+                '<strong>频域电报方程</strong>：假设时谐变化 e^(jωt)，dV/dz = -(R+jωL)I = -ZI，dI/dz = -(G+jωC)V = -YV',
+                '<strong>传播常数</strong>：γ = √[(R+jωL)(G+jωC)] = α + jβ，α 为衰减常数(Np/m)，β 为相位常数(rad/m)',
+                '<strong>电压波动方程</strong>：d²V/dz² = γ²V，通解 V(z) = V<sup>+</sup>e^(-γz) + V<sup>-</sup>e^(+γz)',
+                '<strong>电流解</strong>：I(z) = (V<sup>+</sup>/Z<sub>0</sub>)e^(-γz) - (V<sup>-</sup>/Z<sub>0</sub>)e^(+γz) = I<sup>+</sup>e^(-γz) - I<sup>-</sup>e^(+γz)',
+                '<strong>入射波与反射波</strong>：V<sup>+</sup>e^(-γz) 为沿 +z 方向传播的入射波，V<sup>-</sup>e^(+γz) 为沿 -z 方向传播的反射波',
+                '<strong>无损耗线简化</strong>：γ = jβ = jω√(LC)，α = 0，V(z) = V<sup>+</sup>e^(-jβz) + V<sup>-</sup>e^(+jβz)',
+                '<strong>相位常数</strong>：β = 2π/λ = ω/v<sub>p</sub> = ω√(LC)',
+                '<strong>波长与频率关系</strong>：λ = v<sub>p</sub>/f = 2π/β，导波波长 λg = λ₀/√ε<sub>r</sub>',
+                '<strong>Smith 圆图基本构成</strong>：等电阻圆（圆心在对称轴上，半径随 r 变化）、等电抗圆（圆心在 r=1 直线上，半径随 x 变化）、等反射系数圆（同心圆，圆心在原点）',
+                '<strong>Smith 圆图关键特征点</strong>：中心点（匹配点，Γ=0）、最右点（开路点，Γ=1）、最左点（短路点，Γ=-1）、外圆（|Γ|=1，纯电抗）',
+                '<strong>Smith 圆图应用</strong>：阻抗与导纳转换、传输线阻抗变换、匹配网络设计、驻波比读取'
+            ],
+            examples: [
+                {
+                    title: '例题 2.3',
+                    question: '已知传输线参数：L = 0.2 μH/m，C = 80 pF/m，R = 0.5 Ω/m，G = 0.01 mS/m，工作频率 f = 100MHz。求传播常数 γ。',
+                    solution: '<strong>第一步：计算单位长度阻抗和导纳</strong><br>Z = R + jωL = 0.5 + j2π×10⁸×0.2×10⁻⁶<br>= 0.5 + j125.66 Ω/m<br><br>Y = G + jωC = 0.01×10⁻³ + j2π×10⁸×80×10⁻¹²<br>= 10⁻⁵ + j0.0503 S/m<br><br><strong>第二步：计算 γ = √(ZY)</strong><br>ZY = (0.5+j125.66)(10⁻⁵+j0.0503)<br>≈ j6.32×10⁻³ (忽略小量)<br><br>γ = √(j6.32×10⁻³) = √(6.32×10⁻³)e^(j45°)<br>= 0.0795(0.707 + j0.707)<br>= 0.056 + j0.056<br><br><strong>结果</strong>：α ≈ 0.056 Np/m，β ≈ 0.056 rad/m'
+                },
+                {
+                    title: '例题 2.4',
+                    question: '在无损耗传输线上，电压分布为 V(z) = 10e^(-jβz) + 5e^(+jβz) V。求：(1) 入射波和反射波振幅；(2) 反射系数。',
+                    solution: '<strong>(1) 波振幅</strong>：<br>与标准形式 V(z) = V<sup>+</sup>e^(-jβz) + V<sup>-</sup>e^(+jβz) 比较<br>入射波振幅 V<sup>+</sup> = 10 V<br>反射波振幅 V<sup>-</sup> = 5 V<br><br><strong>(2) 反射系数</strong>：<br>Γ = V<sup>-</sup>/V<sup>+</sup> = 5/10 = 0.5<br><br><strong>物理意义</strong>：<br>• 反射系数模值 |Γ| = 0.5 表示反射波幅度是入射波的一半<br>• 驻波比 VSWR = (1+|Γ|)/(1-|Γ|) = 1.5/0.5 = 3<br>• 需要改善阻抗匹配以减小反射'
+                }
+            ]
+        },
+        'ch2-3': {
+            chapter: '第2章 传输线理论',
+            title: '2.3 特性阻抗与传播常数',
+            desc: '传输线特性参数的定义、计算与物理意义',
+            knowledge: [
+                '<strong>特性阻抗定义</strong>：Z₀ = √[(R+jωL)/(G+jωC)]，是传输线的固有参数',
+                '<strong>无损耗线特性阻抗</strong>：Z₀ = √(L/C)，纯实数，与频率无关',
+                '<strong>特性阻抗物理意义</strong>：传输线上行波电压与行波电流之比，V<sup>+</sup>/I<sup>+</sup> = Z<sub>0</sub>',
+                '<strong>常见传输线阻抗</strong>：同轴线 50Ω/75Ω，双绞线 100-300Ω，微带线 20-100Ω（可调）',
+                '<strong>传播常数 γ</strong>：γ = α + jβ = √[(R+jωL)(G+jωC)]',
+                '<strong>衰减常数 α</strong>：表示波幅度随距离的衰减，单位 Np/m 或 dB/m（1 Np = 8.686 dB）',
+                '<strong>相位常数 β</strong>：表示波相位随距离的变化，单位 rad/m，β = 2π/λ',
+                '<strong>低损耗近似</strong>：当 R << ωL，G << ωC 时，α ≈ (R/2Z₀) + (GZ₀/2)，Z₀ ≈ √(L/C)',
+                '<strong>无损耗线</strong>：α = 0，γ = jβ，波传播无衰减，仅相位变化'
+            ],
+            examples: [
+                {
+                    title: '例题 2.5',
+                    question: '已知微带线基板 ε<sub>r</sub> = 4.2，厚度 h = 1.6mm，要求特性阻抗 Z<sub>0</sub> = 75Ω。估算导带宽度 W。',
+                    solution: '<strong>分析</strong>：75Ω 属于较高阻抗，W/h 可能 ≤ 2，需选用合适的近似公式。<br><br><strong>使用微带线近似公式</strong>：<br>当 W/h ≤ 1 时：Z<sub>0</sub> = (60/√ε<sub>e</sub>)ln(8h/W + W/4h)<br>当 W/h > 2 时：Z<sub>0</sub> = (120π/√ε<sub>e</sub>)/[W/h + 1.393 + 0.667ln(W/h + 1.444)]<br><br>其中有效介电常数 ε<sub>e</sub> ≈ (ε<sub>r</sub> + 1)/2 + (ε<sub>r</sub> - 1)/2 × (1 + 12h/W)^(-0.5)<br><br><strong>迭代求解</strong>：<br>设 W/h = 0.8，则 ε<sub>e</sub> ≈ 2.95<br>Z<sub>0</sub> ≈ (60/√2.95)ln(10 + 0.2) ≈ 34.9 × 2.32 ≈ 81Ω（偏高）<br><br>设 W/h = 0.6，ε<sub>e</sub> ≈ 2.82<br>Z<sub>0</sub> ≈ (60/√2.82)ln(13.3 + 0.15) ≈ 35.7 × 2.59 ≈ 92.5Ω（仍偏高）<br><br>设 W/h = 0.4，ε<sub>e</sub> ≈ 2.68<br>Z<sub>0</sub> ≈ (60/√2.68)ln(20 + 0.1) ≈ 36.7 × 3.0 ≈ 110Ω<br><br>反推得：W/h ≈ 0.9 时 Z<sub>0</sub> ≈ 75Ω<br><strong>W ≈ 0.9 × 1.6mm ≈ 1.4mm</strong><br><br><strong>结论</strong>：75Ω 微带线导带宽度约 1.4mm，明显窄于 50Ω 线（约 3mm）。'
+                },
+                {
+                    title: '例题 2.6',
+                    question: '某传输线在 1GHz 时测得衰减为 0.1 dB/m，求信号传输 10m 后的功率衰减百分比。',
+                    solution: '<strong>第一步：计算总衰减</strong><br>总衰减 = 0.1 dB/m × 10m = 1 dB<br><br><strong>第二步：dB 与功率比转换</strong><br>衰减(dB) = 10lg(P₁/P₀)<br>1 = 10lg(P₁₀/P₀)<br>lg(P₁₀/P₀) = 0.1<br>P₁₀/P₀ = 10^0.1 ≈ 1.259<br><br><strong>第三步：计算功率百分比</strong><br>输出功率/输入功率 = 1/1.259 ≈ 0.794 = 79.4%<br><br><strong>结论</strong>：传输 10m 后功率衰减约 20.6%'
+                }
+            ]
+        },
+        'ch2-4': {
+            chapter: '第2章 传输线理论',
+            title: '2.4 相速、群速与色散',
+            desc: '电磁波在传输线中的传播速度特性',
+            knowledge: [
+                '<strong>相速度 v<sub>p</sub></strong>：等相位面传播的速度，v<sub>p</sub> = ω/β = λf，是单频波的传播速度',
+                '<strong>相速与介质关系</strong>：v<sub>p</sub> = c/√ε<sub>r</sub>，在介质中相速小于光速',
+                '<strong>群速度 v<sub>g</sub></strong>：波包（信号）传播的速度，v<sub>g</sub> = dω/dβ，是能量传播速度',
+                '<strong>群速与相速关系</strong>：v<sub>g</sub> = v<sub>p</sub> / [1 - (ω/v<sub>p</sub>)(dv<sub>p</sub>/dω)]',
+                '<strong>无色散条件</strong>：v<sub>p</sub> 与频率无关，v<sub>g</sub> = v<sub>p</sub>，信号波形传输不变形',
+                '<strong>色散现象</strong>：不同频率分量传播速度不同，导致信号波形展宽或畸变',
+                '<strong>正常色散</strong>：dv<sub>p</sub>/dω < 0，v<sub>g</sub> < v<sub>p</sub>，如波导中的 TE/TM 模',
+                '<strong>反常色散</strong>：dv<sub>p</sub>/dω > 0，v<sub>g</sub> > v<sub>p</sub>，发生在谐振频率附近',
+                '<strong>TEM 模传输线</strong>：同轴线、微带线（准 TEM），无色散，v<sub>p</sub> = c/√ε<sub>r</sub> 为常数',为常数'
+            ],
+            examples: [
+                {
+                    title: '例题 2.7',
+                    question: '在填充 ε<sub>r</sub> = 2.1 的聚四氟乙烯同轴电缆中，计算相速度和群速度。',
+                    solution: '<strong>分析</strong>：同轴线传输 TEM 模，无色散，v<sub>g</sub> = v<sub>p</sub><br><br><strong>计算相速度</strong>：<br>v<sub>p</sub> = c/√ε<sub>r</sub> = (3×10⁸ m/s)/√2.1<br>= (3×10⁸)/1.449<br>= 2.07×10⁸ m/s<br>= 0.69c<br><br><strong>结论</strong>：<br>• 相速度 v<sub>p</sub> = 2.07×10⁸ m/s<br>• 群速度 v<sub>g</sub> = v<sub>p</sub> = 2.07×10⁸ m/s<br>• 波长压缩比 λ/λ₀ = 1/√ε<sub>r</sub> = 0.69'
+                },
+                {
+                    title: '例题 2.8',
+                    question: '矩形波导中 TE₁₀ 模的截止频率为 6GHz，工作频率为 10GHz。求相速度和群速度。',
+                    solution: '<strong>已知</strong>：f<sub>c</sub> = 6GHz，f = 10GHz，c = 3×10⁸ m/s<br><br><strong>第一步：计算自由空间波长</strong><br>λ₀ = c/f = 3×10⁸/(10×10⁹) = 0.03 m = 3 cm<br><br><strong>第二步：计算波导波长</strong><br>λg = λ₀/√[1 - (f<sub>c</sub>/f)²] = 3/√[1 - (6/10)²]<br>= 3/√0.64 = 3/0.8 = 3.75 cm<br><br><strong>第三步：计算相速度</strong><br>v<sub>p</sub> = fλg = 10×10⁹×0.0375 = 3.75×10⁸ m/s = 1.25c<br><br><strong>第四步：计算群速度</strong><br>v<sub>g</sub> = c²/v<sub>p</sub> = (3×10⁸)²/(3.75×10⁸)<br>= 2.4×10⁸ m/s = 0.8c<br><br><strong>结论</strong>：v<sub>p</sub> = 1.25c（超光速，但只是等相位面速度），v<sub>g</sub> = 0.8c（能量传播速度，小于光速）'
+                }
+            ]
+        },
+        'ch2-5': {
+            chapter: '第2章 传输线理论',
+            title: '2.5 输入阻抗、反射系数与驻波比',
+            desc: '传输线状态描述参数及其相互关系',
+            knowledge: [
+                '<strong>输入阻抗定义</strong>：Z<sub>in</sub>(z) = V(z)/I(z)，传输线上某点电压与电流之比',
+                '<strong>输入阻抗公式</strong>：Z<sub>in</sub>(l) = Z<sub>0</sub>(Z<sub>L</sub> + jZ<sub>0</sub>tanβl)/(Z<sub>0</sub> + jZ<sub>L</sub>tanβl)，l 为距负载距离',
+                '<strong>反射系数定义</strong>：Γ(z) = V<sup>-</sup>(z)/V<sup>+</sup>(z) = (Z<sub>L</sub> - Z<sub>0</sub>)/(Z<sub>L</sub> + Z<sub>0</sub>)e^(-j2βz)',
+                '<strong>负载反射系数</strong>：Γ<sub>L</sub> = (Z<sub>L</sub> - Z<sub>0</sub>)/(Z<sub>L</sub> + Z<sub>0</sub>)，决定反射波大小',
+                '<strong>反射系数模值</strong>：|Γ| ≤ 1，无损耗线上 |Γ| 为常数',
+                '<strong>驻波比（VSWR）</strong>：ρ = (1+|Γ|)/(1-|Γ|)，范围 1 ≤ ρ < ∞',
+                '<strong>行波系数</strong>：K = 1/ρ = (1-|Γ|)/(1+|Γ|)，表示行波成分比例',
+                '<strong>三者关系</strong>：|Γ| = (ρ-1)/(ρ+1) = (1-K)/(1+K)',
+                '<strong>特殊状态</strong>：匹配时 Γ=0, ρ=1；全反射时 |Γ|=1, ρ=∞；短路/开路时 |Γ|=1'
+            ],
+            examples: [
+                {
+                    title: '例题 2.9',
+                    question: '特性阻抗 Z<sub>0</sub> = 50Ω 的传输线，终端接 Z<sub>L</sub> = 100Ω 负载。求：(1) 反射系数；(2) 驻波比。',
+                    solution: '<strong>(1) 计算反射系数</strong>：<br>Γ<sub>L</sub> = (Z<sub>L</sub> - Z<sub>0</sub>)/(Z<sub>L</sub> + Z<sub>0</sub>)<br>= (100-50)/(100+50)<br>= 50/150 = 1/3 ≈ 0.333<br><br><strong>(2) 计算驻波比</strong>：<br>ρ = (1+|Γ|)/(1-|Γ|)<br>= (1+1/3)/(1-1/3)<br>= (4/3)/(2/3) = 2<br><br><strong>结论</strong>：反射系数为 0.333，驻波比为 2，需要阻抗匹配改善'
+                },
+                {
+                    title: '例题 2.10',
+                    question: '测得传输线上驻波比为 3，电压最小点处输入阻抗为 25Ω。求特性阻抗 Z₀。',
+                    solution: '<strong>分析</strong>：电压最小点处输入阻抗为纯电阻，且 Z<sub>min</sub> = Z<sub>0</sub>/ρ<br><br><strong>求解</strong>：<br>Z<sub>min</sub> = Z<sub>0</sub>/ρ<br>25 = Z<sub>0</sub>/3<br>Z<sub>0</sub> = 75Ω<br><br><strong>验证</strong>：<br>电压最大点 Z<sub>max</sub> = Z<sub>0</sub>×ρ = 75×3 = 225Ω<br>符合 Z<sub>max</sub>×Z<sub>min</sub> = Z<sub>0</sub>² 的关系<br><br><strong>结论</strong>：特性阻抗 Z<sub>0</sub> = 75Ω'
+                }
+            ]
+        },
+        'ch2-6': {
+            chapter: '第2章 传输线理论',
+            title: '2.6 阻抗匹配与匹配网络',
+            desc: '阻抗匹配原理及常用匹配网络设计',
+            knowledge: [
+                '<strong>阻抗匹配目的</strong>：消除反射，实现最大功率传输，减小信号畸变',
+                '<strong>共轭匹配</strong>：Z<sub>s</sub> = Z<sub>L</sub>*，源阻抗与负载阻抗共轭，实现最大功率传输',
+                '<strong>无反射匹配</strong>：Z<sub>L</sub> = Z<sub>0</sub>，负载与传输线特性阻抗相等，Γ = 0',
+                '<strong>λ/4 阻抗变换器</strong>：Z<sub>01</sub> = √(Z<sub>0</sub>Z<sub>L</sub>)，用于纯电阻负载匹配',
+                '<strong>单支节匹配</strong>：在传输线上并联或串联短路/开路支节，调节电纳实现匹配',
+                '<strong>双支节匹配</strong>：两个可调支节，匹配范围更广，调节更灵活',
+                '<strong>L 型匹配网络</strong>：由电感和电容构成，适用于窄带匹配',
+                '<strong>π 型和 T 型网络</strong>：三元件网络，可实现较宽带宽匹配',
+                '<strong>渐变线匹配</strong>：特性阻抗连续变化，实现宽带匹配，如指数线、切比雪夫线'
+            ],
+            examples: [
+                {
+                    title: '例题 2.11',
+                    question: '设计一个 λ/4 阻抗变换器，将 Z<sub>L</sub> = 100Ω 负载匹配到 Z<sub>0</sub> = 50Ω 传输线，工作频率 1GHz。',
+                    solution: '<strong>第一步：计算变换器特性阻抗</strong><br>Z<sub>01</sub> = √(Z<sub>0</sub>×Z<sub>L</sub>) = √(50×100) = √5000 ≈ 70.7Ω<br><br><strong>第二步：计算变换器长度</strong><br>λ = c/f = 3×10⁸/10⁹ = 0.3m = 30cm<br>l = λ/4 = 7.5cm<br><br><strong>第三步：验证</strong><br>从变换器向负载看：Z<sub>in</sub> = Z<sub>01</sub>²/Z<sub>L</sub> = 5000/100 = 50Ω = Z<sub>0</sub> ✓<br><br><strong>结论</strong>：使用 70.7Ω、7.5cm 长的传输线段作为阻抗变换器<br><br><strong>注意</strong>：λ/4 变换器只适用于纯电阻负载，且为窄带匹配'
+                },
+                {
+                    title: '例题 2.12',
+                    question: '用 L 型网络将 Z<sub>L</sub> = 100 + j50Ω 匹配到 Z<sub>0</sub> = 50Ω，工作频率 500MHz。',
+                    solution: '<strong>分析</strong>：采用并联电容 + 串联电感结构<br><br><strong>第一步：归一化负载</strong><br>z<sub>L</sub> = Z<sub>L</sub>/Z<sub>0</sub> = 2 + j1<br><br><strong>第二步：并联电容将导纳变换到 g=1 圆上</strong><br>y<sub>L</sub> = 1/z<sub>L</sub> = 0.4 - j0.2<br>需添加电纳 jb<sub>c</sub>，使 g = 1<br>由史密斯圆图或计算得：b<sub>c</sub> ≈ 0.6<br>C = b<sub>c</sub>/(ωZ<sub>0</sub>) = 0.6/(2π×5×10⁸×50) ≈ 3.8pF<br><br><strong>第三步：串联电感抵消电抗</strong><br>x<sub>L</sub> ≈ 1.2<br>L = x<sub>L</sub>×Z<sub>0</sub>/ω = 1.2×50/(2π×5×10⁸) ≈ 19nH<br><br><strong>结论</strong>：并联 3.8pF 电容，串联 19nH 电感'
+                }
+            ]
+        },
+        'ch2-7': {
+            chapter: '第2章 传输线理论',
+            title: '2.7 传输线的瞬态响应',
+            desc: '传输线对阶跃信号和脉冲信号的时域响应',
+            knowledge: [
+                '<strong>瞬态分析意义</strong>：数字信号、脉冲信号在传输线上的传播特性',
+                '<strong>信号传播延迟</strong>：t<sub>d</sub> = l/v<sub>p</sub> = l√(LC)，l 为线长，v<sub>p</sub> 为相速度',
+                '<strong>反射系数时域形式</strong>：Γ = (Z<sub>L</sub> - Z<sub>0</sub>)/(Z<sub>L</sub> + Z<sub>0</sub>)，与频域形式相同',
+                '<strong>多次反射</strong>：信号在源端和负载端之间来回反射，形成反射波序列',
+                '<strong>反射图（Bounce Diagram）</strong>：用图形法分析多次反射过程',
+                '<strong>终端电压</strong>：V<sub>L</sub>(t) = V<sup>+</sup>(1 + Γ<sub>L</sub> + Γ<sub>L</sub>Γ<sub>S</sub> + Γ<sub>L</sub>²Γ<sub>S</sub> + ...)，逐步趋近稳态',
+                '<strong>稳态值</strong>：V<sub>∞</sub> = V<sub>s</sub>×Z<sub>L</sub>/(Z<sub>s</sub> + Z<sub>L</sub>)，由分压定理决定',
+                '<strong>上升时间</strong>：t<sub>r</sub> ≈ 2.2t<sub>d</sub>，信号从 10% 上升到 90% 所需时间',
+                '<strong>阻抗不连续</strong>：连接器、过孔、线宽变化等引起反射，需控制反射系数'
+            ],
+            examples: [
+                {
+                    title: '例题 2.13',
+                    question: '传输线长 l = 1m，Z₀ = 50Ω，v<sub>p</sub> = 2×10⁸ m/s，终端开路，源端接 10V 阶跃电压源（内阻 50Ω）。求负载端电压随时间变化。',
+                    solution: '<strong>第一步：计算传播延迟</strong><br>t<sub>d</sub> = l/v<sub>p</sub> = 1/(2×10⁸) = 5ns<br><br><strong>第二步：计算反射系数</strong><br>Γ<sub>L</sub> = (∞ - 50)/(∞ + 50) = 1（开路全反射）<br>Γ<sub>S</sub> = (50 - 50)/(50 + 50) = 0（源端匹配）<br><br><strong>第三步：分析瞬态过程</strong><br>t = 0：源端发射 V<sup>+</sup> = 10×50/(50+50) = 5V<br>t = t<sub>d</sub>：5V 到达负载，反射 5V，V<sub>L</sub> = 10V<br>t = 2t<sub>d</sub>：反射波到达源端，被完全吸收<br><br><strong>结论</strong>：V<sub>L</sub>(t) = 0 (t<5ns)，V<sub>L</sub>(t) = 10V (t≥5ns)，无振荡'
+                },
+                {
+                    title: '例题 2.14',
+                    question: '某数字信号上升时间 t<sub>r</sub> = 1ns，在 PCB 走线上传输，基板 ε<sub>r</sub> = 4。估算不产生明显失真的最大走线长度。',
+                    solution: '<strong>分析</strong>：当传输延迟 t<sub>d</sub> > t<sub>r</sub>/4 时，传输线效应显著<br><br><strong>第一步：计算相速度</strong><br>v<sub>p</sub> = c/√ε<sub>r</sub> = 3×10⁸/√4 = 1.5×10⁸ m/s<br><br><strong>第二步：计算临界长度</strong><br>t<sub>d</sub> = l/v<sub>p</sub> ≤ t<sub>r</sub>/4<br>l ≤ v<sub>p</sub>×t<sub>r</sub>/4 = 1.5×10⁸×10⁻⁹/4<br>= 0.0375 m = 3.75 cm<br><br><strong>结论</strong>：<br>• 走线 < 3.75cm：可按集总参数处理<br>• 走线 > 3.75cm：必须考虑传输线效应，需阻抗匹配<br>• 工程上通常取 l < λ/10 或 l < t<sub>r</sub>×v<sub>p</sub>/6'
+                }
+            ]
+        },
+        'ch3-1': {
+            chapter: '第3章 射频网络理论',
+            title: '3.1 二端口网络参数：Z、Y、ABCD、h',
+            desc: '二端口网络的各种矩阵参数定义与转换',
+            knowledge: [
+                '<strong>二端口网络</strong>：具有两个端口的网络，用四个参数描述输入输出关系',
+                '<strong>阻抗参数（Z 参数）</strong>：V₁ = Z₁₁I₁ + Z₁₂I₂，V₂ = Z₂₁I₁ + Z₂₂I₂，开路参数',
+                '<strong>导纳参数（Y 参数）</strong>：I₁ = Y₁₁V₁ + Y₁₂V₂，I₂ = Y₂₁V₁ + Y₂₂V₂，短路参数',
+                '<strong>传输参数（ABCD 参数）</strong>：V₁ = AV₂ - BI₂，I₁ = CV₂ - DI₂，便于级联',
+                '<strong>混合参数（h 参数）</strong>：V₁ = h₁₁I₁ + h₁₂V₂，I₂ = h₂₁I₁ + h₂₂V₂，用于晶体管',
+                '<strong>互易网络</strong>：Z₁₂ = Z₂₁，Y₁₂ = Y₂₁，不含非互易介质（铁氧体、有源器件）',
+                '<strong>对称网络</strong>：Z₁₁ = Z₂₂，输入输出端口互换特性不变',
+                '<strong>无耗网络</strong>：Z 参数为纯虚数，Re(Zᵢⱼ) = 0',
+                '<strong>参数转换</strong>：各参数矩阵可通过矩阵运算相互转换，如 [Z] = [Y]⁻¹'
+            ],
+            examples: [
+                {
+                    title: '例题 3.1',
+                    question: '求 T 型网络的 Z 参数，其中 Z₁ = j10Ω，Z₂ = j20Ω，Z₃ = j30Ω。',
+                    solution: '<strong>T 型网络结构</strong>：Z₁ 和 Z₂ 串联在输入输出端，Z₃ 跨接在中间<br><br><strong>计算 Z 参数</strong>：<br>Z₁₁ = V₁/I₁|_(I₂=0) = Z₁ + Z₃ = j10 + j30 = j40Ω<br>Z₂₂ = V₂/I₂|_(I₁=0) = Z₂ + Z₃ = j20 + j30 = j50Ω<br>Z₁₂ = Z₂₁ = V₁/I₂|_(I₁=0) = Z₃ = j30Ω<br><br><strong>Z 矩阵</strong>：<br>[Z] = [[j40, j30], [j30, j50]] Ω<br><br><strong>验证互易性</strong>：Z₁₂ = Z₂₁ = j30Ω，网络互易 ✓'
+                },
+                {
+                    title: '例题 3.2',
+                    question: '已知二端口网络的 Y 参数：Y₁₁ = 0.02 S，Y₁₂ = Y₂₁ = -0.01 S，Y₂₂ = 0.03 S。求 Z₁₁。',
+                    solution: '<strong>第一步：写出 Y 矩阵</strong><br>[Y] = [[0.02, -0.01], [-0.01, 0.03]] S<br><br><strong>第二步：计算行列式</strong><br>ΔY = Y₁₁Y₂₂ - Y₁₂Y₂₁<br>= 0.02×0.03 - (-0.01)×(-0.01)<br>= 0.0006 - 0.0001 = 0.0005 S²<br><br><strong>第三步：计算 Z₁₁</strong><br>Z₁₁ = Y₂₂/ΔY = 0.03/0.0005 = 60Ω<br><br><strong>结论</strong>：Z₁₁ = 60Ω'
+                }
+            ]
+        },
+        'ch3-2': {
+            chapter: '第3章 射频网络理论',
+            title: '3.2 散射参数（S 参数）',
+            desc: '微波频段最常用的网络参数，基于入射波和反射波',
+            knowledge: [
+                '<strong>S 参数定义</strong>：基于归一化入射波 a 和反射波 b，b = Sa',
+                '<strong>S₁₁</strong>：输入反射系数，端口2匹配时端口1的反射系数',
+                '<strong>S₂₁</strong>：正向传输系数，端口2匹配时从端口1到端口2的传输',
+                '<strong>S₁₂</strong>：反向传输系数，端口1匹配时从端口2到端口1的传输',
+                '<strong>S₂₂</strong>：输出反射系数，端口1匹配时端口2的反射系数',
+                '<strong>S 参数与功率</strong>：|S₂₁|² 为功率增益，|S₁₁|² 为反射功率比',
+                '<strong>互易网络</strong>：S₁₂ = S₂₁，网络无源且不含非互易介质',
+                '<strong>无耗网络</strong>：[S]⁺[S] = [I]，即 S⁺S = I，功率守恒',
+                '<strong>单位ary矩阵</strong>：无耗互易网络的 S 矩阵是单位ary矩阵，|S₁₁|² + |S₂₁|² = 1'
+            ],
+            examples: [
+                {
+                    title: '例题 3.3',
+                    question: '某二端口网络的 S 参数为：S₁₁ = 0.2∠-45°，S₁₂ = S₂₁ = 0.9∠30°，S₂₂ = 0.1∠-60°。判断网络特性。',
+                    solution: '<strong>分析各参数</strong>：<br><br>1. <strong>互易性</strong>：S₁₂ = S₂₁ = 0.9∠30°，网络互易 ✓<br><br>2. <strong>无耗性检验</strong>：<br>|S₁₁|² + |S₂₁|² = 0.04 + 0.81 = 0.85 ≠ 1<br>网络有损耗<br><br>3. <strong>输入匹配</strong>：|S₁₁| = 0.2，回波损耗 RL = -20log(0.2) = 14dB<br><br>4. <strong>传输特性</strong>：|S₂₁| = 0.9，插入损耗 IL = -20log(0.9) ≈ 0.9dB<br><br>5. <strong>隔离度</strong>：反向传输与正向传输相同，隔离度一般<br><br><strong>结论</strong>：互易有耗网络，接近匹配，传输损耗小'
+                },
+                {
+                    title: '例题 3.4',
+                    question: '设计一个 3dB 衰减器，特性阻抗 50Ω，求 S 参数和电阻值（T 型结构）。',
+                    solution: '<strong>要求</strong>：插入损耗 3dB，即 |S₂₁| = 10^(-3/20) = 0.707<br><br><strong>对称无耗衰减器</strong>：<br>S₁₁ = S₂₂ = 0（匹配）<br>S₁₂ = S₂₁ = 0.707（互易）<br><br><strong>T 型衰减器设计</strong>：<br>R₁ = R₂ = Z₀(1-|S₂₁|)/(1+|S₂₁|) = 50×(1-0.707)/(1+0.707) = 8.6Ω<br>R₃ = 2Z₀|S₂₁|/(1-|S₂₁|²) = 100×0.707/(1-0.5) = 141.4Ω<br><br><strong>S 矩阵</strong>：<br>[S] = [[0, 0.707], [0.707, 0]]<br><br><strong>验证</strong>：|S₁₁|² + |S₂₁|² = 0 + 0.5 = 0.5 ≠ 1（有耗网络）✓'
+                }
+            ]
+        },
+        'ch3-3': {
+            chapter: '第3章 射频网络理论',
+            title: '3.3 多端口网络与信号流图',
+            desc: '多端口网络分析和信号流图方法',
+            knowledge: [
+                '<strong>多端口网络</strong>：N 端口网络用 N×N S 矩阵描述，Sᵢⱼ 表示从端口 j 到端口 i 的传输',
+                '<strong>三端口网络</strong>：如环形器、T 型接头，S 为 3×3 矩阵',
+                '<strong>四端口网络</strong>：如定向耦合器、混合环，S 为 4×4 矩阵',
+                '<strong>信号流图</strong>：用节点和支路表示波的关系，节点表示变量，支路表示传输系数',
+                '<strong>信号流图规则</strong>：节点值等于所有输入支路信号之和',
+                '<strong>流图简化规则</strong>：串联支路相乘、并联支路相加、自环消除',
+                '<strong>梅森增益公式</strong>：T = (Σ PₖΔₖ)/Δ，其中 Pₖ 为第 k 条前向通路增益，Δ 为流图行列式（1 - ΣLᵢ + ΣLᵢLⱼ - ...），Δₖ 为与第 k 条通路不接触子图的行列式',
+                '<strong>不接触环路</strong>：梅森法则中需识别所有环路及其组合',
+                '<strong>应用</strong>：级联网络分析、反馈系统、测量误差修正'
+            ],
+            examples: [
+                {
+                    title: '例题 3.5',
+                    question: '理想三端口环形器的 S 矩阵为 [S] = [[0,0,1],[1,0,0],[0,1,0]]。解释其工作原理。',
+                    solution: '<strong>S 矩阵分析</strong>：<br>S₂₁ = 1：端口1输入，端口2输出<br>S₃₂ = 1：端口2输入，端口3输出<br>S₁₃ = 1：端口3输入，端口1输出<br><br><strong>工作原理</strong>：<br>• 信号只能沿 1→2→3→1 方向传输<br>• 反向隔离：S₁₂ = S₂₃ = S₃₁ = 0<br>• 完全匹配：S₁₁ = S₂₂ = S₃₃ = 0<br><br><strong>应用</strong>：<br>• 收发共用天线（双工器）<br>• 反射计中的信号分离<br>• 雷达系统中的信号路由<br><br><strong>实现</strong>：利用铁氧体的非互易特性'
+                },
+                {
+                    title: '例题 3.6',
+                    question: '用信号流图法求级联两个二端口网络的总 S₂₁（已知各自的 S 参数）。',
+                    solution: '<strong>级联连接</strong>：网络1的端口2与网络2的端口1相连<br><br><strong>信号流图建立</strong>：<br>• 节点：a₁, b₁, a₂, b₂, a₃, b₃（a 为入射波，b 为反射波）<br>• 网络1：b₁ = S₁₁⁽¹⁾a₁ + S₁₂⁽¹⁾a₂，b₂ = S₂₁⁽¹⁾a₁ + S₂₂⁽¹⁾a₂<br>• 网络2：b₂ = S₁₁⁽²⁾a₂ + S₁₂⁽²⁾a₃，b₃ = S₂₁⁽²⁾a₂ + S₂₂⁽²⁾a₃<br>• 连接条件：a₂ = b₂（中间端口）<br><br><strong>求解</strong>：<br>消去中间变量 a₂, b₂，得：<br>S₂₁ = b₃/a₁|_(a₃=0) = S₂₁⁽¹⁾S₂₁⁽²⁾/(1 - S₂₂⁽¹⁾S₁₁⁽²⁾)<br><br><strong>结论</strong>：级联网络总传输与各自传输及反射有关'
+                }
+            ]
+        },
+        'ch3-4': {
+            chapter: '第3章 射频网络理论',
+            title: '3.4 网络等效变换',
+            desc: '不同网络参数间的转换和等效电路',
+            knowledge: [
+                '<strong>Z-Y 转换</strong>：[Z] = [Y]⁻¹，[Y] = [Z]⁻¹，互为逆矩阵',
+                '<strong>Z-ABCD 转换</strong>：A = Z₁₁/Z₂₁，B = ΔZ/Z₂₁，C = 1/Z₂₁，D = Z₂₂/Z₂₁',
+                '<strong>S-Z 转换</strong>：[Z] = [Z₀]^(1/2)([I]+[S])([I]-[S])⁻¹[Z₀]^(1/2)',
+                '<strong>Z-S 转换</strong>：[S] = ([Z]+[Z₀])⁻¹([Z]-[Z₀])，[Z₀] 为参考阻抗对角矩阵',
+                '<strong>T 型-Π 型变换</strong>：星形网络与三角形网络的等效变换',
+                '<strong>阻抗变换</strong>：改变参考阻抗时 S 参数的变换公式',
+                '<strong>网络级联</strong>：ABCD 参数直接相乘，[A] = [A₁][A₂]...[Aₙ]',
+                '<strong>网络并联</strong>：Y 参数直接相加，[Y] = [Y₁] + [Y₂]',
+                '<strong>网络串联</strong>：Z 参数直接相加，[Z] = [Z₁] + [Z₂]'
+            ],
+            examples: [
+                {
+                    title: '例题 3.7',
+                    question: '已知二端口网络的 Z 参数：Z₁₁ = 60Ω，Z₁₂ = Z₂₁ = 40Ω，Z₂₂ = 50Ω。求 Y₁₁。',
+                    solution: '<strong>方法一：矩阵求逆</strong><br>[Z] = [[60, 40], [40, 50]]<br>det(Z) = 60×50 - 40×40 = 3000 - 1600 = 1400<br><br>[Y] = [Z]⁻¹ = (1/1400)[[50, -40], [-40, 60]]<br>Y₁₁ = 50/1400 = 0.0357 S = 35.7 mS<br><br><strong>方法二：公式</strong><br>Y₁₁ = Z₂₂/ΔZ = 50/1400 = 0.0357 S<br><br><strong>结论</strong>：Y₁₁ = 35.7 mS'
+                },
+                {
+                    title: '例题 3.8',
+                    question: '将 Z 参数转换为 ABCD 参数，已知 Z₁₁ = 100Ω，Z₁₂ = Z₂₁ = 50Ω，Z₂₂ = 75Ω。',
+                    solution: '<strong>计算中间量</strong>：<br>ΔZ = Z₁₁Z₂₂ - Z₁₂Z₂₁ = 100×75 - 50×50 = 7500 - 2500 = 5000 Ω²<br><br><strong>ABCD 参数</strong>：<br>A = Z₁₁/Z₂₁ = 100/50 = 2<br>B = ΔZ/Z₂₁ = 5000/50 = 100 Ω<br>C = 1/Z₂₁ = 1/50 = 0.02 S<br>D = Z₂₂/Z₂₁ = 75/50 = 1.5<br><br><strong>验证</strong>：AD - BC = 2×1.5 - 100×0.02 = 3 - 2 = 1 ✓<br>（互易网络满足 AD - BC = 1）<br><br><strong>结论</strong>：[A B; C D] = [2, 100Ω; 0.02S, 1.5]'
+                }
+            ]
+        },
+        'ch3-5': {
+            chapter: '第3章 射频网络理论',
+            title: '3.5 网络的损耗、互易与对称性',
+            desc: '网络的基本性质及其数学表征',
+            knowledge: [
+                '<strong>互易定理</strong>：线性无源网络中，激励与响应位置互换，传输不变',
+                '<strong>互易性判据</strong>：Z₁₂ = Z₂₁，Y₁₂ = Y₂₁，S₁₂ = S₂₁，h₁₂ = -h₂₁',
+                '<strong>非互易器件</strong>：铁氧体器件（环形器、隔离器）、有源器件、时变器件',
+                '<strong>对称网络</strong>：端口互换网络特性不变，Z₁₁ = Z₂₂，S₁₁ = S₂₂',
+                '<strong>无耗网络</strong>：网络无能量损耗，S 矩阵单位ary，Σ|Sᵢⱼ|² = 1（对每行/列）',
+                '<strong>插入损耗（IL）</strong>：IL = -20log|S₂₁|，表示信号通过网络的衰减',
+                '<strong>回波损耗（RL）</strong>：RL = -20log|S₁₁|，表示反射信号衰减',
+                '<strong>网络品质因数</strong>：Q = f₀/Δf，表示频率选择性',
+                '<strong>无耗互易三端口网络</strong>：不可能同时匹配所有三个端口（不可能定理）'
+            ],
+            examples: [
+                {
+                    title: '例题 3.9',
+                    question: '证明无耗互易二端口网络满足 |S₁₁|² + |S₂₁|² = 1。',
+                    solution: '<strong>证明</strong>：<br><br>1. <strong>无耗条件</strong>：[S]⁺[S] = [I]<br>即 S₁₁*S₁₁ + S₂₁*S₂₁ = 1（第一行自乘）<br><br>2. <strong>展开</strong>：<br>|S₁₁|² + |S₂₁|² = 1<br><br>3. <strong>物理意义</strong>：<br>• 输入功率 = |a₁|²<br>• 反射功率 = |b₁|² = |S₁₁|²|a₁|²<br>• 传输功率 = |b₂|² = |S₂₁|²|a₁|²<br>• 功率守恒：反射 + 传输 = 输入<br><br><strong>证毕</strong> ✓<br><br><strong>推论</strong>：|S₁₁| = 0 时，|S₂₁| = 1，全传输无反射'
+                },
+                {
+                    title: '例题 3.10',
+                    question: '某二端口网络测得：S₁₁ = 0.1，S₂₁ = 0.9，S₂₂ = 0.2。判断是否无耗、互易。',
+                    solution: '<strong>互易性检验</strong>：<br>未给出 S₁₂，假设 S₁₂ = S₂₁ = 0.9<br>若 S₁₂ ≠ S₂₁，则网络非互易<br><br><strong>无耗性检验</strong>：<br>第一行：|S₁₁|² + |S₂₁|² = 0.01 + 0.81 = 0.82 ≠ 1<br>网络有损耗<br><br><strong>计算损耗</strong>：<br>插入损耗 IL = -20log(0.9) ≈ 0.92 dB<br>回波损耗（输入）RL₁ = -20log(0.1) = 20 dB<br>回波损耗（输出）RL₂ = -20log(0.2) ≈ 14 dB<br><br><strong>结论</strong>：互易有耗网络，匹配良好'
+                }
+            ]
+        },
+        'ch4-1': {
+            chapter: '第4章 传输线与波导',
+            title: '4.1 平行双线传输线',
+            desc: '平行双线的结构、场分布和传输特性',
+            knowledge: [
+                '<strong>结构特点</strong>：两根平行导体圆柱，间距 d，半径 a，填充介质 ε',
+                '<strong>TEM 模传输</strong>：平行双线传输横电磁波，无色散，频带宽',
+                '<strong>单位长度电容</strong>：C = πε/arccosh(d/2a) ≈ πε/ln(d/a)（d>>a 时）',
+                '<strong>单位长度电感</strong>：L = μarccosh(d/2a)/π ≈ μln(d/a)/π',
+                '<strong>特性阻抗</strong>：Z<sub>0</sub> = (1/π)√(μ/ε)arccosh(d/2a) ≈ (120/√ε<sub>r</sub>)ln(d/a)',
+                '<strong>辐射损耗</strong>：开放结构，高频时辐射损耗显著，一般用于低频（< 200MHz）',
+                '<strong>应用场合</strong>：电视天线馈线（300Ω）、短波通信、低频测量',
+                '<strong>优缺点</strong>：结构简单、成本低，但辐射损耗大、易受干扰',
+                '<strong>平衡传输</strong>：双线对地对称，抗共模干扰能力强'
+            ],
+            examples: [
+                {
+                    title: '例题 4.1',
+                    question: '设计一个 300Ω 的平行双线传输线，导线半径 a = 1mm，空气介质。求导线间距 d。',
+                    solution: '<strong>已知</strong>：Z<sub>0</sub> = 300Ω，a = 1mm，ε<sub>r</sub> = 1<br><br><strong>使用近似公式</strong>（d >> a）：<br>Z<sub>0</sub> ≈ 120ln(d/a)<br>300 = 120ln(d/1mm)<br>ln(d/1mm) = 2.5<br>d = 1mm × e^2.5 ≈ 12.2mm<br><br><strong>验证近似条件</strong>：<br>d/a = 12.2 > 10，近似成立<br><br><strong>结论</strong>：导线间距约 12.2mm<br><br><strong>实际产品</strong>：TV 天线常用 300Ω 扁馈线，间距约 10-15mm'
+                },
+                {
+                    title: '例题 4.2',
+                    question: '比较平行双线（Z₀ = 300Ω）与同轴线（Z₀ = 75Ω）的功率容量，假设两者击穿场强相同。',
+                    solution: '<strong>近似分析</strong>（假设两者最大电场强度 E<sub>max</sub> 相同且由几何尺寸决定）：<br><br>对于 TEM 传输线，功率容量近似与 E<sub>max</sub>² 成正比，与特性阻抗成反比：<br>P ∝ E<sub>max</sub>²/Z<sub>0</sub><br><br><strong>相对功率容量</strong>：<br>P_双线/P_同轴 = Z<sub>0</sub>_同轴/Z<sub>0</sub>_双线 = 75/300 = 0.25<br><br><strong>结论</strong>：<br>• 在相同最大电场强度条件下，300Ω 双线功率容量约为 75Ω 同轴线的 4 倍<br>• 高阻抗线功率容量大，但电流小<br>• 低阻抗线电流容量大，但功率容量相对小<br>• 50Ω 是功率容量与衰减的折中<br><br><strong>注</strong>：实际功率容量还取决于导体间距、介质击穿场强分布等几何因素，此处为简化比较。'
+                }
+            ]
+        },
+        'ch4-2': {
+            chapter: '第4章 传输线与波导',
+            title: '4.2 同轴线',
+            desc: '同轴线的结构、场分布、特性和应用',
+            knowledge: [
+                '<strong>结构特点</strong>：内导体半径 a，外导体内半径 b，填充介质 ε，同轴结构',
+                '<strong>TEM 模</strong>：主模为横电磁波，无色散，截止频率为 0，频带宽',
+                '<strong>场分布</strong>：E 沿径向，H 沿方位角方向，呈轴对称分布',
+                '<strong>单位长度参数</strong>：L = (μ/2π)ln(b/a)，C = 2πε/ln(b/a)',
+                '<strong>特性阻抗</strong>：Z<sub>0</sub> = (60/√ε<sub>r</sub>)ln(b/a) = (138/√ε<sub>r</sub>)lg(b/a)',
+                '<strong>标准阻抗</strong>：50Ω（功率与衰减折中）、75Ω（有线电视，衰减最小）',
+                '<strong>最优尺寸</strong>：50Ω 时 b/a = 2.3；75Ω 时 b/a = 3.5；最大功率时 b/a = 1.65',
+                '<strong>高次模</strong>：TE₁₁ 模截止波长 λc ≈ π(a+b)，工作波长应大于 λc',
+                '<strong>应用</strong>：射频测试电缆、天线馈线、连接器、功分器'
+            ],
+            examples: [
+                {
+                    title: '例题 4.3',
+                    question: '设计一个 50Ω 空气同轴线，外导体内半径 b = 5mm。求内导体半径 a 及 TE₁₁ 模截止频率。',
+                    solution: '<strong>第一步：求内导体半径</strong><br>Z₀ = 60ln(b/a) = 50<br>ln(b/a) = 50/60 = 0.833<br>b/a = e^0.833 ≈ 2.3<br>a = b/2.3 = 5/2.3 ≈ 2.17mm<br><br><strong>第二步：计算 TE₁₁ 截止频率</strong><br>λc ≈ π(a+b) = π(2.17+5) = 22.5mm<br>fc = c/λc = 3×10⁸/(22.5×10⁻³) ≈ 13.3GHz<br><br><strong>结论</strong>：<br>• 内导体半径 a ≈ 2.17mm<br>• 单模工作频率应 < 13.3GHz'
+                },
+                {
+                    title: '例题 4.4',
+                    question: '某同轴线填充 ε<sub>r</sub> = 2.1 的聚四氟乙烯，b/a = 2.3。求特性阻抗和相速度。',
+                    solution: '<strong>特性阻抗</strong>：<br>Z<sub>0</sub> = (60/√ε<sub>r</sub>)ln(b/a)<br>= (60/√2.1)ln(2.3)<br>= (60/1.45)×0.833<br>= 41.4×0.833 ≈ 34.5Ω<br><br><strong>相速度</strong>：<br>v<sub>p</sub> = c/√ε<sub>r</sub> = 3×10⁸/√2.1<br>= 3×10⁸/1.45 ≈ 2.07×10⁸ m/s<br>= 0.69c<br><br><strong>结论</strong>：<br>• 特性阻抗约 34.5Ω<br>• 相速度为 0.69c（光速的 69%）'
+                }
+            ]
+        },
+        'ch4-3': {
+            chapter: '第4章 传输线与波导',
+            title: '4.3 微带线与带状线',
+            desc: '平面传输线的结构、特性和设计方法',
+            knowledge: [
+                '<strong>微带线结构</strong>：导带在介质基板上方，接地板在下方，部分场在空气中',
+                '<strong>准 TEM 模</strong>：微带线传输准横电磁波，存在轻微色散',
+                '<strong>有效介电常数</strong>：ε<sub>e</sub> = (ε<sub>r</sub> + 1)/2 + (ε<sub>r</sub> - 1)/2(1 + 12h/W)^(-0.5)，介于 1 和 ε<sub>r</sub> 之间',
+                '<strong>微带线阻抗公式</strong>：W/h ≤ 1 时，Z₀ = (60/√εₑ)ln(8h/W + W/4h)',
+                '<strong>带状线结构</strong>：导带夹在两层接地板之间，完全填充介质',
+                '<strong>带状线 TEM 模</strong>：真正的 TEM 模，无色散',
+                '<strong>带状线阻抗</strong>：Z<sub>0</sub> = (30π/√ε<sub>r</sub>)/(W<sub>e</sub>/b + 0.441)，W<sub>e</sub> 为有效宽度',
+                '<strong>优缺点比较</strong>：微带线易集成、成本低；带状线屏蔽好、无辐射',
+                '<strong>应用</strong>：微波集成电路（MIC）、单片微波集成电路（MMIC）、PCB 射频电路'
+            ],
+            examples: [
+                {
+                    title: '例题 4.5',
+                    question: '设计一个 50Ω 微带线，基板 ε<sub>r</sub> = 4.2，厚度 h = 1.6mm。求导带宽度 W。',
+                    solution: '<strong>假设 W/h > 2，使用宽导带公式</strong>：<br>Z<sub>0</sub> = (120π/√ε<sub>e</sub>)/[W/h + 1.393 + 0.667ln(W/h + 1.444)]<br><br><strong>迭代求解</strong>：<br>设 W/h = 2，则 ε<sub>e</sub> ≈ 3.15<br>Z<sub>0</sub> ≈ 51.3Ω（接近 50Ω）<br><br>设 W/h = 1.9，ε<sub>e</sub> ≈ 3.12<br>Z<sub>0</sub> ≈ 49.8Ω ≈ 50Ω<br><br><strong>结论</strong>：<br>W = 1.9 × 1.6mm ≈ 3.0mm<br><br><strong>工程近似</strong>：对于 ε<sub>r</sub> = 4.2，50Ω 时 W ≈ 2h'
+                },
+                {
+                    title: '例题 4.6',
+                    question: '比较相同尺寸微带线和带状线的特性阻抗（εᵣ = 4.2，W = 3mm，h = 1.6mm）。',
+                    solution: '<strong>微带线</strong>：<br>W/h = 3/1.6 = 1.875<br>εₑ ≈ 3.15<br>Z₀ ≈ 51Ω（用近似公式计算）<br><br><strong>带状线</strong>（假设 b = 2h = 3.2mm）：<br>Z₀ = (30π/√εᵣ)/(W/b + 0.441)<br>= (30π/2.05)/(3/3.2 + 0.441)<br>= 46/(0.938 + 0.441)<br>= 46/1.379 ≈ 33.4Ω<br><br><strong>结论</strong>：<br>相同尺寸下，微带线阻抗高于带状线<br>原因：微带线部分场在空气中，有效介电常数较小'
+                }
+            ]
+        },
+        'ch4-4': {
+            chapter: '第4章 传输线与波导',
+            title: '4.4 矩形波导',
+            desc: '矩形波导的模式、截止特性和传输特性',
+            knowledge: [
+                '<strong>波导特点</strong>：单导体结构，不能传输 TEM 模，只能传输 TE 或 TM 模',
+                '<strong>矩形波导尺寸</strong>：宽边 a，窄边 b，通常 a = 2b 或 a ≈ 2b',
+                '<strong>TE 模（横电波）</strong>：Ez = 0，Hz ≠ 0，电场纯横向',
+                '<strong>TM 模（横磁波）</strong>：Hz = 0，Ez ≠ 0，磁场纯横向',
+                '<strong>主模 TE₁₀</strong>：截止频率最低的模式，f<sub>c</sub> = c/(2a)，单模工作带宽 1.25:1',
+                '<strong>截止波长</strong>：TEₘₙ 模 λc = 2/√[(m/a)² + (n/b)²]，TM 模类似',
+                '<strong>相速度</strong>：v<sub>p</sub> = c/√[ε<sub>r</sub> - (f<sub>c</sub>/f)²] > c，超光速但只是等相位面速度',
+                '<strong>群速度</strong>：v<sub>g</sub> = c√[1 - (f<sub>c</sub>/f)²] < c，能量传播速度',
+                '<strong>波导波长</strong>：λg = λ₀/√[1 - (f<sub>c</sub>/f)²] > λ₀',λ₀'
+            ],
+            examples: [
+                {
+                    title: '例题 4.7',
+                    question: '标准 WR-90 波导尺寸 a = 22.86mm，b = 10.16mm。求主模 TE₁₀ 的截止频率和单模工作频率范围。',
+                    solution: '<strong>TE₁₀ 截止频率</strong>：<br>λc(TE₁₀) = 2a = 45.72mm<br>fc(TE₁₀) = c/λc = 3×10⁸/(45.72×10⁻³) ≈ 6.56GHz<br><br><strong>次高模 TE₂₀ 截止频率</strong>：<br>λc(TE₂₀) = a = 22.86mm<br>fc(TE₂₀) = 2fc(TE₁₀) ≈ 13.12GHz<br><br><strong>TE₀₁ 截止频率</strong>：<br>λc(TE₀₁) = 2b = 20.32mm<br>fc(TE₀₁) = 3×10⁸/(20.32×10⁻³) ≈ 14.76GHz<br><br><strong>单模工作范围</strong>：<br>6.56GHz < f < 13.12GHz<br>工程上通常取 8.2-12.4GHz（X波段）'
+                },
+                {
+                    title: '例题 4.8',
+                    question: '矩形波导 a = 2.5cm，b = 1cm，工作频率 10GHz。求 TE₁₀ 模的相速度、群速度和波导波长。',
+                    solution: '<strong>已知</strong>：a = 2.5cm，f = 10GHz<br><br><strong>第一步：计算截止频率</strong><br>fc = c/(2a) = 3×10⁸/(2×2.5×10⁻²) = 6GHz<br><br><strong>第二步：计算相速度</strong><br>v<sub>p</sub> = c/√[1 - (fc/f)²]<br>= 3×10⁸/√[1 - (6/10)²]<br>= 3×10⁸/√0.64<br>= 3×10⁸/0.8 = 3.75×10⁸ m/s = 1.25c<br><br><strong>第三步：计算群速度</strong><br>v<sub>g</sub> = c√[1 - (fc/f)²] = 3×10⁸×0.8 = 2.4×10⁸ m/s = 0.8c<br><br><strong>第四步：计算波导波长</strong><br>λ₀ = c/f = 3cm<br>λg = λ₀/√[1 - (fc/f)²] = 3/0.8 = 3.75cm<br><br><strong>结论</strong>：v<sub>p</sub> = 1.25c，v<sub>g</sub> = 0.8c，λg = 3.75cm'
+                }
+            ]
+        },
+        'ch4-5': {
+            chapter: '第4章 传输线与波导',
+            title: '4.5 圆柱形波导',
+            desc: '圆波导的模式、特性和应用',
+            knowledge: [
+                '<strong>圆波导结构</strong>：半径为 a 的圆柱形金属管，轴对称结构',
+                '<strong>模式表示</strong>：TEₘₙ 和 TMₘₙ，m 为方位角变化数，n 为径向变化数',
+                '<strong>TE₁₁ 主模</strong>：截止波长 λc ≈ 3.41a，与矩形波导 TE₁₀ 类似',
+                '<strong>TE₀₁ 模特点</strong>：截止波长 λc ≈ 1.64a，衰减随频率升高而降低，低损耗传输',
+                '<strong>TM₀₁ 模特点</strong>：截止波长 λc ≈ 2.61a，轴对称，用于天线馈电旋转关节',
+                '<strong>模式简并</strong>：不同模式可能有相同截止频率，如 TE₀₁ 和 TM₁₁',
+                '<strong>极化简并</strong>：TE₁₁ 模存在两种正交极化，易产生极化不稳定',
+                '<strong>应用</strong>：远距离低损耗传输（TE₀₁）、雷达旋转关节、天线馈线',
+                '<strong>与矩形波导比较</strong>：圆波导加工困难、模式复杂，但 TE₀₁ 模损耗极低'
+            ],
+            examples: [
+                {
+                    title: '例题 4.9',
+                    question: '圆波导半径 a = 2cm，求 TE₁₁、TM₀₁、TE₀₁ 模的截止频率。',
+                    solution: '<strong>各模式截止波长</strong>：<br>• TE₁₁：λc = 3.41a = 6.82cm<br>• TM₀₁：λc = 2.61a = 5.22cm<br>• TE₀₁：λc = 1.64a = 3.28cm<br><br><strong>计算截止频率</strong>：<br>• fc(TE₁₁) = c/λc = 3×10⁸/0.0682 ≈ 4.4GHz<br>• fc(TM₀₁) = 3×10⁸/0.0522 ≈ 5.75GHz<br>• fc(TE₀₁) = 3×10⁸/0.0328 ≈ 9.15GHz<br><br><strong>单模工作范围</strong>：<br>4.4GHz < f < 5.75GHz<br><br><strong>注意</strong>：TE₀₁ 和 TM₁₁ 简并，fc ≈ 9.15GHz'
+                },
+                {
+                    title: '例题 4.10',
+                    question: '为什么圆波导 TE₀₁ 模适合远距离微波传输？',
+                    solution: '<strong>TE₀₁ 模的独特优势</strong>：<br><br>1. <strong>壁电流特性</strong>：<br>只有方位角方向电流，无纵向电流<br>导体损耗主要来自轴向电流<br><br>2. <strong>衰减特性</strong>：<br>衰减常数 α ∝ (fc/f)²<br>当 f >> fc 时，α 随频率升高而降低<br>与 TE₁₁ 模相反（TE₁₁ 衰减随 f 升高而增大）<br><br>3. <strong>实际应用</strong>：<br>• 毫米波远距离通信<br>• 高功率传输（加速器）<br>• 低损耗延迟线<br><br><strong>挑战</strong>：<br>TE₀₁ 不是主模，需特殊激励和模式滤波'
+                }
+            ]
+        },
+        'ch4-6': {
+            chapter: '第4章 传输线与波导',
+            title: '4.6 介质波导与光纤',
+            desc: '介质波导原理和光纤传输特性',
+            knowledge: [
+                '<strong>介质波导原理</strong>：利用全内反射将电磁波约束在介质中传输',
+                '<strong>全内反射条件</strong>：光从光密介质射向光疏介质，入射角大于临界角',
+                '<strong>临界角</strong>：θc = arcsin(n₂/n₁)，n₁ > n₂',
+                '<strong>光纤结构</strong>：纤芯（折射率 n₁）+ 包层（折射率 n₂）+ 保护层',
+                '<strong>数值孔径</strong>：NA = √(n₁² - n₂²) = n₁√(2Δ)，表示光纤接收光的能力',
+                '<strong>相对折射率差</strong>：Δ = (n₁ - n₂)/n₁，通常 0.1% ~ 1%',
+                '<strong>单模光纤</strong>：V < 2.405，只有一个传输模式，色散小，用于长距离通信',
+                '<strong>多模光纤</strong>：V > 2.405，多个模式传输，模式色散大，用于短距离',
+                '<strong>归一化频率</strong>：V = (2πa/λ)NA = (2πa/λ)n₁√(2Δ)'
+            ],
+            examples: [
+                {
+                    title: '例题 4.11',
+                    question: '光纤纤芯折射率 n₁ = 1.50，包层 n₂ = 1.48。求数值孔径和临界角。',
+                    solution: '<strong>数值孔径</strong>：<br>NA = √(n₁² - n₂²)<br>= √(1.50² - 1.48²)<br>= √(2.25 - 2.1904)<br>= √0.0596 ≈ 0.244<br><br><strong>临界角</strong>：<br>θc = arcsin(n₂/n₁)<br>= arcsin(1.48/1.50)<br>= arcsin(0.9867)<br>≈ 80.6°<br><br><strong>接收角</strong>：<br>θa = arcsin(NA) ≈ 14.1°<br><br><strong>结论</strong>：该光纤可接收约 ±14° 范围内的入射光'
+                },
+                {
+                    title: '例题 4.12',
+                    question: '单模光纤纤芯半径 a = 4μm，n₁ = 1.50，Δ = 0.3%。求单模工作的波长范围。',
+                    solution: '<strong>单模条件</strong>：V < 2.405<br><br><strong>计算</strong>：<br>V = (2πa/λ)n₁√(2Δ) < 2.405<br><br>NA = n₁√(2Δ) = 1.50×√(0.006) ≈ 0.116<br><br>λ > (2πa×NA)/2.405<br>= (2π×4×10⁻⁶×0.116)/2.405<br>= 1.21×10⁻⁶ m<br>= 1.21μm<br><br><strong>结论</strong>：<br>波长 λ > 1.21μm 时为单模传输<br>常用波长：1.31μm 或 1.55μm（损耗最小）'
+                }
+            ]
+        },
+        'ch4-7': {
+            chapter: '第4章 传输线与波导',
+            title: '4.7 传输线损耗与衰减',
+            desc: '传输线损耗来源和衰减计算',
+            knowledge: [
+                '<strong>导体损耗</strong>：由导体有限电导率引起，趋肤效应使高频损耗增大',
+                '<strong>介质损耗</strong>：介质极化滞后和漏导引起，与 tanδ 成正比',
+                '<strong>辐射损耗</strong>：开放结构（如微带线）向空间辐射能量',
+                '<strong>衰减常数</strong>：α = αc + αd，单位 Np/m 或 dB/m（1 Np = 8.686 dB）',
+                '<strong>导体衰减</strong>：αc = Rs/(2Z₀) × (∂Z₀/∂n)，Rs = √(πfμ/σ) 为表面电阻',
+                '<strong>介质衰减</strong>：αd = (π/λ)(ε<sub>r</sub>/√ε<sub>e</sub>)tanδ，tanδ 为损耗角正切',
+                '<strong>同轴线导体损耗</strong>：αc = (Rs/2πZ₀)(1/a + 1/b)/ln(b/a)',
+                '<strong>波导导体损耗</strong>：与模式、频率、表面粗糙度有关，TE₀₁ 模损耗最低',
+                '<strong>降低损耗方法</strong>：选用低损耗介质、增大导体尺寸、表面镀金/银、使用超导'
+            ],
+            examples: [
+                {
+                    title: '例题 4.13',
+                    question: '铜制同轴线（σ = 5.8×10⁷ S/m）a = 1mm，b = 2.3mm，f = 1GHz。求导体衰减常数。',
+                    solution: '<strong>第一步：计算表面电阻</strong><br>Rs = √(πfμ₀/σ)<br>= √(π×10⁹×4π×10⁻⁷/5.8×10⁷)<br>= √(6.83×10⁻⁵)<br>= 8.27×10⁻³ Ω<br><br><strong>第二步：计算特性阻抗</strong><br>Z₀ = 60ln(b/a) = 60ln(2.3) ≈ 50Ω<br><br><strong>第三步：计算衰减常数</strong><br>αc = (Rs/2πZ₀)(1/a + 1/b)/ln(b/a)<br>= (8.27×10⁻³/100π)(1000 + 435)/0.833<br>= 2.63×10⁻⁵ × 1723<br>= 0.0453 Np/m<br>= 0.0453 × 8.686 ≈ 0.39 dB/m<br><br><strong>结论</strong>：导体衰减约 0.39 dB/m'
+                },
+                {
+                    title: '例题 4.14',
+                    question: '比较空气同轴线和聚四氟乙烯（εᵣ=2.1，tanδ=0.0002）填充同轴线的介质衰减（f = 10GHz）。',
+                    solution: '<strong>空气同轴线</strong>：<br>αd ≈ 0（无介质损耗）<br><br><strong>聚四氟乙烯填充</strong>：<br>αd = (π/λ)(ε<sub>r</sub>/√ε<sub>e</sub>)tanδ<br>λ = c/(f√ε<sub>e</sub>) = 3×10⁸/(10¹⁰×√2.1) ≈ 0.0207m<br>ε<sub>e</sub> ≈ 2.1（同轴线完全填充）<br><br>αd = (π/0.0207)(2.1/√2.1)×0.0002<br>= 151.9 × 1.45 × 0.0002<br>= 0.044 Np/m<br>= 0.38 dB/m<br><br><strong>结论</strong>：<br>介质引入约 0.38 dB/m 的附加损耗<br>高频时介质损耗不可忽视'
+                }
+            ]
+        },
+        'ch5-1': {
+            chapter: '第5章 微波谐振器',
+            title: '5.1 谐振器的基本参数',
+            desc: '谐振器的核心参数及其物理意义',
+            knowledge: [
+                '<strong>谐振频率 f₀</strong>：谐振器储能最大时的频率，由结构尺寸和模式决定',
+                '<strong>谐振波长 λ₀</strong>：谐振频率对应的自由空间波长，λ₀ = c/f₀',
+                '<strong>品质因数 Q</strong>：Q = ω₀W/Pₗₒₛₛ，储能与损耗之比，表示频率选择性',
+                '<strong>有载 Q 值（Qᴸ）</strong>：考虑外部负载时的总 Q 值，1/Qᴸ = 1/Q₀ + 1/Qᵉ',
+                '<strong>无载 Q 值（Q₀）</strong>：仅考虑谐振器本身损耗的 Q 值',
+                '<strong>外部 Q 值（Qᵉ）</strong>：仅考虑外部耦合损耗的 Q 值',
+                '<strong>带宽 BW</strong>：BW = f₀/Qᴸ，-3dB 带宽与 Q 值成反比',
+                '<strong>耦合系数 β</strong>：β = Q₀/Qᵉ，表示谐振器与外部电路的耦合程度',
+                '<strong>输入阻抗特性</strong>：谐振时纯电阻，偏离谐振时呈电抗'
+            ],
+            examples: [
+                {
+                    title: '例题 5.1',
+                    question: '某谐振器谐振频率 10GHz，无载 Q₀ = 5000，外部 Qᵉ = 10000。求有载 Qᴸ 和带宽。',
+                    solution: '<strong>计算有载 Q 值</strong>：<br>1/Qᴸ = 1/Q₀ + 1/Qᵉ<br>= 1/5000 + 1/10000<br>= 0.0002 + 0.0001<br>= 0.0003<br><br>Qᴸ = 1/0.0003 ≈ 3333<br><br><strong>计算带宽</strong>：<br>BW = f₀/Qᴸ = 10×10⁹/3333<br>≈ 3 MHz<br><br><strong>耦合系数</strong>：<br>β = Q₀/Qᵉ = 5000/10000 = 0.5（欠耦合）'
+                },
+                {
+                    title: '例题 5.2',
+                    question: '谐振器在 9.9GHz 和 10.1GHz 处功率下降为谐振点的一半。求 Q 值。',
+                    solution: '<strong>分析</strong>：功率下降一半即 -3dB 点<br><br><strong>计算带宽</strong>：<br>f₀ = (9.9 + 10.1)/2 = 10 GHz<br>BW = 10.1 - 9.9 = 0.2 GHz = 200 MHz<br><br><strong>计算 Q 值</strong>：<br>Q = f₀/BW = 10/0.2 = 50<br><br><strong>结论</strong>：该谐振器 Q 值为 50<br><br><strong>说明</strong>：Q 值较低，频率选择性较差<br>（微波谐振器 Q 值通常在 1000-10000 范围）'
+                }
+            ]
+        },
+        'ch5-2': {
+            chapter: '第5章 微波谐振器',
+            title: '5.2 传输线型谐振器',
+            desc: '由传输线构成的谐振器及其特性',
+            knowledge: [
+                '<strong>λ/2 传输线谐振器</strong>：两端开路或短路，长度 l = nλ/2，n = 1,2,3...',
+                '<strong>λ/4 传输线谐振器</strong>：一端开路一端短路，长度 l = (2n-1)λ/4',
+                '<strong>谐振条件</strong>：传输线长度等于半波长的整数倍（开路型）或四分之一波长奇数倍（短路型）',
+                '<strong>同轴谐振器</strong>：同轴线两端短路构成，Q 值高，用于滤波器和振荡器',
+                '<strong>微带谐振器</strong>：微带线开路边形成，易于集成，Q 值中等（100-500）',
+                '<strong>输入阻抗</strong>：短路型 Z<sub>in</sub> = jZ<sub>0</sub>tan(βl)，开路型 Z<sub>in</sub> = -jZ<sub>0</sub>cot(βl)',
+                '<strong>谐振时阻抗</strong>：理想情况下，短路型谐振时 Z<sub>in</sub> = 0（串联谐振），开路型 Z<sub>in</sub> = ∞（并联谐振）',
+                '<strong>损耗影响</strong>：实际谐振器谐振时阻抗为有限值，与 Q 值有关',
+                '<strong>应用</strong>：滤波器、振荡器、频率计、天线'
+            ],
+            examples: [
+                {
+                    title: '例题 5.3',
+                    question: '设计一个 λ/2 微带谐振器，f₀ = 2GHz，基板 εᵣ = 4.2，h = 1.6mm。求谐振器长度。',
+                    solution: '<strong>第一步：计算微带线参数</strong><br>对于 50Ω 微带线，W ≈ 3mm<br>有效介电常数 εₑ ≈ 3.15<br><br><strong>第二步：计算导波波长</strong><br>λg = c/(f√εₑ)<br>= 3×10⁸/(2×10⁹×√3.15)<br>= 3×10⁸/(3.55×10⁹)<br>= 0.0845 m = 84.5 mm<br><br><strong>第三步：计算谐振器长度</strong><br>l = λg/2 = 42.25 mm<br><br><strong>结论</strong>：谐振器长度约 42.3mm<br><br><strong>注意</strong>：实际长度需考虑开路端边缘电容效应，通常略短于理论值'
+                },
+                {
+                    title: '例题 5.4',
+                    question: '证明 λ/4 短路传输线在其输入端呈现并联谐振特性。',
+                    solution: '<strong>短路传输线输入阻抗</strong>：<br>Z<sub>in</sub> = jZ<sub>0</sub>tan(βl)<br><br><strong>当 l = λ/4 时</strong>：<br>βl = (2π/λ)(λ/4) = π/2<br>tan(π/2) → ∞<br><br><strong>因此</strong>：<br>Z<sub>in</sub> → ∞<br><br><strong>物理意义</strong>：<br>• 输入端开路，相当于并联谐振<br>• 并联谐振时阻抗无穷大<br>• 电流在短路端最大，电压在开路端最大<br>• 能量在电场和磁场间交换<br><br><strong>结论</strong>：λ/4 短路传输线等效于并联谐振电路'
+                }
+            ]
+        },
+        'ch5-3': {
+            chapter: '第5章 微波谐振器',
+            title: '5.3 矩形谐振腔',
+            desc: '矩形谐振腔的模式和谐振频率',
+            knowledge: [
+                '<strong>结构</strong>：由矩形波导两端短路形成，尺寸 a × b × d',
+                '<strong>TE 模式</strong>：TEₘₙₚ，m、n 为横向场变化数，p 为纵向（z向）变化数',
+                '<strong>TM 模式</strong>：TMₘₙₚ，电场有纵向分量',
+                '<strong>谐振频率</strong>：f₀ = (c/2√ε<sub>r</sub>)√[(m/a)² + (n/b)² + (p/d)²]',
+                '<strong>主模 TE₁₀₁</strong>：当 a > d > b 时，TE₁₀₁ 为最低模式',
+                '<strong>TE₁₀₁ 谐振频率</strong>：f₀ = (c/2)√(1/a² + 1/d²)',
+                '<strong>简并模式</strong>：不同模式可能有相同谐振频率，需避免',
+                '<strong>Q 值</strong>：与模式、尺寸、材料有关，TE₁₀₁ 模 Q 值可达 10000 以上',
+                '<strong>应用</strong>：滤波器、频率计、介质测量、加速器腔'
+            ],
+            examples: [
+                {
+                    title: '例题 5.5',
+                    question: '矩形谐振腔 a = 3cm，b = 2cm，d = 4cm。求 TE₁₀₁ 模的谐振频率。',
+                    solution: '<strong>TE₁₀₁ 模谐振频率公式</strong>：<br>f₀ = (c/2)√(1/a² + 1/d²)<br><br><strong>代入数值</strong>：<br>f₀ = (3×10⁸/2)√[1/(0.03)² + 1/(0.04)²]<br>= 1.5×10⁸√(1111 + 625)<br>= 1.5×10⁸√1736<br>= 1.5×10⁸×41.67<br>= 6.25×10⁹ Hz<br>= 6.25 GHz<br><br><strong>结论</strong>：TE₁₀₁ 模谐振频率为 6.25GHz'
+                },
+                {
+                    title: '例题 5.6',
+                    question: '设计一个 10GHz 的矩形谐振腔，采用 TE₁₀₁ 模式，a = 2cm，求腔体长度 d。',
+                    solution: '<strong>由谐振频率公式</strong>：<br>f₀ = (c/2)√(1/a² + 1/d²)<br><br><strong>整理得</strong>：<br>(2f₀/c)² = 1/a² + 1/d²<br>1/d² = (2f₀/c)² - 1/a²<br><br><strong>代入数值</strong>：<br>(2×10×10⁹/3×10⁸)² = (66.67)² = 4444<br>1/a² = 1/(0.02)² = 2500<br>1/d² = 4444 - 2500 = 1944<br>d = 1/√1944 = 0.0227 m = 2.27 cm<br><br><strong>结论</strong>：腔体长度 d ≈ 2.27cm<br><br><strong>验证</strong>：a = 2cm > b（设 1cm），d = 2.27cm，满足 a > d > b，TE₁₀₁ 为主模'
+                }
+            ]
+        },
+        'ch5-4': {
+            chapter: '第5章 微波谐振器',
+            title: '5.4 圆柱形谐振腔',
+            desc: '圆柱谐振腔的模式和谐振特性',
+            knowledge: [
+                '<strong>结构</strong>：由圆波导两端短路形成，半径 a，长度 d',
+                '<strong>TE 模式</strong>：TEₘₙₚ，m 为方位角变化，n 为径向变化，p 为轴向变化',
+                '<strong>TM 模式</strong>：TMₘₙₚ，p 可以为 0',
+                '<strong>TM₀₁₀ 模</strong>：最低模式，f₀ = 2.405c/(2πa√ε<sub>r</sub>)，与长度 d 无关',
+                '<strong>TE₀₁₁ 模</strong>：Q 值最高的模式，f₀ = (c/2π√ε<sub>r</sub>)√[(3.832/a)² + (π/d)²]',
+                '<strong>谐振频率通用公式</strong>：TE 模 f₀ = (c/2π√ε<sub>r</sub>)√[(χ\'<sub>mn</sub>/a)² + (pπ/d)²]，TM 模类似',
+                '<strong>贝塞尔函数根</strong>：χ\'ₘₙ 为 J\'ₘ(x)=0 的根，χₘₙ 为 Jₘ(x)=0 的根',
+                '<strong>常用根值</strong>：χ\'₀₁=3.832，χ\'₁₁=1.841，χ₀₁=2.405，χ₁₁=3.832',
+                '<strong>应用</strong>：高精度频率计、滤波器、介质测量'
+            ],
+            examples: [
+                {
+                    title: '例题 5.7',
+                    question: '圆柱谐振腔半径 a = 3cm，长度 d = 5cm。求 TM₀₁₀ 和 TE₀₁₁ 模的谐振频率。',
+                    solution: '<strong>TM₀₁₀ 模</strong>：<br>f₀ = 2.405c/(2πa)<br>= 2.405×3×10⁸/(2π×0.03)<br>= 3.83×10⁹ Hz<br>= 3.83 GHz<br><br><strong>TE₀₁₁ 模</strong>：<br>f₀ = (c/2π)√[(3.832/a)² + (π/d)²]<br>= (3×10⁸/2π)√[(3.832/0.03)² + (π/0.05)²]<br>= 4.77×10⁷√[16384 + 3948]<br>= 4.77×10⁷×142.6<br>= 6.80×10⁹ Hz<br>= 6.80 GHz<br><br><strong>结论</strong>：<br>TM₀₁₀ = 3.83GHz，TE₀₁₁ = 6.80GHz'
+                },
+                {
+                    title: '例题 5.8',
+                    question: '设计一个 5GHz 的圆柱谐振腔，采用 TM₀₁₀ 模式。求腔体半径。',
+                    solution: '<strong>TM₀₁₀ 谐振频率公式</strong>：<br>f₀ = 2.405c/(2πa)<br><br><strong>求解半径</strong>：<br>a = 2.405c/(2πf₀)<br>= 2.405×3×10⁸/(2π×5×10⁹)<br>= 7.215×10⁸/(3.142×10¹⁰)<br>= 0.023 m<br>= 2.3 cm<br><br><strong>结论</strong>：腔体半径 a ≈ 2.3cm<br><br><strong>说明</strong>：TM₀₁₀ 模谐振频率与腔长无关，腔长可根据 Q 值要求选择'
+                }
+            ]
+        },
+        'ch5-5': {
+            chapter: '第5章 微波谐振器',
+            title: '5.5 微带谐振器',
+            desc: '微带线构成的谐振器及其特点',
+            knowledge: [
+                '<strong>结构</strong>：微带线段，两端开路或一端开路一端短路',
+                '<strong>开路端效应</strong>：边缘电容使有效长度增加 Δl ≈ 0.4h',
+                '<strong>有效长度</strong>：lᵉff = l + 2Δl（两端开路）或 lᵉff = l + Δl（单端开路）',
+                '<strong>λ/2 微带谐振器</strong>：两端开路，lᵉff = λg/2',
+                '<strong>λ/4 微带谐振器</strong>：一端开路一端短路，lᵉff = λg/4',
+                '<strong>环形谐振器</strong>：微带线闭合环形，周长 C = nλg，n = 1,2,3...',
+                '<strong>圆盘谐振器</strong>：圆形微带贴片，TMₘₙ₀ 模，用于滤波器和天线',
+                '<strong>Q 值</strong>：微带谐振器 Q 值较低（100-500），受导体损耗和辐射损耗限制',
+                '<strong>优点</strong>：体积小、重量轻、易集成、成本低',
+                '<strong>应用</strong>：微波集成电路滤波器、振荡器、混频器'
+            ],
+            examples: [
+                {
+                    title: '例题 5.9',
+                    question: '设计一个 5GHz 的 λ/2 微带谐振器，基板 εᵣ = 9.8，h = 0.5mm。求谐振器长度。',
+                    solution: '<strong>第一步：估算有效介电常数</strong><br>对于窄微带线（W < h），ε<sub>e</sub> ≈ (ε<sub>r</sub> + 1)/2 = 5.4<br><br><strong>第二步：计算导波波长</strong><br>λg = c/(f√ε<sub>e</sub>)<br>= 3×10⁸/(5×10⁹×√5.4)<br>= 3×10⁸/(1.16×10¹⁰)<br>= 0.0258 m = 25.8 mm<br><br><strong>第三步：计算有效长度</strong><br>l<sub>eff</sub> = λg/2 = 12.9 mm<br><br><strong>第四步：考虑边缘效应</strong><br>Δl ≈ 0.4h = 0.2 mm<br>l = l<sub>eff</sub> - 2Δl = 12.9 - 0.4 = 12.5 mm<br><br><strong>结论</strong>：谐振器长度约 12.5mm'
+                },
+                {
+                    title: '例题 5.10',
+                    question: '微带环形谐振器周长 C = 30mm，基板 εᵣ = 4.2。求主模谐振频率。',
+                    solution: '<strong>主模条件</strong>：<br>C = λg（n = 1）<br><br><strong>计算有效介电常数</strong>：<br>设微带线宽度 W = 1mm，h = 1.6mm<br>W/h = 0.625 < 1<br>ε<sub>e</sub> ≈ (ε<sub>r</sub> + 1)/2 + (ε<sub>r</sub> - 1)/2(1 + 12h/W)^(-0.5)<br>= 2.6 + 1.6×(1 + 19.2)^(-0.5)<br>= 2.6 + 1.6/4.5<br>= 2.6 + 0.36 = 2.96<br><br><strong>计算谐振频率</strong>：<br>λg = C = 30mm<br>f₀ = c/(λg√ε<sub>e</sub>)<br>= 3×10⁸/(0.03×√2.96)<br>= 3×10⁸/0.0516<br>= 5.81×10⁹ Hz<br>= 5.81 GHz<br><br><strong>结论</strong>：主模谐振频率约 5.81GHz'
+                }
+            ]
+        },
+        'ch5-6': {
+            chapter: '第5章 微波谐振器',
+            title: '5.6 介质谐振器',
+            desc: '高介电常数介质构成的谐振器',
+            knowledge: [
+                '<strong>原理</strong>：利用高介电常数介质（ε<sub>r</sub> = 20-100）将电磁场约束在介质内',
+                '<strong>结构</strong>：圆柱形、矩形、圆环形介质块，置于空气中或低介电常数基板上',
+                '<strong>场分布</strong>：大部分能量集中在介质内，外部场按指数衰减',
+                '<strong>TE₀₁δ 模</strong>：常用模式，δ 表示轴向场变化介于 0 和 1 之间',
+                '<strong>优点</strong>：体积小（λ₀/√ε<sub>r</sub>）、Q 值高（1000-20000）、温度稳定性好',
+                '<strong>与金属腔比较</strong>：体积可缩小 1/ε<sub>r</sub>^(3/2)，适合毫米波应用',
+                '<strong>常用材料</strong>：钛酸锶（ε<sub>r</sub> ≈ 300）、锆钛酸铅（PZT）、氧化铝（ε<sub>r</sub> ≈ 10）',
+                '<strong>耦合方式</strong>：微带线耦合、孔耦合、探针耦合',
+                '<strong>应用</strong>：滤波器、振荡器稳频、介质天线、测量'
+            ],
+            examples: [
+                {
+                    title: '例题 5.11',
+                    question: '比较相同频率的金属腔和介质谐振器体积（介质 εᵣ = 36）。',
+                    solution: '<strong>体积缩放关系</strong>：<br>介质谐振器尺寸 ∝ λ₀/√ε<sub>r</sub><br>体积 ∝ (λ₀/√ε<sub>r</sub>)³ = λ₀³/ε<sub>r</sub>^(3/2)<br><br><strong>计算</strong>：<br>ε<sub>r</sub>^(3/2) = 36^1.5 = 216<br><br><strong>结论</strong>：<br>介质谐振器体积约为金属腔的 1/216<br><br><strong>示例</strong>：<br>10GHz 时 λ₀ = 3cm<br>金属腔尺寸约 3cm 量级<br>介质谐振器尺寸约 3/6 = 0.5cm 量级<br>体积比约 (1/6)³ = 1/216'
+                },
+                {
+                    title: '例题 5.12',
+                    question: '介质谐振器 εᵣ = 80，直径 D = 4mm，高度 h = 2mm。估算 TE₀₁δ 模谐振频率。',
+                    solution: '<strong>近似公式</strong>（圆柱介质谐振器）：<br>f₀ ≈ c/(2πD√εᵣ) × 2.5<br>（经验系数 2.5 考虑高度和边界效应）<br><br><strong>计算</strong>：<br>f₀ ≈ 3×10⁸/(2π×4×10⁻³×√80) × 2.5<br>= 3×10⁸/(2.25×10⁻¹) × 2.5<br>= 1.33×10⁹ × 2.5<br>= 3.33×10⁹ Hz<br>= 3.33 GHz<br><br><strong>结论</strong>：谐振频率约 3.3GHz<br><br><strong>注</strong>：精确计算需用数值方法或查图表'
+                }
+            ]
+        },
+        'ch5-7': {
+            chapter: '第5章 微波谐振器',
+            title: '5.7 品质因数 Q 与等效电路',
+            desc: '谐振器 Q 值的计算和集总参数等效',
+            knowledge: [
+                '<strong>Q 值定义</strong>：Q = ω₀×（储能）/（损耗功率）= ω₀W/Pₗₒₛₛ',
+                '<strong>储能计算</strong>：W = Wᵉ + Wᵐ = 2Wᵉ = 2Wᵐ（谐振时电场储能与磁场储能相等）',
+                '<strong>导体损耗 Qᶜ</strong>：Qᶜ = ω₀W/Pᶜ，与表面电阻 Rs 成反比',
+                '<strong>介质损耗 Qd</strong>：Qd = 1/tanδ，与介质损耗角正切成反比',
+                '<strong>辐射损耗 Qᵣ</strong>：Qᵣ = ω₀W/Pᵣ，开放结构存在辐射损耗',
+                '<strong>总 Q 值</strong>：1/Q = 1/Qᶜ + 1/Qd + 1/Qᵣ',
+                '<strong>串联等效电路</strong>：R-L-C 串联，谐振时 Z = R',
+                '<strong>并联等效电路</strong>：R-L-C 并联，谐振时 Z = R',
+                '<strong>Q 与带宽关系</strong>：Q = f₀/BW = ω₀L/R = R/(ω₀L)（并联）',
+                '<strong>提高 Q 值方法</strong>：选用低损耗材料、增大体积、镀银、使用超导'
+            ],
+            examples: [
+                {
+                    title: '例题 5.13',
+                    question: '某谐振腔导体损耗 Qᶜ = 10000，介质损耗 Qd = 5000。求总 Q 值。',
+                    solution: '<strong>计算总 Q 值</strong>：<br>1/Q = 1/Qᶜ + 1/Qd<br>= 1/10000 + 1/5000<br>= 0.0001 + 0.0002<br>= 0.0003<br><br>Q = 1/0.0003 ≈ 3333<br><br><strong>结论</strong>：总 Q 值约 3333<br><br><strong>分析</strong>：<br>介质损耗限制了总 Q 值<br>若去除介质（空气填充），Q 可达 10000'
+                },
+                {
+                    title: '例题 5.14',
+                    question: '并联 RLC 谐振电路，L = 10nH，C = 1pF，R = 1kΩ。求谐振频率和 Q 值。',
+                    solution: '<strong>谐振频率</strong>：<br>f₀ = 1/(2π√LC)<br>= 1/(2π√(10×10⁻⁹×10⁻¹²))<br>= 1/(2π×10⁻¹⁰)<br>= 1.59×10⁹ Hz<br>= 1.59 GHz<br><br><strong>Q 值</strong>：<br>Q = R/(ω₀L)<br>= 1000/(2π×1.59×10⁹×10×10⁻⁹)<br>= 1000/99.8<br>= 10<br><br><strong>带宽</strong>：<br>BW = f₀/Q = 1.59/10 = 0.159 GHz = 159 MHz<br><br><strong>结论</strong>：f₀ = 1.59GHz，Q = 10，BW = 159MHz'
+                }
+            ]
+        },
+        'ch6-1': {
+            chapter: '第6章 微波无源元件',
+            title: '6.1 衰减器与移相器',
+            desc: '信号幅度和相位控制元件',
+            knowledge: [
+                '<strong>衰减器功能</strong>：降低信号功率，用于功率控制、阻抗匹配、保护器件',
+                '<strong>固定衰减器</strong>：T 型、Π 型电阻网络，衰减量固定',
+                '<strong>可变衰减器</strong>：PIN 二极管、机械调节，衰减量可调',
+                '<strong>衰减量定义</strong>：A(dB) = 10log(P₁/P₂) = 20log(V₁/V₂)',
+                '<strong>吸收式衰减器</strong>：能量被电阻吸收，无反射',
+                '<strong>反射式衰减器</strong>：利用反射实现衰减，有驻波',
+                '<strong>移相器功能</strong>：改变信号相位，用于相控阵、调制器',
+                '<strong>数字移相器</strong>：开关线型、加载线型，相位离散可调',
+                '<strong>模拟移相器</strong>：铁氧体、变容二极管，相位连续可调'
+            ],
+            examples: [
+                {
+                    title: '例题 6.1',
+                    question: '设计一个 10dB T 型固定衰减器，Z₀ = 50Ω。',
+                    solution: '<strong>已知</strong>：A = 10dB，即 N = 10^(10/20) = 3.16<br><br><strong>T 型衰减器公式</strong>：<br>R₁ = R₂ = Z₀(N-1)/(N+1)<br>R₃ = 2Z₀N/(N²-1)<br><br><strong>计算</strong>：<br>R₁ = R₂ = 50×(3.16-1)/(3.16+1) = 50×2.16/4.16 = 26Ω<br>R₃ = 2×50×3.16/(10-1) = 316/9 = 35.1Ω<br><br><strong>结论</strong>：<br>R₁ = R₂ = 26Ω，R₃ = 35.1Ω<br><br><strong>验证</strong>：输入输出阻抗均为 50Ω，匹配良好'
+                },
+                {
+                    title: '例题 6.2',
+                    question: '开关线型移相器，工作频率 10GHz，要求相移 90°。求两路径长度差。',
+                    solution: '<strong>相位差与路径差关系</strong>：<br>Δφ = βΔl = (2π/λg)Δl<br><br><strong>计算波长</strong>：<br>λ₀ = c/f = 3×10⁸/10¹⁰ = 0.03m = 30mm<br>假设微带线 εₑ = 3，则 λg = λ₀/√εₑ = 17.3mm<br><br><strong>计算长度差</strong>：<br>Δl = Δφ×λg/(2π)<br>= (π/2)×17.3/(2π)<br>= 17.3/4 = 4.33mm<br><br><strong>结论</strong>：两路径长度差约 4.33mm'
+                }
+            ]
+        },
+        'ch6-2': {
+            chapter: '第6章 微波无源元件',
+            title: '6.2 匹配负载与短路器',
+            desc: '终端匹配元件',
+            knowledge: [
+                '<strong>匹配负载功能</strong>：吸收全部入射功率，无反射，Γ = 0',
+                '<strong>集总电阻负载</strong>：薄膜电阻、贴片电阻，用于低频',
+                '<strong>分布式负载</strong>：楔形、渐变电阻，用于高频宽带',
+                '<strong>功率容量</strong>：匹配负载需承受特定功率，大功率需散热',
+                '<strong>短路器功能</strong>：产生全反射，Γ = -1（短路）',
+                '<strong>固定短路器</strong>：金属短路块，不可调',
+                '<strong>可调短路器</strong>：短路活塞，位置可调，用于调谐',
+                '<strong>短路器应用</strong>：谐振器调谐、阻抗测量、标准器',
+                '<strong>开路器</strong>：Γ = +1，实际难以实现理想开路',
+                '<strong>滑动负载</strong>：用于测量，可移动以改变相位'
+            ],
+            examples: [
+                {
+                    title: '例题 6.3',
+                    question: '设计一个 50Ω 同轴匹配负载，可承受 10W 功率。',
+                    solution: '<strong>设计要求</strong>：<br>• 阻抗：50Ω<br>• 功率：10W<br>• 频率范围：DC-6GHz<br><br><strong>方案</strong>：<br>1. 选用 50Ω 薄膜电阻（如氧化铍陶瓷基板）<br>2. 尺寸：直径 2mm，长度 5mm<br>3. 散热：金属外壳，散热片<br>4. 渐变过渡：锥形结构减少反射<br><br><strong>功率密度计算</strong>：<br>假设有效面积 0.1cm²<br>功率密度 = 10W/0.1cm² = 100W/cm²<br>需选用高导热基板<br><br><strong>结论</strong>：薄膜电阻 + 金属散热结构'
+                },
+                {
+                    title: '例题 6.4',
+                    question: '可调短路活塞在波导中移动，测得相邻两次谐振位置间距为 2cm。求波导波长。',
+                    solution: '<strong>分析</strong>：<br>短路活塞形成 λ/2 谐振器<br>相邻谐振位置间距 = λg/2<br><br><strong>计算</strong>：<br>λg/2 = 2cm<br>λg = 4cm<br><br><strong>结论</strong>：波导波长 λg = 4cm<br><br><strong>扩展</strong>：<br>若波导为 WR-90（a = 22.86mm）<br>λ₀ = λg√[1-(λ₀/2a)²]<br>可求出工作频率'
+                }
+            ]
+        },
+        'ch6-3': {
+            chapter: '第6章 微波无源元件',
+            title: '6.3 定向耦合器',
+            desc: '信号分离与耦合元件',
+            knowledge: [
+                '<strong>功能</strong>：从主传输线中提取部分信号，方向性强',
+                '<strong>四端口器件</strong>：输入、直通、耦合、隔离端口',
+                '<strong>耦合度 C</strong>：C(dB) = 10log(P₁/P₃)，表示耦合强弱',
+                '<strong>方向性 D</strong>：D(dB) = 10log(P₃/P₄)，表示方向选择能力',
+                '<strong>隔离度 I</strong>：I(dB) = 10log(P₁/P₄)，输入到隔离端口的衰减',
+                '<strong>关系</strong>：I = C + D',
+                '<strong>耦合类型</strong>：3dB（混合器）、6dB、10dB、20dB、30dB',
+                '<strong>实现形式</strong>：平行线耦合、分支线耦合、波导孔耦合',
+                '<strong>应用</strong>：功率监测、反射计、混频器、天线馈电'
+            ],
+            examples: [
+                {
+                    title: '例题 6.5',
+                    question: '定向耦合器耦合度 C = 20dB，方向性 D = 30dB。求隔离度。',
+                    solution: '<strong>已知</strong>：<br>C = 20dB<br>D = 30dB<br><br><strong>计算隔离度</strong>：<br>I = C + D = 20 + 30 = 50dB<br><br><strong>物理意义</strong>：<br>• 输入功率 0dBm<br>• 耦合端口输出 -20dBm<br>• 隔离端口输出 -50dBm<br>• 方向性 30dB 表示正向与反向耦合差 30dB<br><br><strong>结论</strong>：隔离度为 50dB'
+                },
+                {
+                    title: '例题 6.6',
+                    question: '设计一个 10dB 微带平行线定向耦合器，Z₀ = 50Ω，中心频率 2GHz。',
+                    solution: '<strong>设计步骤</strong>：<br><br>1. <strong>计算耦合系数</strong>：<br>k = 10^(-10/20) = 0.316<br><br>2. <strong>计算奇偶模阻抗</strong>：<br>Z₀ₑ = Z₀√[(1+k)/(1-k)] = 50√(1.316/0.684) = 69.4Ω<br>Z₀ₒ = Z₀√[(1-k)/(1+k)] = 50√(0.684/1.316) = 36.0Ω<br><br>3. <strong>微带线尺寸</strong>（εᵣ = 4.2，h = 1.6mm）：<br>查表或用软件计算得：<br>Wₑ ≈ 1.2mm，S ≈ 0.3mm<br><br>4. <strong>耦合区长度</strong>：<br>l = λg/4 = c/(4f√εₑ) ≈ 21mm<br><br><strong>结论</strong>：耦合线宽 1.2mm，间距 0.3mm，长度 21mm'
+                }
+            ]
+        },
+        'ch6-4': {
+            chapter: '第6章 微波无源元件',
+            title: '6.4 功率分配器 / 合成器',
+            desc: '功率分配与合成元件',
+            knowledge: [
+                '<strong>功能</strong>：将一路信号分成多路，或将多路信号合成一路',
+                '<strong>无耗分配器</strong>：电阻性，有损耗但各端口匹配',
+                '<strong>威尔金森功分器</strong>：有耗，输出端口隔离，最常用',
+                '<strong>二路等分威尔金森</strong>：两输出端口间有隔离电阻 R = 2Z₀',
+                '<strong>阻抗变换</strong>：λ/4 变换段 Z = Z₀√2',
+                '<strong>隔离度</strong>：输出端口间隔离，防止相互影响',
+                '<strong>多路功分器</strong>：树形结构或径向结构',
+                '<strong>合成器</strong>：功分器的逆向使用，用于功率合成',
+                '<strong>应用</strong>：天线阵列馈电、功率放大器合成、测试系统'
+            ],
+            examples: [
+                {
+                    title: '例题 6.7',
+                    question: '设计一个 50Ω 二路等分威尔金森功分器，中心频率 1GHz。',
+                    solution: '<strong>威尔金森功分器参数</strong>：<br><br>1. <strong>λ/4 变换段阻抗</strong>：<br>Z = Z₀√2 = 50×1.414 = 70.7Ω<br><br>2. <strong>隔离电阻</strong>：<br>R = 2Z₀ = 100Ω<br><br>3. <strong>λ/4 线长度</strong>（微带线 εᵣ = 4.2）：<br>λg = c/(f√εₑ) = 3×10⁸/(10⁹×√3.15) ≈ 169mm<br>l = λg/4 ≈ 42mm<br><br>4. <strong>微带线宽度</strong>：<br>Z = 70.7Ω 时，W ≈ 1.8mm（h = 1.6mm）<br><br><strong>结论</strong>：<br>• 变换段：70.7Ω，42mm<br>• 隔离电阻：100Ω<br>• 输出端口：50Ω'
+                },
+                {
+                    title: '例题 6.8',
+                    question: '八路功率合成器，每路输入 1W。求总输出功率（假设效率 100%）。',
+                    solution: '<strong>理想情况</strong>：<br>Pₒᵤₜ = 8 × 1W = 8W<br><br><strong>实际考虑</strong>：<br>• 功分器/合成器损耗：约 0.5-1dB<br>• 幅度相位不平衡：合成效率降低<br>• 实际效率：约 80-90%<br><br><strong>实际输出</strong>：<br>Pₒᵤₜ ≈ 8W × 0.85 = 6.8W<br><br><strong>结论</strong>：八路合成理想输出 8W，实际约 6-7W<br><br><strong>应用</strong>：固态功率放大器功率合成'
+                }
+            ]
+        },
+        'ch6-5': {
+            chapter: '第6章 微波无源元件',
+            title: '6.5 微波滤波器',
+            desc: '频率选择元件',
+            knowledge: [
+                '<strong>功能</strong>：选择特定频率信号，抑制其他频率',
+                '<strong>低通滤波器</strong>：通过低频，抑制高频',
+                '<strong>高通滤波器</strong>：通过高频，抑制低频',
+                '<strong>带通滤波器</strong>：通过特定频带，应用最广泛',
+                '<strong>带阻滤波器</strong>：抑制特定频带，通过其他频率',
+                '<strong>关键指标</strong>：截止频率、带宽、插入损耗、回波损耗、矩形系数',
+                '<strong>矩形系数</strong>：SF = BW₋₆₀dB/BW₋₃dB，越接近 1 选择性越好',
+                '<strong>实现形式</strong>：集总元件、分布参数（微带、波导）、介质、SAW',
+                '<strong>设计方法</strong>：巴特沃斯（最大平坦）、切比雪夫（等波纹）、椭圆函数'
+            ],
+            examples: [
+                {
+                    title: '例题 6.9',
+                    question: '设计一个切比雪夫带通滤波器，中心频率 2GHz，带宽 100MHz，带内波纹 0.5dB，5 阶。',
+                    solution: '<strong>设计步骤</strong>：<br><br>1. <strong>归一化带宽</strong>：<br>FBW = 100/2000 = 5%<br><br>2. <strong>查切比雪夫低通原型</strong>：<br>0.5dB 波纹，5 阶：<br>g₁ = 1.7058，g₂ = 1.2296，g₃ = 2.5408，g₄ = 1.2296，g₅ = 1.7058<br><br>3. <strong>转换为带通参数</strong>：<br>使用频率变换和阻抗变换<br><br>4. <strong>微带实现</strong>：<br>采用并联谐振器 + λ/4 耦合线结构<br><br><strong>结论</strong>：需用微波设计软件（ADS、HFSS）精确仿真优化'
+                },
+                {
+                    title: '例题 6.10',
+                    question: '某带通滤波器 -3dB 带宽 100MHz，-60dB 带宽 500MHz。求矩形系数。',
+                    solution: '<strong>矩形系数定义</strong>：<br>SF = BW₋₆₀dB/BW₋₃dB<br><br><strong>计算</strong>：<br>SF = 500/100 = 5<br><br><strong>评价</strong>：<br>• 理想矩形滤波器：SF = 1<br>• 实际滤波器：SF > 1<br>• SF = 5 表示选择性一般<br>• 高选择性滤波器：SF < 3<br><br><strong>结论</strong>：矩形系数为 5'
+                }
+            ]
+        },
+        'ch6-6': {
+            chapter: '第6章 微波无源元件',
+            title: '6.6 环行器与隔离器',
+            desc: '非互易微波器件',
+            knowledge: [
+                '<strong>环行器功能</strong>：信号沿固定方向环行，1→2→3→1',
+                '<strong>隔离器功能</strong>：单向传输，正向通过，反向隔离',
+                '<strong>非互易性</strong>：利用铁氧体的旋磁效应，外加直流磁场',
+                '<strong>法拉第旋转</strong>：线极化波在铁氧体中传播时极化面旋转',
+                '<strong>结环行器</strong>：Y 型或 T 型结，三端口对称结构',
+                '<strong>性能指标</strong>：隔离度（>20dB）、插入损耗（<0.5dB）、驻波比（<1.2）',
+                '<strong>隔离器实现</strong>：环行器一个端口接匹配负载',
+                '<strong>四端口环行器</strong>：用于双工器、反射计',
+                '<strong>应用</strong>：雷达收发开关、功放保护、测量系统、通信系统'
+            ],
+            examples: [
+                {
+                    title: '例题 6.11',
+                    question: '环行器用作雷达收发开关，发射功率 100W，接收信号 -80dBm。计算隔离度要求。',
+                    solution: '<strong>分析</strong>：<br>发射端功率：Pᵀ = 100W = 50dBm<br>接收端允许泄漏：Pᴿ = -80dBm<br><br><strong>计算隔离度</strong>：<br>I = Pᵀ - Pᴿ = 50 - (-80) = 130dB<br><br><strong>实际考虑</strong>：<br>• 单级环行器隔离度：20-30dB<br>• 需多级级联或使用其他技术<br>• 实际系统使用收发开关（如 PIN 管）<br><br><strong>结论</strong>：理论需 130dB 隔离，实际采用组合方案'
+                },
+                {
+                    title: '例题 6.12',
+                    question: '隔离器正向损耗 0.3dB，反向隔离 25dB。求正向传输系数和反向传输系数。',
+                    solution: '<strong>正向传输</strong>：<br>IL = 0.3dB<br>S₂₁ = 10^(-0.3/20) = 0.966<br>即正向传输 96.6%<br><br><strong>反向传输</strong>：<br>I = 25dB<br>S₁₂ = 10^(-25/20) = 0.056<br>即反向传输 5.6%<br><br><strong>结论</strong>：<br>• 正向：-0.3dB（损耗很小）<br>• 反向：-25dB（隔离良好）<br>• 隔离比：25/0.3 ≈ 83:1'
+                }
+            ]
+        },
+        'ch6-7': {
+            chapter: '第6章 微波无源元件',
+            title: '6.7 开关与移相器',
+            desc: '微波控制元件',
+            knowledge: [
+                '<strong>开关功能</strong>：控制信号通断，用于调制、切换、保护',
+                '<strong>机械开关</strong>：继电器，低损耗、高隔离，速度慢（ms 级）',
+                '<strong>固态开关</strong>：PIN 二极管、FET，速度快（ns-μs 级）',
+                '<strong>SPST、SPDT</strong>：单刀单掷、单刀双掷',
+                '<strong>开关指标</strong>：插入损耗、隔离度、切换速度、功率容量',
+                '<strong>移相器类型</strong>：开关线型、加载线型、反射型',
+                '<strong>数字移相器</strong>：1 位、2 位、3 位...组合实现多位移相',
+                '<strong>铁氧体移相器</strong>：非互易，高功率，用于雷达',
+                '<strong>应用</strong>：相控阵天线、调制器、测试系统'
+            ],
+            examples: [
+                {
+                    title: '例题 6.13',
+                    question: '设计一个 3 位数字移相器，实现 0°-360° 移相，步进 45°。',
+                    solution: '<strong>3 位移相器结构</strong>：<br><br>位 1：45° 移相<br>位 2：90° 移相<br>位 3：180° 移相<br><br><strong>组合实现</strong>：<br>0° = 000（全关）<br>45° = 100<br>90° = 010<br>135° = 110<br>180° = 001<br>225° = 101<br>270° = 011<br>315° = 111<br><br><strong>实现方式</strong>：<br>• 开关线型：不同长度传输线<br>• 加载线型：开关电容/电感<br><br><strong>结论</strong>：3 位可实现 8 种相位状态'
+                },
+                {
+                    title: '例题 6.14',
+                    question: 'PIN 二极管开关，导通电阻 1Ω，截止电容 0.5pF，工作频率 1GHz。估算插入损耗和隔离度。',
+                    solution: '<strong>导通状态（串联）</strong>：<br>Z = R = 1Ω<br>Γ = (Z-Z₀)/(Z+Z₀) = (1-50)/(1+50) = -0.961<br>IL = -20log|1+Γ|/2 ≈ 0.17dB<br><br><strong>截止状态（并联）</strong>：<br>Z = 1/(jωC) = -j318Ω<br>Γ = (Z-Z₀)/(Z+Z₀) ≈ -1（近似开路）<br>实际隔离度约 20-30dB<br><br><strong>结论</strong>：<br>• 导通：IL ≈ 0.2dB<br>• 截止：隔离 > 20dB'
+                }
+            ]
+        },
+        'ch7-1': {
+            chapter: '第7章 微波有源器件',
+            title: '7.1 微波二极管',
+            desc: '微波频段常用的二极管器件',
+            knowledge: [
+                '<strong>PIN 二极管</strong>：I 层本征区，用于开关、衰减器、移相器',
+                '<strong>变容二极管</strong>：结电容随电压变化，用于调谐、倍频',
+                '<strong>肖特基二极管</strong>：金属-半导体结，用于检波、混频',
+                '<strong>雪崩二极管（IMPATT）</strong>：负阻效应，用于振荡器',
+                '<strong>转移电子器件（Gunn）</strong>：体效应，用于振荡器',
+                '<strong>隧道二极管</strong>：量子隧穿效应，负阻，用于放大、振荡',
+                '<strong>阶跃恢复二极管</strong>：用于倍频器',
+                '<strong>检波二极管参数</strong>：灵敏度、噪声系数、视频电阻',
+                '<strong>混频二极管参数</strong>：变频损耗、噪声比、隔离度'
+            ],
+            examples: [
+                {
+                    title: '例题 7.1',
+                    question: '肖特基二极管检波器，输入功率 -20dBm，电压灵敏度 20mV/μW。求输出视频电压。',
+                    solution: '<strong>输入功率转换</strong>：<br>Pᵢₙ = -20dBm = 10^(-20/10) mW = 0.01mW = 10μW<br><br><strong>计算输出电压</strong>：<br>Vₒᵤₜ = 灵敏度 × Pᵢₙ<br>= 20mV/μW × 10μW<br>= 200mV = 0.2V<br><br><strong>结论</strong>：输出视频电压约 0.2V<br><br><strong>应用</strong>：功率计、场强仪、雷达接收机'
+                },
+                {
+                    title: '例题 7.2',
+                    question: 'Gunn 二极管振荡器，工作频率 10GHz，负阻 -20Ω，负载 50Ω。判断能否振荡。',
+                    solution: '<strong>振荡条件</strong>：<br>Rⁿeg + Rˡoad < 0<br>即 |Rⁿeg| > Rˡoad<br><br><strong>判断</strong>：<br>|Rⁿeg| = 20Ω<br>Rˡoad = 50Ω<br>20 < 50，不满足条件<br><br><strong>解决方案</strong>：<br>• 降低负载阻抗（如用 25Ω 传输线）<br>• 增加负阻绝对值<br>• 使用阻抗变换器<br><br><strong>结论</strong>：当前条件下不能振荡'
+                }
+            ]
+        },
+        'ch7-2': {
+            chapter: '第7章 微波有源器件',
+            title: '7.2 微波双极晶体管',
+            desc: 'BJT 在微波频段的特性与应用',
+            knowledge: [
+                '<strong>结构特点</strong>：NPN 或 PNP，微波用 Si、SiGe、GaAs 材料',
+                '<strong>特征频率 fᵀ</strong>：电流增益为 1 时的频率，fᵀ ≈ gₘ/(2πCᵖⁱ)',
+                '<strong>最高振荡频率 fₘₐₓ</strong>：功率增益为 1 时的频率',
+                '<strong>fₘₐₓ 与 fᵀ 关系</strong>：fₘₐₓ = √(fᵀ/(8πRᵇCᵘ))',
+                '<strong>噪声系数</strong>：F = Fₘᵢₙ + (Rⁿ/Gˢ)|Yˢ - Yₒₚₜ|²',
+                '<strong>小信号模型</strong>：混合 π 模型，含 Cᵖⁱ、Cᵘ、rᵖⁱ、gₘ',
+                '<strong>偏置条件</strong>：微波 BJT 通常工作在 A 类',
+                '<strong>功率限制</strong>：击穿电压、热限制、电流限制',
+                '<strong>应用</strong>：低噪声放大器（LNA）、功率放大器（< 6GHz）、振荡器'
+            ],
+            examples: [
+                {
+                    title: '例题 7.3',
+                    question: '微波 BJT 参数：fᵀ = 10GHz，Rᵇ = 10Ω，Cᵘ = 0.1pF。估算 fₘₐₓ。',
+                    solution: '<strong>计算 fₘₐₓ</strong>：<br>fₘₐₓ = √(fᵀ/(8πRᵇCᵘ))<br>= √(10×10⁹/(8π×10×0.1×10⁻¹²))<br>= √(10¹⁰/(2.51×10⁻¹¹))<br>= √(3.98×10²⁰)<br>= 19.95 GHz<br>≈ 20 GHz<br><br><strong>结论</strong>：最高振荡频率约 20GHz<br><br><strong>关系</strong>：fₘₐₓ ≈ 2fᵀ（典型值）'
+                },
+                {
+                    title: '例题 7.4',
+                    question: 'BJT 功率放大器，Vᶜᶜ = 12V，Iᶜ = 100mA，输出功率 1W。求功率附加效率 PAE。',
+                    solution: '<strong>直流功耗</strong>：<br>Pᵈᶜ = Vᶜᶜ × Iᶜ = 12 × 0.1 = 1.2W<br><br><strong>漏极效率</strong>：<br>η = Pₒᵤₜ/Pᵈᶜ = 1/1.2 ≈ 83.3%<br><br><strong>分析</strong>：<br>该效率值超过了 A 类放大器理论最大效率 50%，说明此工作点已超出 A 类线性区，可能工作在 AB 类或存在非线性失真。<br><br><strong>功率附加效率</strong>：<br>PAE = (Pₒᵤₜ - Pᵢₙ)/Pᵈᶜ<br>假设增益 10dB（10 倍），则 Pᵢₙ = 0.1W<br>PAE = (1 - 0.1)/1.2 = 0.9/1.2 = 75%<br><br><strong>结论</strong>：<br>PAE = 75%，η ≈ 83.3%<br>（注：A 类理想最大效率 50%，此高效率表明实际工作在非 A 类状态）'
+                }
+            ]
+        },
+        'ch7-3': {
+            chapter: '第7章 微波有源器件',
+            title: '7.3 场效应晶体管（FET、MESFET、HEMT）',
+            desc: '微波 FET 器件的结构、原理与特性',
+            knowledge: [
+                '<strong>FET 类型</strong>：JFET、MOSFET、MESFET、HEMT、pHEMT',
+                '<strong>MESFET</strong>：金属-半导体肖特基栅，GaAs 材料，高频特性好',
+                '<strong>HEMT</strong>：高电子迁移率晶体管，异质结结构，噪声极低',
+                '<strong>2DEG</strong>：二维电子气，HEMT 中载流子限制在界面量子阱中',
+                '<strong>跨导 gₘ</strong>：gₘ = ∂Iᵈ/∂Vᵍˢ，表示栅压对漏流的控制',
+                '<strong>截止频率</strong>：fᵀ = gₘ/(2π(Cᵍˢ + Cᵍᵈ))',
+                '<strong>最高频率</strong>：fₘₐₓ = fᵀ/2 × √(Rᵈˢ/Rᵍ)',
+                '<strong>噪声性能</strong>：HEMT 噪声系数可低至 0.5dB（12GHz）',
+                '<strong>应用</strong>：低噪声放大器、功率放大器、混频器、开关'
+            ],
+            examples: [
+                {
+                    title: '例题 7.5',
+                    question: 'GaAs MESFET 参数：gₘ = 50mS，Cᵍˢ = 0.5pF，Cᵍᵈ = 0.05pF。计算 fᵀ。',
+                    solution: '<strong>计算 fᵀ</strong>：<br>fᵀ = gₘ/(2π(Cᵍˢ + Cᵍᵈ))<br>= 50×10⁻³/(2π(0.5 + 0.05)×10⁻¹²)<br>= 0.05/(2π×0.55×10⁻¹²)<br>= 0.05/(3.45×10⁻¹²)<br>= 14.5×10⁹ Hz<br>= 14.5 GHz<br><br><strong>结论</strong>：截止频率约 14.5GHz<br><br><strong>提高 fᵀ 方法</strong>：<br>• 减小栅长（亚微米）<br>• 减小寄生电容'
+                },
+                {
+                    title: '例题 7.6',
+                    question: '比较 Si MOSFET 与 GaAs HEMT 的微波特性。',
+                    solution: '<strong>Si MOSFET</strong>：<br>优点：成本低、集成度高、数字兼容<br>缺点：电子迁移率低、fᵀ 较低（< 50GHz）<br>应用：< 10GHz 消费电子<br><br><strong>GaAs HEMT</strong>：<br>优点：电子迁移率高、fᵀ 高（> 100GHz）、噪声极低<br>缺点：成本高、集成度低、功耗大<br>应用：卫星通信、雷达、5G 基站<br><br><strong>发展趋势</strong>：<br>GaN HEMT：高功率、高效率<br>SiGe BiCMOS：成本与性能折中'
+                }
+            ]
+        },
+        'ch7-4': {
+            chapter: '第7章 微波有源器件',
+            title: '7.4 有源器件小信号等效模型',
+            desc: '微波晶体管的小信号建模',
+            knowledge: [
+                '<strong>小信号条件</strong>：信号幅度足够小，器件工作在线性区',
+                '<strong>混合 π 模型</strong>：BJT 小信号模型，含 rᵖⁱ、Cᵖⁱ、Cᵘ、gₘ、rₒ',
+                '<strong>小信号 FET 模型</strong>：含 Cᵍˢ、Cᵍᵈ、Cᵈˢ、gₘ、Rⁱ、Rᵈ、Rˢ',
+                '<strong>S 参数模型</strong>：基于测量，最准确，频率相关',
+                '<strong>噪声模型</strong>：含噪声源（热噪声、散粒噪声、闪烁噪声）',
+                '<strong>寄生参数</strong>：引线电感、焊盘电容、封装效应',
+                '<strong>去嵌入</strong>：去除测试夹具影响，提取本征器件参数',
+                '<strong>模型提取</strong>：从 S 参数提取等效电路参数',
+                '<strong>应用</strong>：电路设计、仿真、优化'
+            ],
+            examples: [
+                {
+                    title: '例题 7.7',
+                    question: '从 S 参数提取 FET 的 gₘ 和 Cᵍˢ，已知在 1GHz：S₂₁ = 3∠90°，输入阻抗 50Ω。',
+                    solution: '<strong>S₂₁ 与增益关系</strong>：<br>|S₂₁| ≈ 2gₘZ₀/(ωCᵍˢZ₀) = 2gₘ/(ωCᵍˢ)<br>（简化模型，忽略寄生）<br><br><strong>已知</strong>：<br>|S₂₁| = 3<br>∠S₂₁ = 90°（符合电容耦合特征）<br><br><strong>建立方程</strong>：<br>3 = 2gₘ/(2π×10⁹×Cᵍˢ)<br>gₘ/Cᵍˢ = 3π×10⁹<br><br><strong>需补充条件</strong>：<br>通常 fᵀ = gₘ/(2πCᵍˢ) 已知<br>或从其他 S 参数提取<br><br><strong>结论</strong>：需更多信息或测量数据'
+                },
+                {
+                    title: '例题 7.8',
+                    question: '解释为什么微波晶体管模型需要随频率变化。',
+                    solution: '<strong>频率相关效应</strong>：<br><br>1. <strong>分布参数效应</strong>：<br>高频下电极尺寸与波长可比拟<br>不能用集总参数描述<br><br>2. <strong>寄生参数</strong>：<br>引线电感：L ~ nH，在 10GHz 时 Xᴸ = 2πfL ~ 几十 Ω<br>焊盘电容：C ~ pF，在 10GHz 时 Xᶜ = 1/(2πfC) ~ 几 Ω<br><br>3. <strong>物理效应</strong>：<br>载流子渡越时间<br>界面态响应<br>热效应<br><br><strong>结论</strong>：<br>微波模型需分段或连续随频率变化<br>常用 S 参数表或宽带等效电路'
+                }
+            ]
+        },
+        'ch7-5': {
+            chapter: '第7章 微波有源器件',
+            title: '7.5 有源器件非线性模型',
+            desc: '大信号和非线性建模',
+            knowledge: [
+                '<strong>非线性来源</strong>：器件特性非线性、大信号效应、温度效应',
+                '<strong>非线性模型类型</strong>：物理模型、经验模型、表格模型',
+                '<strong>物理模型</strong>：基于器件物理，如 Gummel-Poon（BJT）、BSIM（MOSFET）',
+                '<strong>经验模型</strong>：Curtice、Statz、Angelov（FET），基于测量拟合',
+                '<strong>谐波平衡法</strong>：非线性电路频域分析方法',
+                '<strong>时域分析</strong>：SPICE 类仿真，瞬态分析',
+                '<strong>负载牵引</strong>：测量不同负载下的性能，用于功放设计',
+                '<strong>非线性指标</strong>：P1dB、IP3、PAE、谐波失真',
+                '<strong>热模型</strong>：自热效应、热阻、瞬态热响应'
+            ],
+            examples: [
+                {
+                    title: '例题 7.9',
+                    question: '功率放大器非线性模型，输入功率从 -10dBm 增加到 10dBm 时，增益从 20dB 压缩到 18dB。求 P1dB。',
+                    solution: '<strong>增益压缩</strong>：<br>ΔG = 20 - 18 = 2dB<br><br><strong>P1dB 定义</strong>：<br>增益压缩 1dB 时的输出功率<br><br><strong>估算</strong>：<br>假设增益压缩线性增加<br>2dB 压缩对应 20dB 输入变化<br>1dB 压缩对应 10dB 输入变化<br><br>输入 P1dB ≈ -10 + 10 = 0dBm<br>输出 P1dB ≈ 0 + 19 = 19dBm<br>（压缩 1dB 时增益约 19dB）<br><br><strong>结论</strong>：P1dB ≈ 19dBm（输出）'
+                },
+                {
+                    title: '例题 7.10',
+                    question: '解释谐波平衡法在功放仿真中的应用。',
+                    solution: '<strong>谐波平衡法原理</strong>：<br><br>1. <strong>线性部分</strong>：频域分析，S 参数描述<br><br>2. <strong>非线性部分</strong>：时域分析，I-V 特性描述<br><br>3. <strong>平衡条件</strong>：<br>线性网络电流 + 非线性网络电流 = 0<br>在谐波频率上成立<br><br><strong>功放仿真应用</strong>：<br>• 输入：单频或调制信号<br>• 输出：基波 + 谐波频谱<br>• 计算：输出功率、效率、谐波失真<br><br><strong>优点</strong>：<br>• 比时域仿真快<br>• 适合稳态分析<br>• 直接得到频谱'
+                }
+            ]
+        },
+        'ch8-1': {
+            chapter: '第8章 微波放大器设计',
+            title: '8.1 放大器的功率与增益',
+            desc: '放大器增益定义与功率关系',
+            knowledge: [
+                '<strong>转换功率增益 Gᵀ</strong>：Gᵀ = Pᴸ/Pₐᵥₛ，负载吸收功率/源可用功率',
+                '<strong>工作功率增益 Gᴾ</strong>：Gᴾ = Pᴸ/Pᵢₙ，负载吸收功率/输入功率',
+                '<strong>可用功率增益 Gᴬ</strong>：Gᴬ = Pₐᵥₙ/Pₐᵥₛ，网络可用功率/源可用功率',
+                '<strong>单向增益 U</strong>：S₁₂ = 0 时的最大增益，U = |S₂₁|²/[(1-|S₁₁|²)(1-|S₂₂|²)]',
+                '<strong>最大稳定增益 MSG</strong>：MSG = |S₂₁/S₁₂|，K < 1 时最大增益',
+                '<strong>最大可用增益 MAG</strong>：MAG = |S₂₁/S₁₂|(K - √(K²-1))，K > 1 时',
+                '<strong>稳定性因子 K</strong>：K = (1-|S₁₁|²-|S₂₂|²+|Δ|²)/(2|S₁₂S₂₁|)，K > 1 绝对稳定',
+                '<strong>增益圆</strong>：Smith 圆图上等增益轨迹',
+                '<strong>设计目标</strong>：在稳定条件下实现所需增益'
+            ],
+            examples: [
+                {
+                    title: '例题 8.1',
+                    question: '晶体管 S 参数（2GHz）：S₁₁ = 0.6∠-60°，S₁₂ = 0.1∠30°，S₂₁ = 3∠75°，S₂₂ = 0.5∠-45°。计算单向增益 U。',
+                    solution: '<strong>单向增益公式</strong>：<br>U = |S₂₁|²/[(1-|S₁₁|²)(1-|S₂₂|²)]<br><br><strong>计算</strong>：<br>|S₂₁|² = 9<br>|S₁₁|² = 0.36<br>|S₂₂|² = 0.25<br><br>U = 9/[(1-0.36)(1-0.25)]<br>= 9/(0.64×0.75)<br>= 9/0.48<br>= 18.75<br>= 12.7 dB<br><br><strong>结论</strong>：单向增益约 12.7dB'
+                },
+                {
+                    title: '例题 8.2',
+                    question: '计算上题晶体管的稳定性因子 K，判断是否绝对稳定。',
+                    solution: '<strong>计算 Δ</strong>：<br>Δ = S₁₁S₂₂ - S₁₂S₂₁<br>= 0.6∠-60°×0.5∠-45° - 0.1∠30°×3∠75°<br>= 0.3∠-105° - 0.3∠105°<br><br>|Δ| ≈ 0.3（近似计算）<br><br><strong>计算 K</strong>：<br>K = (1-|S₁₁|²-|S₂₂|²+|Δ|²)/(2|S₁₂S₂₁|)<br>= (1-0.36-0.25+0.09)/(2×0.1×3)<br>= 0.48/0.6<br>= 0.8<br><br><strong>判断</strong>：<br>K = 0.8 < 1，非绝对稳定<br>需要设计稳定电路'
+                }
+            ]
+        },
+        'ch8-2': {
+            chapter: '第8章 微波放大器设计',
+            title: '8.2 稳定性判别',
+            desc: '放大器稳定性分析与设计',
+            knowledge: [
+                '<strong>绝对稳定条件</strong>：K > 1 且 |Δ| < 1，任意无源负载和源阻抗都稳定',
+                '<strong>条件稳定</strong>：K < 1，某些负载范围不稳定',
+                '<strong>稳定性圆</strong>：Smith 圆图上稳定与不稳定的边界',
+                '<strong>源稳定性圆</strong>：Γ_S 平面上的稳定性边界',
+                '<strong>负载稳定性圆</strong>：Γᴸ 平面上的稳定性边界',
+                '<strong>稳定区域判断</strong>：圆内或圆外稳定取决于 S 参数',
+                '<strong>稳定措施</strong>：源端串联/并联电阻、负载端串联/并联电阻、负反馈',
+                '<strong>阻性加载</strong>：牺牲增益换取稳定性',
+                '<strong>负反馈</strong>：降低增益，改善稳定性、展宽带宽'
+            ],
+            examples: [
+                {
+                    title: '例题 8.3',
+                    question: '晶体管潜在不稳定（K = 0.8），设计源端串联电阻使其绝对稳定。',
+                    solution: '<strong>分析</strong>：<br>源端串联电阻 Rˢ 增加输入损耗<br>等效增加输入反射损耗<br><br><strong>设计</strong>：<br>目标：K > 1<br>通常需要增加输入损耗约 20-30%<br><br><strong>计算</strong>：<br>设 Z₀ = 50Ω<br>串联 Rˢ = 10Ω<br>新 S₁₁\' = (S₁₁(Rˢ+Z₀) - Rˢ)/(Rˢ+Z₀+S₁₁Rˢ)<br>（近似计算）<br><br><strong>验证</strong>：<br>重新计算 K\'，应 > 1<br><br><strong>结论</strong>：<br>串联 10Ω 电阻可使 K > 1<br>但增益降低约 1-2dB'
+                },
+                {
+                    title: '例题 8.4',
+                    question: '解释为什么低噪声放大器通常条件稳定而非绝对稳定。',
+                    solution: '<strong>低噪声设计考虑</strong>：<br><br>1. <strong>最佳噪声匹配</strong>：<br>Γₒₚₜ 通常不等于 Γ_S 稳定区<br>追求低噪声可能进入不稳定区<br><br>2. <strong>增益与噪声权衡</strong>：<br>绝对稳定需要阻性加载<br>增加损耗 = 增加噪声<br><br>3. <strong>实际解决方案</strong>：<br>• 在特定频段内稳定<br>• 使用稳定圆选择工作点<br>• 带外增加稳定网络<br><br><strong>结论</strong>：<br>LNA 设计是噪声、增益、稳定性的权衡<br>通常接受条件稳定'
+                }
+            ]
+        },
+        'ch8-3': {
+            chapter: '第8章 微波放大器设计',
+            title: '8.3 噪声与噪声系数',
+            desc: '放大器噪声分析与低噪声设计',
+            knowledge: [
+                '<strong>噪声来源</strong>：热噪声、散粒噪声、闪烁噪声（1/f 噪声）',
+                '<strong>噪声系数 F</strong>：F = (SNRⁱn)/(SNRₒᵤₜ) = 1 + (Nₐddₑd/Nᵢₙ)',
+                '<strong>噪声因子</strong>：NF = 10log(F)，单位 dB',
+                '<strong>级联噪声系数</strong>：Fₜₒₜₐₗ = F₁ + (F₂-1)/G₁ + (F₃-1)/(G₁G₂) + ...',
+                '<strong>等效噪声温度</strong>：Tᵉ = (F-1)T₀，T₀ = 290K',
+                '<strong>最小噪声系数 Fₘᵢₙ</strong>：器件可达到的最佳噪声性能',
+                '<strong>最佳源反射系数 Γₒₚₜ</strong>：实现 Fₘᵢₙ 的源阻抗',
+                '<strong>噪声圆</strong>：Smith 圆图上等噪声系数轨迹',
+                '<strong>噪声电阻 Rⁿ</strong>：噪声系数对源阻抗的敏感程度'
+            ],
+            examples: [
+                {
+                    title: '例题 8.5',
+                    question: '两级放大器，第一级 F₁ = 2dB，G₁ = 15dB；第二级 F₂ = 4dB。求总噪声系数。',
+                    solution: '<strong>转换为线性值</strong>：<br>F₁ = 10^(2/10) = 1.585<br>G₁ = 10^(15/10) = 31.6<br>F₂ = 10^(4/10) = 2.512<br><br><strong>计算总噪声系数</strong>：<br>Fₜₒₜₐₗ = F₁ + (F₂-1)/G₁<br>= 1.585 + (2.512-1)/31.6<br>= 1.585 + 0.048<br>= 1.633<br><br><strong>转换为 dB</strong>：<br>NFₜₒₜₐₗ = 10log(1.633) = 2.13 dB<br><br><strong>结论</strong>：总噪声系数约 2.13dB<br>（第一级噪声占主导）'
+                },
+                {
+                    title: '例题 8.6',
+                    question: '设计 2GHz 低噪声放大器，FET 参数：Fₘᵢₙ = 0.5dB，Γₒₚₜ = 0.6∠120°，Rⁿ = 20Ω。求最佳源阻抗。',
+                    solution: '<strong>最佳源反射系数</strong>：<br>Γˢ = Γₒₚₜ = 0.6∠120°<br><br><strong>转换为阻抗</strong>：<br>Zˢ = Z₀(1+Γˢ)/(1-Γˢ)<br>= 50(1+0.6∠120°)/(1-0.6∠120°)<br><br><strong>计算</strong>：<br>1 + 0.6∠120° = 1 - 0.3 + j0.52 = 0.7 + j0.52<br>1 - 0.6∠120° = 1 + 0.3 - j0.52 = 1.3 - j0.52<br><br>Zˢ = 50×(0.7+j0.52)/(1.3-j0.52)<br>≈ 50×(0.4 + j0.55)<br>= 20 + j27.5 Ω<br><br><strong>结论</strong>：最佳源阻抗约 20 + j27.5Ω'
+                }
+            ]
+        },
+        'ch8-4': {
+            chapter: '第8章 微波放大器设计',
+            title: '8.4 小信号放大器设计',
+            desc: '低噪声和增益放大器设计方法',
+            knowledge: [
+                '<strong>设计流程</strong>：选择器件 → 稳定性分析 → 确定工作点 → 阻抗匹配 → 仿真优化',
+                '<strong>直流偏置</strong>：确定 Vᵍˢ、Vᵈˢ（FET）或 Vᵇᵉ、Vᶜᵉ（BJT）',
+                '<strong>增益匹配设计</strong>：Γ_S = S₁₁*，Γᴸ = S₂₂*，共轭匹配',
+                '<strong>低噪声设计</strong>：Γ_S = Γₒₚₜ，牺牲部分增益换取低噪声',
+                '<strong>单向化设计</strong>：假设 S₁₂ = 0，简化设计',
+                '<strong>双向设计</strong>：考虑 S₁₂，使用完整公式',
+                '<strong>匹配网络</strong>：L 型、π 型、T 型，微带线实现',
+                '<strong>稳定性检查</strong>：全频段稳定性验证',
+                '<strong>偏置网络</strong>：射频扼流圈、去耦电容，隔离直流与射频'
+            ],
+            examples: [
+                {
+                    title: '例题 8.7',
+                    question: '设计 1GHz 小信号放大器，FET S 参数：S₁₁ = 0.8∠-90°，S₂₂ = 0.6∠-45°，S₂₁ = 3∠60°，S₁₂ = 0。求输入输出匹配网络。',
+                    solution: '<strong>单向化设计</strong>（S₁₂ = 0）：<br><br>1. <strong>输入匹配</strong>：<br>Γ_S = S₁₁* = 0.8∠90°<br><br>2. <strong>输出匹配</strong>：<br>Γᴸ = S₂₂* = 0.6∠45°<br><br>3. <strong>计算增益</strong>：<br>Gˢ = 1/(1-|S₁₁|²) = 1/(1-0.64) = 2.78 = 4.4dB<br>G₀ = |S₂₁|² = 9 = 9.5dB<br>Gᴸ = 1/(1-|S₂₂|²) = 1/(1-0.36) = 1.56 = 1.9dB<br>Gₜₒₜₐₗ = 4.4 + 9.5 + 1.9 = 15.8dB<br><br><strong>匹配网络</strong>：<br>用 Smith 圆图设计 L 型网络'
+                },
+                {
+                    title: '例题 8.8',
+                    question: 'LNA 设计，要求 NF < 1dB，增益 > 15dB。选择器件并说明设计要点。',
+                    solution: '<strong>器件选择</strong>：<br>• 频率：< 6GHz：pHEMT<br>• 频率：> 6GHz：GaAs HEMT 或 GaN HEMT<br>• 要求 NF < 1dB：选低噪声管，如 ATF-54143<br><br><strong>设计要点</strong>：<br>1. 偏置在最佳噪声点（通常 Iᵈ = 10-20% Iᵈss）<br>2. 输入匹配：Γˢ = Γₒₚₜ<br>3. 输出匹配：共轭匹配<br>4. 稳定性：必要时加稳定网络<br>5. 直流偏置：射频扼流圈 + 去耦电容<br><br><strong>结论</strong>：pHEMT LNA 可实现 NF < 0.5dB，增益 15-20dB'
+                }
+            ]
+        },
+        'ch8-5': {
+            chapter: '第8章 微波放大器设计',
+            title: '8.5 功率放大器设计',
+            desc: '高效率功率放大器设计',
+            knowledge: [
+                '<strong>功率放大器分类</strong>：A、B、C、D、E、F 类',
+                '<strong>A 类</strong>：导通角 360°，线性最好，效率最高 50%',
+                '<strong>B 类</strong>：导通角 180°，推挽结构，效率最高 78.5%',
+                '<strong>C 类</strong>：导通角 < 180°，效率高，非线性',
+                '<strong>D/E/F 类</strong>：开关模式，效率 > 80%',
+                '<strong>1dB 压缩点 P1dB</strong>：增益压缩 1dB 时的输出功率',
+                '<strong>三阶交调 IP3</strong>：三阶交调产物与基波相等时的输入/输出功率',
+                '<strong>功率附加效率 PAE</strong>：PAE = (P<sub>out</sub> - P<sub>in</sub>)/P<sub>dc</sub>',
+                '<strong>负载牵引</strong>：测量不同负载阻抗下的输出功率和效率',
+                '<strong>大信号阻抗</strong>：功率匹配与增益匹配不同'
+            ],
+            examples: [
+                {
+                    title: '例题 8.9',
+                    question: 'A 类功放，V<sub>dd</sub> = 28V，I<sub>max</sub> = 1A。求最大输出功率和理论效率。',
+                    solution: '<strong>A 类功放分析</strong>：<br><br>1. <strong>最大输出电压摆幅</strong>：<br>V<sub>peak</sub> = V<sub>dd</sub>/2 = 14V<br><br>2. <strong>最大输出电流摆幅</strong>：<br>I<sub>peak</sub> = I<sub>max</sub>/2 = 0.5A<br><br>3. <strong>最大输出功率</strong>：<br>P<sub>out</sub> = V<sub>peak</sub>×I<sub>peak</sub>/2<br>= 14×0.5/2 = 3.5W<br><br>4. <strong>直流功耗</strong>：<br>P<sub>dc</sub> = V<sub>dd</sub>×I<sub>max</sub>/2 = 28×0.5 = 14W<br><br>5. <strong>效率</strong>：<br>η = P<sub>out</sub>/P<sub>dc</sub> = 3.5/14 = 25%<br>（理论最大 50%，实际 25-40%）<br><br><strong>结论</strong>：P<sub>out</sub> = 3.5W，η = 25%'
+                },
+                {
+                    title: '例题 8.10',
+                    question: 'B 类推挽功放，每管饱和电流 2A，电源 12V。估算最大输出功率和效率。',
+                    solution: '<strong>B 类功放分析</strong>：<br><br>1. <strong>输出电压摆幅</strong>：<br>V<sub>peak</sub> ≈ V<sub>dd</sub> = 12V<br><br>2. <strong>输出电流（每管）</strong>：<br>I<sub>peak</sub> = 2A<br><br>3. <strong>总输出功率</strong>：<br>B 类推挽结构中，两管交替工作，总输出功率为单管的两倍：<br>P<sub>out</sub> = 2 × (V<sub>peak</sub>×I<sub>peak</sub>/2) = V<sub>peak</sub>×I<sub>peak</sub><br>= 12 × 2 = <strong>12W</strong><br><br>4. <strong>直流功耗</strong>：<br>P<sub>dc</sub> = 2×V<sub>dd</sub>×I<sub>peak</sub>/π<br>= 2×12×2/π<br>= 15.3W<br><br>5. <strong>效率</strong>：<br>η = P<sub>out</sub>/P<sub>dc</sub> = 12/15.3 = 78.5%<br>（理论最大值）<br><br><strong>结论</strong>：P<sub>out</sub> = 12W，η = 78.5%'
+                }
+            ]
+        },
+        'ch8-6': {
+            chapter: '第8章 微波放大器设计',
+            title: '8.6 宽带与低噪声放大器',
+            desc: '特殊应用放大器设计',
+            knowledge: [
+                '<strong>宽带放大器挑战</strong>：增益平坦、匹配困难、稳定性',
+                '<strong>展宽技术</strong>：负反馈、平衡结构、分布式放大器',
+                '<strong>负反馈</strong>：降低增益，展宽带宽，改善匹配和稳定性',
+                '<strong>平衡放大器</strong>：90° 混合器 + 两个相同放大器，改善匹配',
+                '<strong>分布式放大器</strong>：行波放大，极宽带宽（DC-几十 GHz）',
+                '<strong>低噪声设计要点</strong>：第一级噪声主导、最佳噪声匹配、低损耗输入',
+                '<strong>多级 LNA</strong>：第一级低噪声，后续级高增益',
+                '<strong>偏置优化</strong>：低电流偏置降低噪声',
+                '<strong>应用</strong>：通信接收机、雷达、射电天文、仪器仪表'
+            ],
+            examples: [
+                {
+                    title: '例题 8.11',
+                    question: '设计 1-10GHz 宽带放大器，采用负反馈。晶体管 f<sub>T</sub> = 30GHz，求反馈电阻。',
+                    solution: '<strong>负反馈原理</strong>：<br>串联电流负反馈：R<sub>f</sub> 从漏极反馈到栅极<br><br><strong>设计目标</strong>：<br>• 增益平坦：10dB ± 1dB<br>• 输入匹配：S₁₁ < -10dB<br><br><strong>反馈电阻选择</strong>：<br>R<sub>f</sub> ≈ (增益 × Z<sub>0</sub>)/S₂₁<br>目标增益 10dB（10 倍）<br>S₂₁ ≈ f<sub>T</sub>/f = 30/5 = 6（中频）<br><br>R<sub>f</sub> ≈ (10×50)/6 ≈ 83Ω<br><br><strong>实际值</strong>：<br>R<sub>f</sub> = 100-200Ω（通过仿真优化）<br><br><strong>结论</strong>：反馈电阻约 100-200Ω'
+                },
+                {
+                    title: '例题 8.12',
+                    question: '卫星接收机 LNA 设计，要求 NF < 0.8dB，增益 > 30dB，带宽 500MHz。',
+                    solution: '<strong>系统架构</strong>：<br>三级放大 + 滤波<br><br><strong>第一级（低噪声）</strong>：<br>• 器件：GaAs pHEMT<br>• NF₁ = 0.3dB，G₁ = 15dB<br>• 输入匹配：Γ<sub>opt</sub><br><br><strong>第二级（增益）</strong>：<br>• NF₂ = 2dB，G₂ = 15dB<br><br><strong>第三级（输出驱动）</strong>：<br>• G₃ = 10dB<br><br><strong>总性能</strong>：<br>NF<sub>total</sub> ≈ NF₁ = 0.3dB（第一级主导）<br>G<sub>total</sub> = 15 + 15 + 10 = 40dB<br><br><strong>结论</strong>：<br>三级设计可满足 NF < 0.8dB，增益 > 30dB'
+                }
+            ]
+        }
+    };
+    
+    // 加载章节内容函数
+    // 课程代码
+    const COURSE_CODE = 'mw';
+    
+    // 章节结构定义：每个章节包含哪些小章节
+    const CHAPTER_STRUCTURE = {
+        '第0章': ['ch0-1'],
+        '第1章': ['ch1-1', 'ch1-2', 'ch1-3', 'ch1-4'],
+        '第2章': ['ch2-1', 'ch2-2', 'ch2-3', 'ch2-4', 'ch2-5', 'ch2-6', 'ch2-7'],
+        '第3章': ['ch3-1', 'ch3-2', 'ch3-3', 'ch3-4', 'ch3-5'],
+        '第4章': ['ch4-1', 'ch4-2', 'ch4-3', 'ch4-4', 'ch4-5', 'ch4-6', 'ch4-7'],
+        '第5章': ['ch5-1', 'ch5-2', 'ch5-3', 'ch5-4', 'ch5-5', 'ch5-6', 'ch5-7'],
+        '第6章': ['ch6-1', 'ch6-2', 'ch6-3', 'ch6-4', 'ch6-5', 'ch6-6', 'ch6-7'],
+        '第7章': ['ch7-1', 'ch7-2', 'ch7-3', 'ch7-4', 'ch7-5'],
+        '第8章': ['ch8-1', 'ch8-2', 'ch8-3', 'ch8-4', 'ch8-5', 'ch8-6']
+    };
+    
+    // 获取所有小章节ID
+    function getAllChapterIds() {
+        return Object.keys(chapterDetails);
+    }
+    
+    // 获取所有章节名称
+    function getAllMainChapters() {
+        return Object.keys(CHAPTER_STRUCTURE);
+    }
+    
+    // 检查某个章节是否全部完成
+    function isMainChapterCompleted(chapterName) {
+        const subChapters = CHAPTER_STRUCTURE[chapterName];
+        if (!subChapters || subChapters.length === 0) return false;
+        return subChapters.every(subId => isChapterCompleted(subId));
+    }
+    
+    // 获取已完成的主章节数量
+    function getCompletedMainChaptersCount() {
+        return Object.keys(CHAPTER_STRUCTURE).filter(chapterName => isMainChapterCompleted(chapterName)).length;
+    }
+    
+    // 获取总主章节数量
+    function getTotalMainChaptersCount() {
+        return Object.keys(CHAPTER_STRUCTURE).length;
+    }
+    
+    // 本地存储键名
+    function getStorageKey() {
+        return `chapter_progress_${COURSE_CODE}`;
+    }
+    
+    // 从本地存储获取进度数据
+    function getLocalProgress() {
+        try {
+            const data = localStorage.getItem(getStorageKey());
+            return data ? JSON.parse(data) : {};
+        } catch (e) {
+            console.error('读取本地存储失败:', e);
+            return {};
+        }
+    }
+    
+    // 保存进度到本地存储
+    function saveLocalProgress(chapterId, isCompleted, chapterName) {
+        try {
+            const progress = getLocalProgress();
+            progress[chapterId] = {
+                is_completed: isCompleted,
+                chapter_name: chapterName,
+                completed_at: isCompleted ? new Date().toISOString() : null,
+                course_code: COURSE_CODE
+            };
+            localStorage.setItem(getStorageKey(), JSON.stringify(progress));
+            updateProgressSummary();
+            updateNavIndicators();
+        } catch (e) {
+            console.error('保存到本地存储失败:', e);
+        }
+    }
+    
+    // 检查章节是否已完成
+    function isChapterCompleted(chapterId) {
+        const progress = getLocalProgress();
+        return progress[chapterId] && progress[chapterId].is_completed;
+    }
+    
+    // 更新进度汇总面板
+    function updateProgressSummary() {
+        // 基于主章节（大章节）计算进度
+        const totalMainChapters = getTotalMainChaptersCount();
+        const completedMainChapters = getCompletedMainChaptersCount();
+        const rate = totalMainChapters > 0 ? Math.round((completedMainChapters / totalMainChapters) * 100) : 0;
+        const remaining = totalMainChapters - completedMainChapters;
+        
+        // 同时统计小章节完成情况（用于显示详情）
+        const allSubIds = getAllChapterIds();
+        const completedSubChapters = allSubIds.filter(id => isChapterCompleted(id)).length;
+        
+        document.getElementById('completedCount').textContent = completedMainChapters;
+        document.getElementById('totalCount').textContent = totalMainChapters;
+        document.getElementById('remainingCount').textContent = remaining;
+        document.getElementById('progressPercentage').textContent = rate + '%';
+        document.getElementById('progressBarFill').style.width = rate + '%';
+        
+        // 更新触发按钮上的进度指示器
+        const toggleBtn = document.getElementById('progressToggleBtn');
+        if (completedMainChapters > 0) {
+            toggleBtn.classList.add('has-progress');
+        } else {
+            toggleBtn.classList.remove('has-progress');
+        }
+        
+        // 更新当前学习位置
+        updateCurrentModule(totalMainChapters, completedMainChapters);
+        
+        // 更新主章节导航的完成标记
+        updateMainChapterIndicators();
+    }
+    
+    // 更新当前学习位置显示
+    function updateCurrentModule(totalMainChapters, completedMainChapters) {
+        const currentModuleName = document.getElementById('currentModuleName');
+        const currentModuleStatus = document.getElementById('currentModuleStatus');
+        
+        if (completedMainChapters === 0) {
+            currentModuleName.textContent = '尚未开始';
+            currentModuleStatus.textContent = '等待学习';
+            currentModuleStatus.className = 'current-module-status pending';
+        } else if (completedMainChapters === totalMainChapters) {
+            currentModuleName.textContent = '全部完成';
+            currentModuleStatus.textContent = '恭喜完成所有章节！';
+            currentModuleStatus.className = 'current-module-status';
+        } else {
+            // 找到第一个未完成的主章节
+            const nextMainChapter = Object.keys(CHAPTER_STRUCTURE).find(chapterName => !isMainChapterCompleted(chapterName));
+            if (nextMainChapter) {
+                currentModuleName.textContent = nextMainChapter;
+                currentModuleStatus.textContent = '学习中';
+                currentModuleStatus.className = 'current-module-status pending';
+            }
+        }
+    }
+    
+    // 更新主章节导航的完成标记
+    function updateMainChapterIndicators() {
+        document.querySelectorAll('.mw-nav-header').forEach(header => {
+            const chapterName = header.textContent.trim().split('\n')[0].trim();
+            if (CHAPTER_STRUCTURE[chapterName]) {
+                const isCompleted = isMainChapterCompleted(chapterName);
+                header.style.borderLeft = isCompleted ? '4px solid #28a745' : '4px solid transparent';
+                header.style.background = isCompleted ? 'rgba(40, 167, 69, 0.1)' : 'transparent';
+            }
+        });
+    }
+    
+    // 进度栏面板控制
+    const progressPanel = document.getElementById('chapterProgressPanel');
+    const progressToggleBtn = document.getElementById('progressToggleBtn');
+    const progressCloseBtn = document.getElementById('progressCloseBtn');
+    const progressOverlay = document.getElementById('progressOverlay');
+    const PANEL_STORAGE_KEY = 'chapterProgressPanel_' + COURSE_CODE + '_visible';
+    
+    // 打开进度面板
+    function openProgressPanel() {
+        progressPanel.classList.add('show');
+        progressOverlay.classList.add('show');
+        localStorage.setItem(PANEL_STORAGE_KEY, 'true');
+    }
+    
+    // 关闭进度面板
+    function closeProgressPanel() {
+        progressPanel.classList.remove('show');
+        progressOverlay.classList.remove('show');
+        localStorage.setItem(PANEL_STORAGE_KEY, 'false');
+    }
+    
+    // 切换进度面板
+    function toggleProgressPanel() {
+        if (progressPanel.classList.contains('show')) {
+            closeProgressPanel();
+        } else {
+            openProgressPanel();
+        }
+    }
+    
+    // 事件监听
+    progressToggleBtn.addEventListener('click', toggleProgressPanel);
+    progressCloseBtn.addEventListener('click', closeProgressPanel);
+    progressOverlay.addEventListener('click', closeProgressPanel);
+    
+    // ESC键关闭面板
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && progressPanel.classList.contains('show')) {
+            closeProgressPanel();
+        }
+    });
+    
+    // 页面加载时恢复面板状态
+    function restorePanelState() {
+        const isVisible = localStorage.getItem(PANEL_STORAGE_KEY);
+        if (isVisible === 'true') {
+            openProgressPanel();
+        }
+    }
+    
+    // 更新导航栏完成标记
+    function updateNavIndicators() {
+        document.querySelectorAll('.mw-nav-list li a').forEach(link => {
+            const chapterId = link.getAttribute('href').substring(1);
+            const existingIndicator = link.querySelector('.nav-completed-indicator');
+            
+            if (isChapterCompleted(chapterId)) {
+                if (!existingIndicator) {
+                    const indicator = document.createElement('span');
+                    indicator.className = 'nav-completed-indicator';
+                    indicator.innerHTML = '✓';
+                    link.appendChild(indicator);
+                }
+            } else if (existingIndicator) {
+                existingIndicator.remove();
+            }
+        });
+    }
+    
+    // 发送进度到后端
+    async function syncProgressToServer(chapterId, isCompleted, chapterName) {
+        try {
+            console.log(`🔄 正在同步进度到服务器: ${chapterId} (${isCompleted ? '完成' : '未完成'})`);
+            const response = await fetch('/api/chapter-progress/update/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                },
+                body: JSON.stringify({
+                    chapter_id: `${COURSE_CODE}/${chapterId}`,
+                    chapter_name: chapterName,
+                    course_code: COURSE_CODE,
+                    is_completed: isCompleted
+                })
+            });
+            const result = await response.json();
+            if (result.success) {
+                console.log('✅ 进度同步成功:', result.message, result.data);
+                // 触发全局事件通知其他页面数据已更新
+                window.dispatchEvent(new CustomEvent('chapterProgressUpdated', {
+                    detail: { course: COURSE_CODE, chapterId, isCompleted, timestamp: Date.now() }
+                }));
+                // 使用 BroadcastChannel 通知其他页面
+                notifyOtherPages({ course: COURSE_CODE, chapterId, isCompleted });
+            } else {
+                console.error('❌ 进度同步失败:', result.message);
+                markForRetry(chapterId, isCompleted, chapterName);
+            }
+        } catch (error) {
+            console.error('❌ 同步请求失败:', error);
+            markForRetry(chapterId, isCompleted, chapterName);
+        }
+    }
+    
+    // 标记需要重试同步的章节
+    function markForRetry(chapterId, isCompleted, chapterName) {
+        const retryKey = `${COURSE_CODE}_retry_queue`;
+        const retryQueue = JSON.parse(localStorage.getItem(retryKey) || '[]');
+        retryQueue.push({ chapterId, isCompleted, chapterName, timestamp: Date.now() });
+        localStorage.setItem(retryKey, JSON.stringify(retryQueue));
+        console.log('⏳ 已标记为待重试同步');
+    }
+    
+    // 重试同步失败的章节
+    async function retryFailedSyncs() {
+        const retryKey = `${COURSE_CODE}_retry_queue`;
+        const retryQueue = JSON.parse(localStorage.getItem(retryKey) || '[]');
+        if (retryQueue.length === 0) return;
+        
+        console.log(`🔄 开始重试 ${retryQueue.length} 个失败的同步...`);
+        const failed = [];
+        
+        for (const item of retryQueue) {
+            try {
+                const response = await fetch('/api/chapter-progress/update/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCsrfToken()
+                    },
+                    body: JSON.stringify({
+                        chapter_id: `${COURSE_CODE}/${item.chapterId}`,
+                        chapter_name: item.chapterName,
+                        course_code: COURSE_CODE,
+                        is_completed: item.isCompleted
+                    })
+                });
+                const result = await response.json();
+                if (!result.success) {
+                    failed.push(item);
+                }
+            } catch (error) {
+                failed.push(item);
+            }
+        }
+        
+        localStorage.setItem(retryKey, JSON.stringify(failed));
+        if (failed.length === 0) {
+            console.log('✅ 所有失败同步已重试成功');
+        } else {
+            console.log(`⚠️ 仍有 ${failed.length} 个同步失败，将在下次页面加载时重试`);
+        }
+    }
+    
+    // 获取CSRF Token
+    function getCsrfToken() {
+        const name = 'csrftoken';
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    // 从服务器加载进度数据
+    async function loadProgressFromServer() {
+        try {
+            const response = await fetch(`/api/chapter-progress/?course=${COURSE_CODE}`);
+            const result = await response.json();
+            if (result.success && result.data && result.data.progress_list) {
+                const serverProgress = result.data.progress_list;
+                const localProgress = getLocalProgress();
+                let hasUpdate = false;
+                
+                // 合并服务器数据和本地数据
+                serverProgress.forEach(item => {
+                    const chapterId = item.chapter_id.replace(`${COURSE_CODE}/`, '');
+                    if (!localProgress[chapterId] || 
+                        (item.is_completed && !localProgress[chapterId].is_completed)) {
+                        localProgress[chapterId] = {
+                            is_completed: item.is_completed,
+                            chapter_name: item.chapter_name,
+                            completed_at: item.completed_at,
+                            course_code: item.course_code
+                        };
+                        hasUpdate = true;
+                    }
+                });
+                
+                if (hasUpdate) {
+                    localStorage.setItem(getStorageKey(), JSON.stringify(localProgress));
+                }
+                
+                updateProgressSummary();
+                updateNavIndicators();
+            }
+        } catch (error) {
+            console.error('从服务器加载进度失败:', error);
+        }
+    }
+    
+    // 批量同步本地数据到服务器
+    async function batchSyncToServer() {
+        const progress = getLocalProgress();
+        const progressData = Object.keys(progress).map(chapterId => ({
+            chapter_id: `${COURSE_CODE}/${chapterId}`,
+            chapter_name: progress[chapterId].chapter_name,
+            course_code: COURSE_CODE,
+            is_completed: progress[chapterId].is_completed,
+            completed_at: progress[chapterId].completed_at
+        }));
+        
+        if (progressData.length === 0) return;
+        
+        try {
+            const response = await fetch('/api/chapter-progress/sync/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                },
+                body: JSON.stringify({ progress_data: progressData })
+            });
+            const result = await response.json();
+            if (result.success) {
+                console.log('批量同步成功:', result.message);
+            }
+        } catch (error) {
+            console.error('批量同步失败:', error);
+        }
+    }
+    
+    // 切换章节完成状态
+    function toggleChapterCompletion(chapterId, chapterName) {
+        const isCompleted = !isChapterCompleted(chapterId);
+        saveLocalProgress(chapterId, isCompleted, chapterName);
+        syncProgressToServer(chapterId, isCompleted, chapterName);
+        updateCompletionButton(chapterId, chapterName);
+    }
+    
+    // 更新完成按钮状态
+    function updateCompletionButton(chapterId, chapterName) {
+        const btn = document.getElementById('btnComplete');
+        const statusDiv = document.getElementById('completionStatus');
+        const isCompleted = isChapterCompleted(chapterId);
+        
+        if (btn) {
+            btn.className = isCompleted ? 'btn-complete completed' : 'btn-complete';
+            btn.innerHTML = isCompleted ? 
+                '<span>✓</span> 已完成' : 
+                '<span>○</span> 标记为已完成';
+        }
+        
+        if (statusDiv) {
+            statusDiv.className = isCompleted ? 'completion-status completed' : 'completion-status';
+            statusDiv.innerHTML = isCompleted ? 
+                '<span class="completion-status-icon">✓</span> <span>本节已完成学习</span>' :
+                '<span class="completion-status-icon">○</span> <span>本节尚未完成</span>';
+        }
+    }
+
+    function loadChapter(chapterId) {
+        const detail = chapterDetails[chapterId];
+        if (!detail) return;
+        
+        const main = document.querySelector('.mw-main');
+        const isCompleted = isChapterCompleted(chapterId);
+        
+        const completionSection = `
+            <div class="chapter-completion-section">
+                <div class="completion-status ${isCompleted ? 'completed' : ''}" id="completionStatus">
+                    <span class="completion-status-icon">${isCompleted ? '✓' : '○'}</span>
+                    <span>${isCompleted ? '本节已完成学习' : '本节尚未完成'}</span>
+                </div>
+                <br>
+                <button class="btn-complete ${isCompleted ? 'completed' : ''}" id="btnComplete" onclick="toggleChapterCompletion('${chapterId}', '${detail.title}')">
+                    <span>${isCompleted ? '✓' : '○'}</span>
+                    ${isCompleted ? '已完成' : '标记为已完成'}
+                </button>
+            </div>
+        `;
+        
+        // 第0章教材介绍 - 特殊布局
+        if (detail.isIntro) {
+            main.innerHTML = `
+                <div class="chapter-content">
+                    <div class="chapter-header">
+                        <div class="chapter-tag">${detail.chapter}</div>
+                        <h1 class="chapter-title">${detail.title}</h1>
+                        <p class="chapter-desc">${detail.desc}</p>
+                    </div>
+                    ${detail.content}
+                    ${completionSection}
+                </div>
+            `;
+            return;
+        }
+        
+        let examplesHtml = '';
+        if (detail.examples && detail.examples.length > 0) {
+            examplesHtml = `
+                <div class="examples-section">
+                    <h3 class="section-title">典型例题</h3>
+                    ${detail.examples.map(ex => `
+                        <div class="example-card">
+                            <h4>${ex.title}</h4>
+                            <div class="question">
+                                <strong>题目：</strong>${ex.question}
+                            </div>
+                            <div class="solution">
+                                <strong>解答：</strong><br>${ex.solution}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+        
+        main.innerHTML = `
+            <div class="chapter-content">
+                <div class="chapter-header">
+                    <div class="chapter-tag">${detail.chapter}</div>
+                    <h1 class="chapter-title">${detail.title}</h1>
+                    <p class="chapter-desc">${detail.desc}</p>
+                </div>
+                
+                <div class="knowledge-section">
+                    <h3 class="section-title">核心知识点</h3>
+                    <ul class="knowledge-list">
+                        ${detail.knowledge.map(k => `<li>${k}</li>`).join('')}
+                    </ul>
+                </div>
+                
+                ${examplesHtml}
+                ${completionSection}
+            </div>
+        `;
+    }
+    
+    // BroadcastChannel 实例
+    let bc = null;
+    if ('BroadcastChannel' in window) {
+        bc = new BroadcastChannel('chapter_progress_channel');
+        console.log('✅ BroadcastChannel 已启用');
+    }
+    
+    // 通知其他页面进度已更新
+    function notifyOtherPages(data) {
+        const message = { type: 'progress_updated', timestamp: Date.now(), ...data };
+        
+        // 使用 BroadcastChannel
+        if (bc) {
+            bc.postMessage(message);
+            console.log('📢 已通过 BroadcastChannel 通知其他页面');
+        }
+        
+        // 同时使用 localStorage 作为备选（兼容不支持 BroadcastChannel 的浏览器）
+        localStorage.setItem('chapter_progress_sync', JSON.stringify(message));
+        setTimeout(() => localStorage.removeItem('chapter_progress_sync'), 1000);
+    }
+    
+    // 监听来自其他页面的更新通知
+    if ('BroadcastChannel' in window) {
+        bc.onmessage = function(event) {
+            console.log('📢 收到其他页面的更新通知:', event.data);
+            if (event.data && event.data.type === 'progress_updated' && event.data.course !== COURSE_CODE) {
+                console.log('🔄 其他课程进度已更新，可切换查看');
+            }
+        };
+    } else {
+        // 使用 localStorage 作为备选
+        window.addEventListener('storage', function(event) {
+            if (event.key === 'chapter_progress_sync' && event.newValue) {
+                try {
+                    const data = JSON.parse(event.newValue);
+                    if (data.type === 'progress_updated' && data.course !== COURSE_CODE) {
+                        console.log('🔄 其他课程进度已更新(localStorage)，可切换查看');
+                    }
+                } catch (e) {
+                    console.error('解析通知数据失败:', e);
+                }
+            }
+        });
+    }
+    
+    // 页面加载时初始化
+    document.addEventListener('DOMContentLoaded', function() {
+        // 先重试之前失败的同步
+        retryFailedSyncs().then(() => {
+            // 然后从服务器加载最新进度
+            loadProgressFromServer();
+        });
+        
+        // 恢复进度面板状态
+        restorePanelState();
+        
+        // 页面关闭前批量同步数据
+        window.addEventListener('beforeunload', function() {
+            batchSyncToServer();
+        });
+        
+        // 定期重试失败的同步（每30秒）
+        setInterval(retryFailedSyncs, 30000);
+    });
+</script>
+
+<style>
+    /* 章节内容样式 */
+    .chapter-content {
+        padding: 40px 0;
+    }
+    .chapter-header {
+        margin-bottom: 40px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #C20E0E;
+    }
+    .chapter-tag {
+        font-size: 12px;
+        color: #C20E0E;
+        letter-spacing: 2px;
+        margin-bottom: 10px;
+    }
+    .chapter-title {
+        font-size: 32px;
+        font-weight: 600;
+        color: #111;
+        margin-bottom: 15px;
+    }
+    .chapter-desc {
+        font-size: 16px;
+        color: #666;
+    }
+    .section-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #111;
+        margin-bottom: 20px;
+        padding-left: 15px;
+        border-left: 4px solid #C20E0E;
+    }
+    .knowledge-section {
+        margin-bottom: 40px;
+    }
+    .knowledge-list {
+        list-style: none;
+        padding: 0;
+    }
+    .knowledge-list li {
+        padding: 12px 0;
+        border-bottom: 1px solid #eee;
+        line-height: 1.8;
+        color: #333;
+    }
+    .knowledge-list li:last-child {
+        border-bottom: none;
+    }
+    .examples-section {
+        margin-top: 40px;
+    }
+    
+    /* 第0章教材介绍样式 */
+    .intro-book-section {
+        display: flex;
+        gap: 40px;
+        margin-top: 30px;
+        align-items: flex-start;
+    }
+    
+    .intro-book-cover {
+        flex: 0 0 320px;
+        text-align: center;
+    }
+    
+    .book-cover-img {
+        width: 100%;
+        max-width: 300px;
+        height: auto;
+        border-radius: 8px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .book-cover-img:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+    }
+    
+    .intro-book-content {
+        flex: 1;
+        padding: 20px 0;
+    }
+    
+    .intro-book-content p {
+        font-size: 15px;
+        line-height: 2;
+        color: #444;
+        text-align: justify;
+        text-indent: 2em;
+        margin: 0;
+    }
+    
+    /* 响应式适配 */
+    @media (max-width: 992px) {
+        .intro-book-section {
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+        
+        .intro-book-cover {
+            flex: 0 0 auto;
+            max-width: 280px;
+        }
+        
+        .intro-book-content {
+            padding: 0;
+        }
+        
+        .intro-book-content p {
+            font-size: 14px;
+            line-height: 1.9;
+        }
+    }
+    
+    @media (max-width: 640px) {
+        .intro-book-section {
+            gap: 25px;
+        }
+        
+        .intro-book-cover {
+            max-width: 240px;
+        }
+        
+        .book-cover-img {
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+        }
+        
+        .intro-book-content p {
+            font-size: 14px;
+            line-height: 1.8;
+            text-indent: 1.5em;
+        }
+    }
+    .example-card {
+        background: #fafafa;
+        border: 1px solid #e5e5e5;
+        border-radius: 8px;
+        padding: 25px;
+        margin-bottom: 20px;
+    }
+    .example-card h4 {
+        font-size: 16px;
+        color: #C20E0E;
+        margin-bottom: 15px;
+    }
+    .question {
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        border-bottom: 1px dashed #ddd;
+        color: #333;
+    }
+    .solution {
+        color: #555;
+        line-height: 1.8;
+    }
+</style>
+
+{% endblock %}

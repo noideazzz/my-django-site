@@ -1,0 +1,223 @@
+<!-- register.html -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册 - 华侨大学</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Georgia", "Times New Roman", "Times", "Songti SC", "STSong", "华文宋体", "宋体", serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .register-box {
+            background: white;
+            width: 400px;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+        }
+
+        .register-title {
+            text-align: center;
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 30px;
+            font-weight: normal;
+        }
+
+        .form-item {
+            margin-bottom: 20px;
+        }
+
+        .form-input {
+            width: 100%;
+            height: 44px;
+            padding: 0 15px;
+            border: 1px solid #dcdcdc;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #C8102E;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-item {
+            flex: 1;
+        }
+
+        .error-message {
+            color: #C8102E;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .register-btn {
+            width: 100%;
+            height: 44px;
+            background: #C8102E;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 10px;
+        }
+
+        .register-btn:hover {
+            background: #a00d24;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .login-link a {
+            color: #0066B3;
+            text-decoration: none;
+        }
+
+        .login-link a:hover {
+            color: #C8102E;
+        }
+
+        /* 错误提示样式 */
+        .alert {
+            padding: 10px 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .alert-error {
+            background: #fee;
+            color: #C8102E;
+            border: 1px solid #fcc;
+        }
+
+        .alert-success {
+            background: #efe;
+            color: #28a745;
+            border: 1px solid #cfc;
+        }
+    </style>
+</head>
+<body>
+    <div style="display: flex; gap: 30px; align-items: flex-start; max-width: 900px; margin: 0 auto;">
+    <div class="register-box" style="flex: 0 0 400px;">
+        <h2 class="register-title">管理员注册新用户</h2>
+        <p style="text-align: center; color: #666; font-size: 12px; margin-bottom: 20px;">
+            <i class="bi bi-shield-lock"></i> 当前操作管理员：{{ request.user.username }}
+        </p>
+
+        <!-- 消息提示 -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post" action="{% url 'users:register' %}">
+            {% csrf_token %}
+
+            <!-- 用户名 -->
+            <div class="form-item">
+                <input type="text" name="username" class="form-input" placeholder="用户名（3-20个字符）" required minlength="3" maxlength="20" value="{{ form.username.value|default:'' }}">
+                {% if form.username.errors %}
+                    <div class="error-message">{{ form.username.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <!-- 邮箱 -->
+            <div class="form-item">
+                <input type="email" name="email" class="form-input" placeholder="邮箱" required value="{{ form.email.value|default:'' }}">
+                {% if form.email.errors %}
+                    <div class="error-message">{{ form.email.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <!-- 密码 -->
+            <div class="form-item">
+                <input type="password" name="password1" class="form-input" placeholder="密码（至少8位）" required minlength="8">
+                {% if form.password1.errors %}
+                    <div class="error-message">{{ form.password1.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <!-- 确认密码 -->
+            <div class="form-item">
+                <input type="password" name="password2" class="form-input" placeholder="确认密码" required>
+                {% if form.password2.errors %}
+                    <div class="error-message">{{ form.password2.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <!-- 非字段错误 -->
+            {% if form.non_field_errors %}
+                <div class="error-message" style="margin-bottom: 15px;">
+                    {{ form.non_field_errors.0 }}
+                </div>
+            {% endif %}
+
+            <button type="submit" class="register-btn">注 册</button>
+        </form>
+
+        <div class="login-link">
+            <a href="{% url 'index' %}">返回首页</a>
+        </div>
+    </div>
+    
+    <!-- 注册日志面板 -->
+    {% if recent_logs %}
+    <div style="flex: 1; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); max-height: 600px; overflow-y: auto;">
+        <h3 style="font-size: 18px; color: #333; margin-bottom: 20px; border-bottom: 2px solid #C8102E; padding-bottom: 10px;">
+            <i class="bi bi-clock-history"></i> 最近注册记录
+        </h3>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+            <thead>
+                <tr style="background: #f8f9fa;">
+                    <th style="padding: 10px; text-align: left; border-bottom: 1px solid #dee2e6;">时间</th>
+                    <th style="padding: 10px; text-align: left; border-bottom: 1px solid #dee2e6;">操作管理员</th>
+                    <th style="padding: 10px; text-align: left; border-bottom: 1px solid #dee2e6;">新用户</th>
+                    <th style="padding: 10px; text-align: left; border-bottom: 1px solid #dee2e6;">邮箱</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in recent_logs %}
+                <tr>
+                    <td style="padding: 10px; border-bottom: 1px solid #f0f0f0;">{{ log.created_at|date:"Y-m-d H:i" }}</td>
+                    <td style="padding: 10px; border-bottom: 1px solid #f0f0f0;">{{ log.operator.username|default:"未知" }}</td>
+                    <td style="padding: 10px; border-bottom: 1px solid #f0f0f0;">{{ log.target_username }}</td>
+                    <td style="padding: 10px; border-bottom: 1px solid #f0f0f0; color: #666;">{{ log.target_email }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+    </div>
+</body>
+</html>

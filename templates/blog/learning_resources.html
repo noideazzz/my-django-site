@@ -1,0 +1,1233 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}学习资源 - 课程资料下载{% endblock %}
+
+{% block extra_css %}
+<style>
+    .resources-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 30px 20px;
+    }
+    
+    /* 页面标题 */
+    .page-header {
+        margin-bottom: 30px;
+    }
+    
+    .page-title {
+        font-size: 28px;
+        font-weight: bold;
+        color: #C20E0E;
+        margin-bottom: 10px;
+    }
+    
+    /* 搜索栏 */
+    .search-bar {
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        margin-bottom: 25px;
+    }
+    
+    /* 主布局 */
+    .main-layout {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 25px;
+    }
+    
+    /* 左侧导航 */
+    .sidebar {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+    
+    .sidebar-header {
+        background: #C20E0E;
+        color: #fff;
+        padding: 15px 20px;
+        font-weight: bold;
+    }
+    
+    .course-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .course-item {
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .course-name {
+        display: block;
+        padding: 12px 20px;
+        color: #333;
+        text-decoration: none;
+        font-weight: 500;
+        background: #f8f8f8;
+        cursor: pointer;
+    }
+    
+    .course-name:hover,
+    .course-name.active {
+        background: #fff5f5;
+        color: #C20E0E;
+    }
+    
+    .chapter-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        background: #fafafa;
+    }
+    
+    .chapter-list li a {
+        display: block;
+        padding: 10px 20px 10px 35px;
+        color: #666;
+        text-decoration: none;
+        font-size: 14px;
+        border-left: 3px solid transparent;
+    }
+    
+    .chapter-list li a:hover,
+    .chapter-list li a.active {
+        background: #fff;
+        color: #C20E0E;
+        border-left-color: #C20E0E;
+    }
+    
+    /* 右侧内容 */
+    .content-area {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        padding: 25px;
+    }
+    
+    .filter-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .filter-tabs {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .filter-tab {
+        padding: 6px 15px;
+        border-radius: 20px;
+        background: #f5f5f5;
+        color: #666;
+        text-decoration: none;
+        font-size: 14px;
+        transition: all 0.3s;
+    }
+    
+    .filter-tab:hover,
+    .filter-tab.active {
+        background: #C20E0E;
+        color: #fff;
+    }
+    
+    /* 资料列表 */
+    .material-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .material-item {
+        display: flex;
+        align-items: center;
+        padding: 20px;
+        border: 1px solid #e8e8e8;
+        border-radius: 8px;
+        transition: all 0.3s;
+    }
+    
+    .material-item:hover {
+        border-color: #C20E0E;
+        box-shadow: 0 4px 12px rgba(194, 14, 14, 0.1);
+    }
+    
+    .file-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        margin-right: 15px;
+        flex-shrink: 0;
+    }
+    
+    .file-icon.ppt { background: #fff3e0; color: #ff9800; }
+    .file-icon.pdf { background: #ffebee; color: #f44336; }
+    .file-icon.video { background: #e3f2fd; color: #2196f3; }
+    .file-icon.code { background: #e8f5e9; color: #4caf50; }
+    .file-icon.data { background: #f3e5f5; color: #9c27b0; }
+    .file-icon.other { background: #f5f5f5; color: #666; }
+    
+    /* 视频播放器样式 */
+    .video-player-section {
+        background: #000;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 30px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+    
+    .video-container {
+        position: relative;
+        width: 100%;
+        padding-bottom: 56.25%; /* 16:9 比例 */
+        background: #000;
+    }
+    
+    .video-container video {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+    
+    /* 自定义视频控制栏 */
+    .video-controls {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(transparent, rgba(0,0,0,0.8));
+        padding: 20px 15px 15px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .video-container:hover .video-controls,
+    .video-controls.show {
+        opacity: 1;
+    }
+    
+    /* 进度条 */
+    .progress-bar-container {
+        width: 100%;
+        height: 6px;
+        background: rgba(255,255,255,0.3);
+        border-radius: 3px;
+        cursor: pointer;
+        position: relative;
+    }
+
+    /* 扩大点击区域的透明层 */
+    .progress-bar-container::before {
+        content: '';
+        position: absolute;
+        top: -8px;
+        left: 0;
+        right: 0;
+        bottom: -8px;
+        background: transparent;
+        z-index: 1;
+    }
+    
+    .progress-bar {
+        height: 100%;
+        background: #C20E0E;
+        border-radius: 3px;
+        position: relative;
+        width: 0%;
+        transition: width 0.1s linear;
+    }
+    
+    .progress-bar::after {
+        content: '';
+        position: absolute;
+        right: -6px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 12px;
+        height: 12px;
+        background: #fff;
+        border-radius: 50%;
+        opacity: 0;
+        transition: opacity 0.2s;
+    }
+    
+    .progress-bar-container:hover .progress-bar::after {
+        opacity: 1;
+    }
+    
+    /* 控制按钮区域 */
+    .controls-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+    }
+    
+    .controls-left,
+    .controls-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .control-btn {
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 18px;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 50%;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+    }
+    
+    .control-btn:hover {
+        background: rgba(255,255,255,0.2);
+    }
+    
+    .control-btn.play-pause {
+        font-size: 24px;
+        width: 44px;
+        height: 44px;
+    }
+    
+    /* 时间显示 */
+    .time-display {
+        color: #fff;
+        font-size: 13px;
+        font-family: monospace;
+        min-width: 100px;
+    }
+    
+    /* 音量控制 */
+    .volume-container {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .volume-slider {
+        width: 80px;
+        height: 4px;
+        -webkit-appearance: none;
+        appearance: none;
+        background: rgba(255,255,255,0.3);
+        border-radius: 2px;
+        cursor: pointer;
+    }
+    
+    .volume-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 12px;
+        height: 12px;
+        background: #fff;
+        border-radius: 50%;
+        cursor: pointer;
+    }
+    
+    .volume-slider::-moz-range-thumb {
+        width: 12px;
+        height: 12px;
+        background: #fff;
+        border-radius: 50%;
+        cursor: pointer;
+        border: none;
+    }
+    
+    /* 播放速度选择 */
+    .speed-selector {
+        position: relative;
+    }
+    
+    .speed-btn {
+        background: rgba(255,255,255,0.1);
+        border: none;
+        color: #fff;
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .speed-btn:hover {
+        background: rgba(255,255,255,0.2);
+    }
+    
+    .speed-menu {
+        position: absolute;
+        bottom: 100%;
+        right: 0;
+        background: rgba(0,0,0,0.9);
+        border-radius: 8px;
+        padding: 8px 0;
+        min-width: 80px;
+        display: none;
+        margin-bottom: 8px;
+    }
+    
+    .speed-menu.show {
+        display: block;
+    }
+    
+    .speed-option {
+        padding: 8px 16px;
+        color: #fff;
+        font-size: 13px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    
+    .speed-option:hover,
+    .speed-option.active {
+        background: #C20E0E;
+    }
+    
+    /* 加载状态 */
+    .video-loading {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: #fff;
+        font-size: 48px;
+        display: none;
+    }
+    
+    .video-loading.show {
+        display: block;
+    }
+    
+    /* 错误提示 */
+    .video-error {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        color: #fff;
+        display: none;
+        padding: 20px;
+    }
+    
+    .video-error.show {
+        display: block;
+    }
+    
+    .video-error i {
+        font-size: 48px;
+        color: #C20E0E;
+        margin-bottom: 15px;
+    }
+    
+    .video-error p {
+        margin: 0;
+        font-size: 16px;
+    }
+    
+    /* 视频标题 */
+    .video-title-bar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(rgba(0,0,0,0.7), transparent);
+        padding: 15px 20px;
+        color: #fff;
+        font-size: 16px;
+        font-weight: 500;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+    
+    .video-container:hover .video-title-bar {
+        opacity: 1;
+    }
+    
+    /* 响应式 */
+    @media (max-width: 768px) {
+        .video-controls {
+            padding: 15px 10px 10px;
+        }
+        
+        .control-btn {
+            font-size: 16px;
+            width: 32px;
+            height: 32px;
+        }
+        
+        .control-btn.play-pause {
+            font-size: 20px;
+            width: 40px;
+            height: 40px;
+        }
+        
+        .volume-slider {
+            width: 60px;
+        }
+        
+        .time-display {
+            font-size: 11px;
+            min-width: 80px;
+        }
+    }
+    
+    .file-info {
+        flex: 1;
+    }
+    
+    .file-title {
+        font-size: 16px;
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 5px;
+    }
+    
+    .file-meta {
+        font-size: 13px;
+        color: #999;
+    }
+    
+    .file-meta span {
+        margin-right: 15px;
+    }
+    
+    .file-actions {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .download-count {
+        font-size: 13px;
+        color: #999;
+    }
+    
+    .download-count i {
+        color: #C20E0E;
+        margin-right: 5px;
+    }
+    
+    .btn-download {
+        background: #C20E0E;
+        color: #fff;
+        padding: 8px 20px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 14px;
+        transition: all 0.3s;
+    }
+    
+    .btn-download:hover {
+        background: #a01010;
+        color: #fff;
+    }
+    
+    /* 空状态 */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #999;
+    }
+    
+    .empty-state i {
+        font-size: 64px;
+        margin-bottom: 20px;
+        color: #ddd;
+    }
+    
+    /* 响应式 */
+    @media (max-width: 768px) {
+        .main-layout {
+            grid-template-columns: 1fr;
+        }
+        
+        .sidebar {
+            display: none;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="resources-container">
+    <!-- 页面标题 -->
+    <div class="page-header d-flex justify-content-between align-items-start">
+        <div>
+            <h1 class="page-title">
+                <i class="bi bi-folder2-open me-2"></i>学习资源
+            </h1>
+            <p class="text-muted">课程资料下载中心</p>
+        </div>
+        {% if user.is_staff or user.is_superuser %}
+        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#uploadModal">
+            <i class="bi bi-cloud-upload me-2"></i>上传资料
+        </button>
+        {% endif %}
+    </div>
+    
+    <!-- 搜索栏 -->
+    <div class="search-bar">
+        <form method="get" class="row g-3">
+            <div class="col-md-8">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0">
+                        <i class="bi bi-search text-muted"></i>
+                    </span>
+                    <input type="text" name="search" class="form-control border-start-0" 
+                           placeholder="搜索资料名称..." value="{{ search_query }}">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-danger w-100">
+                    <i class="bi bi-search me-2"></i>搜索
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <!-- 视频播放器模块 -->
+    <div class="video-player-section">
+        <div class="video-container" id="videoContainer">
+            <!-- 视频标题 -->
+            <div class="video-title-bar">
+                <i class="bi bi-play-circle me-2"></i>课程视频演示
+            </div>
+            
+            <!-- 视频元素 -->
+            <video id="mainVideo" preload="metadata">
+                <source src="{% static 'video/test_demo.mp4' %}" type="video/mp4">
+                您的浏览器不支持视频播放，请升级浏览器或尝试其他浏览器。
+            </video>
+            
+            <!-- 加载动画 -->
+            <div class="video-loading" id="videoLoading">
+                <i class="bi bi-arrow-repeat spin"></i>
+            </div>
+            
+            <!-- 错误提示 -->
+            <div class="video-error" id="videoError">
+                <i class="bi bi-exclamation-triangle"></i>
+                <p>视频加载失败</p>
+                <p class="small text-muted mt-2">请检查网络连接或刷新页面重试</p>
+            </div>
+            
+            <!-- 自定义控制栏 -->
+            <div class="video-controls" id="videoControls">
+                <!-- 进度条 -->
+                <div class="progress-bar-container" id="progressContainer">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                
+                <!-- 控制按钮行 -->
+                <div class="controls-row">
+                    <div class="controls-left">
+                        <!-- 播放/暂停 -->
+                        <button class="control-btn play-pause" id="playPauseBtn">
+                            <i class="bi bi-play-fill"></i>
+                        </button>
+                        
+                        <!-- 时间显示 -->
+                        <span class="time-display" id="timeDisplay">00:00 / 00:00</span>
+                    </div>
+                    
+                    <div class="controls-right">
+                        <!-- 音量控制 -->
+                        <div class="volume-container">
+                            <button class="control-btn" id="muteBtn">
+                                <i class="bi bi-volume-up-fill"></i>
+                            </button>
+                            <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="100">
+                        </div>
+                        
+                        <!-- 播放速度 -->
+                        <div class="speed-selector">
+                            <button class="speed-btn" id="speedBtn">1.0x</button>
+                            <div class="speed-menu" id="speedMenu">
+                                <div class="speed-option" data-speed="0.5">0.5x</div>
+                                <div class="speed-option" data-speed="0.75">0.75x</div>
+                                <div class="speed-option active" data-speed="1.0">1.0x</div>
+                                <div class="speed-option" data-speed="1.25">1.25x</div>
+                                <div class="speed-option" data-speed="1.5">1.5x</div>
+                                <div class="speed-option" data-speed="2.0">2.0x</div>
+                            </div>
+                        </div>
+                        
+                        <!-- 全屏 -->
+                        <button class="control-btn" id="fullscreenBtn">
+                            <i class="bi bi-fullscreen"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 主布局 -->
+    <div class="main-layout">
+        <!-- 左侧导航 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="bi bi-book me-2"></i>课程目录
+            </div>
+            <ul class="course-list">
+                {% for course in courses %}
+                <li class="course-item">
+                    <a href="?course={{ course.code }}" 
+                       class="course-name {% if current_course == course.code %}active{% endif %}">
+                        {{ course.name }}
+                    </a>
+                    {% if current_course == course.code %}
+                    <ul class="chapter-list">
+                        <li>
+                            <a href="?course={{ course.code }}" 
+                               class="{% if not current_chapter %}active{% endif %}">
+                                全部章节
+                            </a>
+                        </li>
+                        {% for chapter in course.chapters.all %}
+                        <li>
+                            <a href="?course={{ course.code }}&chapter={{ chapter.code }}"
+                               class="{% if current_chapter == chapter.code %}active{% endif %}">
+                                {{ chapter.name }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        </aside>
+        
+        <!-- 右侧内容 -->
+        <main class="content-area">
+            <!-- 筛选栏 -->
+            <div class="filter-bar">
+                <div class="filter-tabs">
+                    <a href="?{% if current_course %}course={{ current_course }}&{% endif %}{% if current_chapter %}chapter={{ current_chapter }}&{% endif %}" 
+                       class="filter-tab {% if not request.GET.type %}active{% endif %}">全部</a>
+                    {% for type_code, type_name in file_types %}
+                    <a href="?{% if current_course %}course={{ current_course }}&{% endif %}{% if current_chapter %}chapter={{ current_chapter }}&{% endif %}type={{ type_code }}" 
+                       class="filter-tab {% if request.GET.type == type_code %}active{% endif %}">
+                        {{ type_name }}
+                    </a>
+                    {% endfor %}
+                </div>
+                <span class="text-muted small">共 {{ materials|length }} 个资料</span>
+            </div>
+            
+            <!-- 资料列表 -->
+            {% if materials %}
+            <div class="material-list">
+                {% for material in materials %}
+                <div class="material-item">
+                    <!-- 文件图标 -->
+                    <div class="file-icon {{ material.file_type }}">
+                        {% if material.file_type == 'ppt' %}
+                            <i class="bi bi-file-earmark-ppt"></i>
+                        {% elif material.file_type == 'pdf' %}
+                            <i class="bi bi-file-earmark-pdf"></i>
+                        {% elif material.file_type == 'video' %}
+                            <i class="bi bi-file-earmark-play"></i>
+                        {% elif material.file_type == 'code' %}
+                            <i class="bi bi-file-earmark-code"></i>
+                        {% elif material.file_type == 'data' %}
+                            <i class="bi bi-file-earmark-bar-graph"></i>
+                        {% else %}
+                            <i class="bi bi-file-earmark"></i>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- 文件信息 -->
+                    <div class="file-info">
+                        <div class="file-title">{{ material.title }}</div>
+                        <div class="file-meta">
+                            <span><i class="bi bi-book me-1"></i>{{ material.course.name }}</span>
+                            {% if material.chapter %}
+                            <span><i class="bi bi-list-ul me-1"></i>{{ material.chapter.name }}</span>
+                            {% endif %}
+                            <span><i class="bi bi-hdd me-1"></i>{{ material.get_file_size_display }}</span>
+                            <span><i class="bi bi-calendar me-1"></i>{{ material.upload_time|date:"Y-m-d" }}</span>
+                        </div>
+                        {% if material.description %}
+                        <div class="text-muted small mt-1">{{ material.description|truncatechars:100 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- 操作按钮 -->
+                    <div class="file-actions">
+                        <span class="download-count">
+                            <i class="bi bi-download"></i>{{ material.download_count }}
+                        </span>
+                        {% if user.is_authenticated %}
+                        <a href="{% url 'download_material' material.id %}" class="btn-download">
+                            <i class="bi bi-download me-1"></i>下载
+                        </a>
+                        {% else %}
+                        <a href="{% url 'users:login' %}?next={{ request.path }}" class="btn btn-outline-secondary btn-sm">
+                            登录下载
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <!-- 空状态 -->
+            <div class="empty-state">
+                <i class="bi bi-inbox"></i>
+                <h5>暂无资料</h5>
+                <p>该分类下还没有上传资料，请选择其他分类或稍后再来</p>
+            </div>
+            {% endif %}
+        </main>
+    </div>
+</div>
+
+<!-- 上传资料模态框 -->
+{% if user.is_staff or user.is_superuser %}
+<div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="uploadModalLabel">
+                    <i class="bi bi-cloud-upload me-2 text-danger"></i>上传新资料
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{% url 'upload_material' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">资料标题 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="title" name="title" required 
+                               placeholder="请输入资料标题">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">资料描述</label>
+                        <textarea class="form-control" id="description" name="description" rows="3" 
+                                  placeholder="请输入资料描述（可选）"></textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="course" class="form-label">所属课程 <span class="text-danger">*</span></label>
+                            <select class="form-select" id="course" name="course" required>
+                                <option value="">请选择课程</option>
+                                {% for course in courses %}
+                                <option value="{{ course.id }}">{{ course.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="chapter" class="form-label">所属章节</label>
+                            <select class="form-select" id="chapter" name="chapter">
+                                <option value="">请选择章节（可选）</option>
+                                {% for course in courses %}
+                                <optgroup label="{{ course.name }}">
+                                    {% for chapter in course.chapters.all %}
+                                    <option value="{{ chapter.id }}" data-course="{{ course.id }}">{{ chapter.name }}</option>
+                                    {% endfor %}
+                                </optgroup>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="file" class="form-label">选择文件 <span class="text-danger">*</span></label>
+                        <input type="file" class="form-control" id="file" name="file" required 
+                               accept=".ppt,.pptx,.pdf,.mp4,.avi,.mkv,.py,.m,.ipynb,.csv,.txt,.dat,.doc,.docx,.xls,.xlsx,.zip,.rar">
+                        <div class="form-text">
+                            支持格式：PPT、PDF、视频、代码文件、数据文件、文档、压缩包等
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">访问权限</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="is_public" name="is_public" checked>
+                                <label class="form-check-label" for="is_public">
+                                    公开访问
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">下载权限</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="require_login" name="require_login" checked>
+                                <label class="form-check-label" for="require_login">
+                                    需要登录下载
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-cloud-upload me-2"></i>确认上传
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// 章节选择联动
+document.getElementById('course').addEventListener('change', function() {
+    const courseId = this.value;
+    const chapterSelect = document.getElementById('chapter');
+    const options = chapterSelect.querySelectorAll('option[data-course]');
+    
+    options.forEach(option => {
+        if (option.getAttribute('data-course') === courseId) {
+            option.style.display = '';
+        } else {
+            option.style.display = 'none';
+        }
+    });
+    
+    // 重置选择
+    chapterSelect.value = '';
+});
+
+// 初始化时隐藏所有章节选项
+(function() {
+    const chapterSelect = document.getElementById('chapter');
+    const options = chapterSelect.querySelectorAll('option[data-course]');
+    options.forEach(option => option.style.display = 'none');
+})();
+
+// 视频播放器功能
+(function() {
+    const video = document.getElementById('mainVideo');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const progressBar = document.getElementById('progressBar');
+    const progressContainer = document.getElementById('progressContainer');
+    const timeDisplay = document.getElementById('timeDisplay');
+    const muteBtn = document.getElementById('muteBtn');
+    const volumeSlider = document.getElementById('volumeSlider');
+    const speedBtn = document.getElementById('speedBtn');
+    const speedMenu = document.getElementById('speedMenu');
+    const speedOptions = document.querySelectorAll('.speed-option');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const videoContainer = document.getElementById('videoContainer');
+    const videoControls = document.getElementById('videoControls');
+    const videoLoading = document.getElementById('videoLoading');
+    const videoError = document.getElementById('videoError');
+    
+    if (!video) return;
+    
+    // 格式化时间
+    function formatTime(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+    
+    // 更新进度条
+    function updateProgress() {
+        // 拖动时不更新，避免覆盖手动设置的进度
+        if (isDragging) return;
+
+        if (video.duration && isFinite(video.duration) && video.duration > 0) {
+            const progress = (video.currentTime / video.duration) * 100;
+            progressBar.style.width = progress + '%';
+            timeDisplay.textContent = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
+        }
+    }
+    
+    // 播放/暂停
+    function togglePlay() {
+        if (video.paused) {
+            video.play().catch(err => {
+                console.error('播放失败:', err);
+                showError();
+            });
+        } else {
+            video.pause();
+        }
+    }
+    
+    // 更新播放按钮图标
+    function updatePlayButton() {
+        const icon = playPauseBtn.querySelector('i');
+        if (video.paused) {
+            icon.className = 'bi bi-play-fill';
+        } else {
+            icon.className = 'bi bi-pause-fill';
+        }
+    }
+    
+    // 显示加载状态
+    function showLoading() {
+        videoLoading.classList.add('show');
+    }
+    
+    // 隐藏加载状态
+    function hideLoading() {
+        videoLoading.classList.remove('show');
+    }
+    
+    // 显示错误
+    function showError() {
+        hideLoading();
+        videoError.classList.add('show');
+    }
+    
+    // 隐藏错误
+    function hideError() {
+        videoError.classList.remove('show');
+    }
+    
+    // 事件监听
+    playPauseBtn.addEventListener('click', togglePlay);
+    
+    video.addEventListener('click', togglePlay);
+    
+    video.addEventListener('play', updatePlayButton);
+    video.addEventListener('pause', updatePlayButton);
+    video.addEventListener('timeupdate', updateProgress);
+    
+    video.addEventListener('waiting', showLoading);
+    video.addEventListener('playing', hideLoading);
+    video.addEventListener('canplay', hideLoading);
+    
+    video.addEventListener('error', function() {
+        console.error('视频加载错误');
+        showError();
+    });
+    
+    // ========== 进度条跳转（修复版）==========
+    let isDragging = false;
+
+    // 统一的跳转函数
+    function seekToPosition(clientX) {
+        const rect = progressContainer.getBoundingClientRect();
+        const pos = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+        // 用 isFinite 判断，避免 NaN 或 Infinity 导致无法跳转
+        if (video.duration && isFinite(video.duration)) {
+            video.currentTime = pos * video.duration;
+        }
+    }
+
+    // 1) 点击跳转（桌面端）
+    progressContainer.addEventListener('click', function(e) {
+        seekToPosition(e.clientX);
+    });
+
+    // 2) 鼠标拖动（桌面端）
+    progressContainer.addEventListener('mousedown', function(e) {
+        e.preventDefault();           // 阻止文本选择、拖动等默认行为
+        isDragging = true;
+        seekToPosition(e.clientX);
+    });
+
+    document.addEventListener('mousemove', function(e) {
+        if (isDragging) {
+            seekToPosition(e.clientX);
+        }
+    });
+
+    document.addEventListener('mouseup', function() {
+        isDragging = false;
+    });
+
+    // 3) 触摸支持（移动端 / 触摸屏）
+    progressContainer.addEventListener('touchstart', function(e) {
+        e.preventDefault();           // 阻止页面滚动等默认行为
+        isDragging = true;
+        seekToPosition(e.touches[0].clientX);
+    }, { passive: false });
+
+    progressContainer.addEventListener('touchmove', function(e) {
+        if (isDragging) {
+            e.preventDefault();       // 拖动进度条时禁止页面滚动
+            seekToPosition(e.touches[0].clientX);
+        }
+    }, { passive: false });
+
+    progressContainer.addEventListener('touchend', function() {
+        isDragging = false;
+    });
+
+    // 音量控制
+    muteBtn.addEventListener('click', function() {
+        video.muted = !video.muted;
+        const icon = muteBtn.querySelector('i');
+        if (video.muted) {
+            icon.className = 'bi bi-volume-mute-fill';
+            volumeSlider.value = 0;
+        } else {
+            icon.className = 'bi bi-volume-up-fill';
+            volumeSlider.value = video.volume * 100;
+        }
+    });
+    
+    volumeSlider.addEventListener('input', function() {
+        video.volume = this.value / 100;
+        video.muted = this.value == 0;
+        const icon = muteBtn.querySelector('i');
+        if (video.muted || this.value == 0) {
+            icon.className = 'bi bi-volume-mute-fill';
+        } else if (this.value < 50) {
+            icon.className = 'bi bi-volume-down-fill';
+        } else {
+            icon.className = 'bi bi-volume-up-fill';
+        }
+    });
+    
+    // 播放速度
+    speedBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        speedMenu.classList.toggle('show');
+    });
+    
+    speedOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            const speed = parseFloat(this.dataset.speed);
+            video.playbackRate = speed;
+            speedBtn.textContent = speed + 'x';
+            speedOptions.forEach(opt => opt.classList.remove('active'));
+            this.classList.add('active');
+            speedMenu.classList.remove('show');
+        });
+    });
+    
+    document.addEventListener('click', function() {
+        speedMenu.classList.remove('show');
+    });
+    
+    // 全屏
+    fullscreenBtn.addEventListener('click', function() {
+        if (!document.fullscreenElement) {
+            if (videoContainer.requestFullscreen) {
+                videoContainer.requestFullscreen();
+            } else if (videoContainer.webkitRequestFullscreen) {
+                videoContainer.webkitRequestFullscreen();
+            } else if (videoContainer.msRequestFullscreen) {
+                videoContainer.msRequestFullscreen();
+            }
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+        }
+    });
+    
+    // 全屏状态变化
+    document.addEventListener('fullscreenchange', function() {
+        const icon = fullscreenBtn.querySelector('i');
+        if (document.fullscreenElement) {
+            icon.className = 'bi bi-fullscreen-exit';
+            videoContainer.classList.add('fullscreen');
+        } else {
+            icon.className = 'bi bi-fullscreen';
+            videoContainer.classList.remove('fullscreen');
+        }
+    });
+    
+    // 键盘快捷键
+    document.addEventListener('keydown', function(e) {
+        // 只在视频区域聚焦时响应
+        if (document.activeElement === video || videoContainer.contains(document.activeElement)) {
+            switch(e.key) {
+                case ' ':
+                    e.preventDefault();
+                    togglePlay();
+                    break;
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    video.currentTime = Math.max(0, video.currentTime - 10);
+                    break;
+                case 'ArrowRight':
+                    e.preventDefault();
+                    video.currentTime = Math.min(video.duration, video.currentTime + 10);
+                    break;
+                case 'ArrowUp':
+                    e.preventDefault();
+                    video.volume = Math.min(1, video.volume + 0.1);
+                    volumeSlider.value = video.volume * 100;
+                    break;
+                case 'ArrowDown':
+                    e.preventDefault();
+                    video.volume = Math.max(0, video.volume - 0.1);
+                    volumeSlider.value = video.volume * 100;
+                    break;
+                case 'f':
+                case 'F':
+                    e.preventDefault();
+                    fullscreenBtn.click();
+                    break;
+                case 'm':
+                case 'M':
+                    e.preventDefault();
+                    muteBtn.click();
+                    break;
+            }
+        }
+    });
+    
+    // 初始化
+    video.volume = 1;
+    hideLoading();
+})();
+</script>
+{% endif %}
+
+<style>
+/* 加载动画旋转 */
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* 全屏模式样式 */
+.video-container.fullscreen {
+    padding-bottom: 0;
+    height: 100vh;
+}
+
+.video-container.fullscreen video {
+    object-fit: contain;
+}
+</style>
+{% endblock %}

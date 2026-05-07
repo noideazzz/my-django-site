@@ -1,0 +1,2387 @@
+{% extends "base.html" %}  <!-- 核心：继承公共导航栏模板 -->
+{% load static %}
+
+{% block title %}电磁场与微波技术精品课程-首页{% endblock %}  <!-- 自定义页面标题 -->
+
+{% block extra_css %}
+<style>
+    /* 图片覆盖层样式 */
+    .image-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url('{% static 'image/core-feature-bg.jfif' %}') center/cover no-repeat;
+        z-index: 99999;
+        opacity: 1;
+        transform: scale(1);
+        transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+        will-change: transform, opacity;
+        pointer-events: auto;
+    }
+    
+    .image-overlay::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.3);
+    }
+    
+    body:hover .image-overlay {
+        opacity: 0;
+        transform: scale(1.1);
+        pointer-events: none;
+    }
+    
+    /* 核心功能区样式 */
+    .core-feature-section {
+        position: relative;
+        overflow: hidden;
+        padding: 80px 0;
+        min-height: 600px;
+    }
+    
+    /* 背景图层 */
+    .parallax-bg {
+        position: absolute;
+        top: -50px;
+        left: -50px;
+        right: -50px;
+        bottom: -50px;
+        background-image: url("{% static 'image/core-feature-bg.jfif' %}");
+        background-size: cover;
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        opacity: 0;
+        transition: opacity 1s ease-out;
+        will-change: opacity;
+        z-index: -1;
+    }
+    
+    .parallax-bg.active {
+        opacity: 1;
+    }
+    
+    /* 通透遮罩 */
+    .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.3) 100%);
+        z-index: 0;
+        opacity: 0;
+        transition: opacity 1s ease-out;
+        will-change: opacity;
+    }
+    
+    .overlay.active {
+        opacity: 1;
+    }
+    
+    /* Hero 区域极简重设计 - 背景轮播 */
+    .hero-section-new {
+        height: 100vh;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #000;
+    }
+
+    /* 背景轮播容器 */
+    .hero-carousel {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+    }
+
+    .hero-carousel-item {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), transform 8s cubic-bezier(0.4, 0, 0.2, 1);
+        transform: scale(1);
+        will-change: opacity, transform;
+        pointer-events: none;
+    }
+
+    .hero-carousel-item.active {
+        opacity: 1;
+        transform: scale(1.05);
+        pointer-events: auto;
+    }
+
+    .hero-carousel-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        will-change: transform;
+    }
+
+    /* 轻量级遮罩 - 移除磨玻璃效果 */
+    .hero-overlay-gradient {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.05) 50%, rgba(0,0,0,0.2) 100%);
+        z-index: 1;
+    }
+
+    /* 轮播指示器 */
+    .carousel-indicators {
+        position: absolute;
+        bottom: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+        display: flex;
+        gap: 12px;
+    }
+
+    .carousel-indicator {
+        width: 40px;
+        height: 3px;
+        background: rgba(255,255,255,0.3);
+        border-radius: 2px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        will-change: background-color;
+    }
+
+    .carousel-indicator.active {
+        background: rgba(255,255,255,0.8);
+    }
+
+    .carousel-indicator .progress-bar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 0;
+        background: #fff;
+        will-change: width;
+    }
+
+    .carousel-indicator.active .progress-bar {
+        animation: indicatorProgress 5s linear forwards;
+    }
+
+    .carousel-indicator.reset .progress-bar {
+        animation: none;
+        width: 0;
+    }
+
+    @keyframes indicatorProgress {
+        from { width: 0; }
+        to { width: 100%; }
+    }
+
+    /* 滚动提示指示器 (类似华大官网) */
+    .scroll-down-indicator {
+        position: absolute;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+        color: #fff;
+        text-align: center;
+        animation: bounce 2s infinite;
+        cursor: pointer;
+        opacity: 0.8;
+    }
+
+    .scroll-down-indicator i {
+        font-size: 24px;
+        display: block;
+    }
+
+    .scroll-down-text {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-top: 5px;
+        display: block;
+    }
+
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% {transform: translateX(-50%) translateY(0);}
+        40% {transform: translateX(-50%) translateY(-10px);}
+        60% {transform: translateX(-50%) translateY(-5px);}
+    }
+
+    @media (max-width: 768px) {
+        /* 轮播响应式适配 */
+        .carousel-indicators {
+            bottom: 60px;
+            gap: 8px;
+        }
+        
+        .carousel-indicator {
+            width: 30px;
+            height: 2px;
+        }
+        
+        .hero-carousel-item img {
+            object-position: center center;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .carousel-indicators {
+            bottom: 50px;
+            gap: 6px;
+        }
+        
+        .carousel-indicator {
+            width: 24px;
+            height: 2px;
+        }
+    }
+    
+    /* 横屏模式适配 */
+    @media (max-height: 500px) and (orientation: landscape) {
+        .hero-section-new {
+            min-height: 100vh;
+        }
+        
+        .carousel-indicators {
+            bottom: 20px;
+        }
+    }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 50px;
+        position: relative;
+    }
+
+    .section-header h2 {
+        font-size: 32px;
+        font-weight: 800;
+        color: #ffffff;
+        letter-spacing: -0.5px;
+        margin-bottom: 12px;
+    }
+
+    .section-header .sub-title {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    .feature-section-item {
+        background: rgba(26, 26, 26, 0.75);
+        backdrop-filter: blur(25px);
+        -webkit-backdrop-filter: blur(25px);
+        border-radius: 16px;
+        padding: 30px 35px;
+        margin-bottom: 40px;
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: stretch;
+        gap: 35px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        opacity: 0;
+        transform: translateY(40px);
+        overflow: hidden;
+    }
+
+    .feature-section-item.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .feature-section-item:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+        border-color: rgba(211, 47, 47, 0.3);
+    }
+
+    .feature-image-side {
+        flex: 0 0 40%;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        aspect-ratio: 16 / 10;
+        background: #111;
+    }
+
+    .feature-image-side picture,
+    .feature-image-side img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s ease;
+        display: block;
+    }
+
+    .feature-section-item:hover .feature-image-side img {
+        transform: scale(1.05);
+    }
+
+    .feature-content-side {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .feature-tag {
+        font-size: 11px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: #cccccc;
+        font-weight: 700;
+        margin-bottom: 10px;
+        display: block;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
+
+    .feature-title {
+        font-size: 26px;
+        font-weight: 800;
+        color: #ffffff;
+        margin-bottom: 18px;
+        line-height: 1.2;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+    }
+
+    .feature-meta-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px 20px;
+        margin-bottom: 20px;
+    }
+
+    .meta-item {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .meta-label {
+        font-size: 10px;
+        color: #cccccc;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
+
+    .meta-value {
+        font-size: 14px;
+        font-weight: 700;
+        color: #ffffff;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
+
+    .feature-info-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .feature-rating-box {
+        flex: 0 0 80px;
+        height: 80px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.03);
+    }
+
+    .rating-num {
+        font-size: 24px;
+        font-weight: 800;
+        color: #ff6b35;
+    }
+
+    .rating-label {
+        font-size: 10px;
+        color: rgba(255, 255, 255, 0.4);
+        text-transform: uppercase;
+    }
+
+    .feature-desc-wrap {
+        flex: 1;
+        position: relative;
+        padding-left: 25px;
+    }
+
+    .feature-desc-wrap::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 10px;
+        width: 16px;
+        height: 1.5px;
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .feature-desc {
+        font-size: 14px;
+        line-height: 1.7;
+        color: #cccccc;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
+
+    .feature-action-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #d32f2f;
+        color: #fff;
+        padding: 12px 28px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        width: fit-content;
+        box-shadow: 0 4px 15px rgba(211, 47, 47, 0.2);
+    }
+
+    .feature-action-btn:hover {
+        background: #b71c1c;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(211, 47, 47, 0.3);
+        color: #fff;
+    }
+
+    @media (max-width: 992px) {
+        .feature-section-item {
+            flex-direction: column;
+            padding: 25px;
+            gap: 25px;
+        }
+        .feature-image-side {
+            flex: 0 0 250px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .feature-meta-grid {
+            grid-template-columns: 1fr;
+        }
+        .feature-info-row {
+            flex-direction: column;
+            gap: 20px;
+        }
+        .feature-rating-box {
+            width: 100px;
+            height: 60px;
+            flex-direction: row;
+            gap: 10px;
+            flex: 0 0 60px;
+        }
+        .feature-desc-wrap {
+            padding-left: 0;
+        }
+        .feature-desc-wrap::before {
+            display: none;
+        }
+    }
+    
+    /* 入场动画序列 */
+    .feature-card.main-card {
+        transform: translateX(-40px);
+        transition: all 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    
+    .feature-card.main-card.visible {
+        transform: translateX(0);
+    }
+    
+    .feature-card.secondary-card {
+        transition: all 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    
+    .feature-card:nth-child(2) {
+        transition-delay: 100ms;
+    }
+    
+    .feature-card:nth-child(3) {
+        transition-delay: 200ms;
+    }
+    
+    .feature-card:nth-child(4) {
+        transition-delay: 300ms;
+    }
+    
+    .feature-card:nth-child(5) {
+        transition-delay: 400ms;
+    }
+    
+    .feature-card.cta-card {
+        transform: translateY(30px);
+        transition: all 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
+        transition-delay: 500ms;
+    }
+    
+    .feature-card.cta-card.visible {
+        transform: translateY(0);
+    }
+    
+    /* 鼠标悬停效果 */
+    .feature-card {
+        cursor: pointer;
+    }
+    
+    /* 响应式适配 */
+    @media (max-width: 1440px) {
+        .core-features-grid {
+            max-width: 1000px;
+        }
+    }
+    
+    @media (max-width: 1200px) {
+        .core-features-grid {
+            max-width: 900px;
+            grid-template-rows: 180px 180px 140px;
+        }
+        
+        .main-card .card-content {
+            padding: 24px;
+        }
+        
+        .main-card .card-title {
+            font-size: 28px;
+        }
+        
+        .secondary-card .card-link {
+            padding: 20px;
+        }
+    }
+    
+    /* 响应式适配 */
+    @media (max-width: 768px) {
+        .parallax-bg {
+            background-attachment: scroll;
+            background-position: center;
+        }
+    }
+    
+    /* 减少动画偏好 */
+    @media (prefers-reduced-motion: reduce) {
+        .parallax-bg,
+        .overlay,
+        .feature-card {
+            transition: none;
+        }
+    }
+    
+    /* 视差滚动效果 */
+    #heroCarousel {
+        transition: transform 0.1s ease-out;
+    }
+    
+    .features-section .container {
+        position: relative;
+        z-index: 1;
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    
+    .features-section.visible .container {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    .features-section .feature-grid {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.8s ease 0.3s, transform 0.8s ease 0.3s;
+    }
+    
+    .features-section.visible .feature-grid {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    .features-section .section-title {
+        opacity: 1;
+        transform: translateY(0);
+        transition: opacity 0.8s ease, transform 0.8s ease, color 0.8s ease;
+    }
+    
+    /* 响应式适配 */
+    @media (max-width: 768px) {
+        .features-section::before {
+            background-attachment: scroll;
+            background-position: center;
+        }
+    }
+    
+    /* 减少动画偏好 */
+    @media (prefers-reduced-motion: reduce) {
+        .features-section::before,
+        .features-section::after {
+            transition: none;
+        }
+    }
+    
+    .section-title {
+        font-size: 32px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 60px;
+        padding-bottom: 15px;
+        border-bottom: 3px solid #C20E0E;
+        display: inline-block;
+    }
+    
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 30px;
+    }
+    
+    .feature-card {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 12px;
+        padding: 40px 30px;
+        text-align: center;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(194, 14, 14, 0.3);
+        cursor: pointer;
+        display: block;
+        text-decoration: none;
+        color: #333;
+        backdrop-filter: blur(10px);
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 30px rgba(194, 14, 14, 0.3);
+        border-color: #C20E0E;
+        background: rgba(255, 255, 255, 0.95);
+    }
+    
+    .feature-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(194, 14, 14, 0.1);
+        border-radius: 50%;
+    }
+    
+    .feature-icon i {
+        font-size: 40px;
+        color: #C20E0E;
+    }
+    
+    .feature-title {
+        font-size: 22px;
+        font-weight: 600;
+        color: #ffffff;
+        margin-bottom: 15px;
+    }
+    
+    .feature-desc {
+        font-size: 14px;
+        color: #cccccc;
+        line-height: 1.8;
+    }
+    
+    /* 专题聚焦区域 */
+    .extended-features {
+        padding: 80px 0;
+        background: url('{% static 'image/extended-feature-bg.jfif' %}') center/cover no-repeat fixed;
+        color: #333;
+    }
+    
+    .extended-features .container {
+        max-width: 1200px;
+    }
+    
+    .extended-features h2 {
+        font-size: 28px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 15px;
+    }
+
+    .section-subtitle {
+        font-size: 14px;
+        color: rgba(0, 0, 0, 0.5);
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        margin-bottom: 40px;
+    }
+    
+    .topic-carousel {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .topic-slider {
+        display: flex;
+        gap: 20px;
+        transition: transform 0.5s ease;
+    }
+    
+    .topic-card {
+        flex: 0 0 calc(25% - 15px);
+        min-width: 250px;
+        height: 180px;
+        border-radius: 12px;
+        overflow: hidden;
+        position: relative;
+        text-decoration: none;
+        display: block;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+    
+    .topic-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+    }
+    
+    .topic-card-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-size: cover;
+        background-position: center;
+        transition: transform 0.5s ease;
+    }
+    
+    .topic-card:hover .topic-card-bg {
+        transform: scale(1.1);
+    }
+    
+    .topic-card-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.6) 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.3s ease;
+    }
+    
+    .topic-card:hover .topic-card-overlay {
+        background: linear-gradient(to bottom, rgba(194, 14, 14, 0.3) 0%, rgba(0,0,0,0.7) 100%);
+    }
+    
+    .topic-card-title {
+        color: #fff;
+        font-size: 20px;
+        font-weight: 600;
+        text-align: center;
+        padding: 20px;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        z-index: 2;
+        position: relative;
+    }
+    
+    /* 轮播箭头 - 基础样式 */
+    .carousel-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 56px;
+        height: 56px;
+        background: rgba(255, 255, 255, 0.95);
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: #333;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 10;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    }
+    
+    .carousel-arrow:hover {
+        background: #fff;
+        transform: translateY(-50%) scale(1.15);
+        box-shadow: 0 8px 30px rgba(194, 14, 14, 0.35);
+        color: #C20E0E;
+    }
+    
+    .carousel-arrow:active {
+        transform: translateY(-50%) scale(1.05);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    .carousel-arrow.prev {
+        left: 0;
+    }
+    
+    .carousel-arrow.next {
+        right: 0;
+    }
+    
+    /* 响应式 */
+    @media (max-width: 1200px) {
+        .topic-card {
+            flex: 0 0 calc(33.333% - 14px);
+        }
+    }
+    
+    @media (max-width: 992px) {
+        .topic-card {
+            flex: 0 0 calc(50% - 10px);
+        }
+        .carousel-arrow {
+            display: none;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .topic-card {
+            flex: 0 0 100%;
+            min-width: 280px;
+        }
+        .topic-slider {
+            gap: 15px;
+        }
+    }
+    
+    /* ====== 核心功能网格布局样式 ====== */
+    .core-features-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .core-features-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+    }
+
+    /* 第二行居中显示（3个卡片） */
+    .core-features-row:last-child {
+        justify-content: center;
+    }
+
+    .core-feature-card {
+        height: 280px;
+        border-radius: 16px;
+        overflow: hidden;
+        position: relative;
+        text-decoration: none;
+        display: block;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        cursor: pointer;
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    /* 卡片入场动画 */
+    .core-feature-card.fade-in {
+        animation: cardFadeIn 0.6s ease forwards;
+    }
+
+    .core-feature-card.fade-in:nth-child(1) { animation-delay: 0.1s; }
+    .core-feature-card.fade-in:nth-child(2) { animation-delay: 0.2s; }
+    .core-feature-card.fade-in:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes cardFadeIn {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .core-feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 16px 40px rgba(194, 14, 14, 0.25);
+    }
+    
+    .core-feature-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-size: cover;
+        background-position: center;
+        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .core-feature-card:hover .core-feature-bg {
+        transform: scale(1.1);
+    }
+    
+    .core-feature-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.7) 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-end;
+        padding: 30px 20px;
+        transition: background 0.3s ease;
+    }
+    
+    .core-feature-card:hover .core-feature-overlay {
+        background: linear-gradient(to bottom, rgba(194, 14, 14, 0.2) 0%, rgba(0,0,0,0.8) 100%);
+    }
+    
+    .core-feature-icon {
+        width: 70px;
+        height: 70px;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .core-feature-card:hover .core-feature-icon {
+        background: rgba(194, 14, 14, 0.9);
+        transform: scale(1.1);
+        border-color: rgba(255, 255, 255, 0.5);
+    }
+    
+    .core-feature-icon i {
+        font-size: 32px;
+        color: #fff;
+    }
+    
+    .core-feature-title {
+        color: #fff;
+        font-size: 22px;
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 12px;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+    
+    .core-feature-desc {
+        color: rgba(255, 255, 255, 0.85);
+        font-size: 14px;
+        text-align: center;
+        line-height: 1.6;
+        margin-bottom: 20px;
+        text-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
+    }
+    
+    .core-feature-btn {
+        display: inline-block;
+        padding: 10px 24px;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        border-radius: 25px;
+        color: #fff;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .core-feature-card:hover .core-feature-btn {
+        background: #C20E0E;
+        border-color: #C20E0E;
+        transform: scale(1.05);
+    }
+    
+    /* 核心功能网格响应式 */
+    @media (max-width: 1200px) {
+        .core-features-grid {
+            padding: 0 40px;
+        }
+        .core-feature-card {
+            height: 260px;
+        }
+    }
+
+    @media (max-width: 992px) {
+        .core-features-row {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        .core-feature-card {
+            height: 240px;
+        }
+        .core-feature-title {
+            font-size: 20px;
+        }
+        .core-feature-desc {
+            font-size: 13px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .core-features-grid {
+            padding: 0 16px;
+            gap: 16px;
+        }
+        .core-features-row {
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+        .core-feature-card {
+            height: 220px;
+        }
+        .core-feature-icon {
+            width: 56px;
+            height: 56px;
+        }
+        .core-feature-icon i {
+            font-size: 26px;
+        }
+        .core-feature-title {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+        .core-feature-desc {
+            font-size: 12px;
+            margin-bottom: 16px;
+        }
+        .core-feature-btn {
+            padding: 8px 20px;
+            font-size: 13px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .core-feature-card {
+            height: 200px;
+        }
+        .core-feature-overlay {
+            padding: 20px 16px;
+        }
+    }
+    
+    /* 底部信息区域 */
+    .footer-info {
+        padding: 40px 0 30px;
+        background: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.45)), url('{% static 'image/background4.jfif' %}') center top / 100% auto no-repeat;
+        background-attachment: fixed;
+        color: #fff;
+        position: relative;
+        min-height: auto;
+    }
+
+    .footer-info .container {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .footer-info .container {
+        max-width: 1200px;
+    }
+    
+    .footer-content {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 30px;
+        align-items: start;
+    }
+
+    .footer-section {
+        min-width: 0;
+    }
+
+    .footer-section h3 {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: #fff;
+        border-bottom: 2px solid #C20E0E;
+        padding-bottom: 8px;
+        display: inline-block;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    .footer-section p {
+        line-height: 1.6;
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.9);
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        margin-bottom: 6px;
+    }
+
+    .footer-section ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    .footer-section ul li {
+        margin-bottom: 6px;
+    }
+
+    .footer-section ul li a {
+        color: rgba(255, 255, 255, 0.95);
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-size: 13px;
+        padding: 3px 0;
+        display: inline-block;
+        position: relative;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+    
+    .footer-section ul li a:hover {
+        color: #C20E0E;
+        transform: translateX(5px);
+    }
+    
+    .footer-section ul li a:hover::before {
+        content: '→';
+        position: absolute;
+        left: -15px;
+        color: #C20E0E;
+    }
+    
+    .footer-bottom {
+        margin-top: 25px;
+        padding-top: 15px;
+        border-top: 1px solid rgba(255,255,255,0.1);
+        text-align: center;
+        font-size: 12px;
+        color: rgba(255,255,255,0.7);
+    }
+    
+    /* 图片预留区域 */
+    .image-reserve {
+        width: 100%;
+        height: 250px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 20px 0;
+        color: #fff;
+        border: 2px dashed rgba(255, 255, 255, 0.3);
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .image-reserve:hover {
+        background: rgba(194, 14, 14, 0.2);
+        border-color: #C20E0E;
+    }
+    
+    /* 响应式适配 */
+    @media (max-width: 992px) {
+        .feature-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .footer-content {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        
+        .footer-info {
+            background-attachment: scroll;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .section-title {
+            font-size: 28px;
+        }
+
+        .extended-features h2 {
+            font-size: 24px;
+        }
+
+        .footer-content {
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+        
+        .footer-info {
+            padding: 30px 0 25px;
+            background-attachment: scroll;
+            background-size: cover;
+        }
+        
+        .footer-section {
+            text-align: center;
+        }
+
+        .footer-section h3 {
+            display: inline-block;
+        }
+
+        .footer-section ul li a:hover {
+            transform: translateX(0);
+        }
+
+        .footer-section ul li a:hover::before {
+            display: none;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .feature-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .extended-link-item {
+            flex: 100%;
+        }
+        
+        .footer-info {
+            padding: 30px 0 25px;
+        }
+        
+        .footer-bottom {
+            margin-top: 20px;
+        }
+    }
+    
+    /* 滚动动画 */
+    .fade-in {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    
+    .fade-in.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    /* 点击触发动画 */
+    .click-trigger {
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .click-trigger:hover {
+        transform: scale(1.05);
+    }
+    
+    /* 页面过渡动画 */
+    .page-transition {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #C20E0E;
+        z-index: 9999;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+    
+    .page-transition.active {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    /* 平滑滚动 */
+    html {
+        scroll-behavior: smooth;
+    }
+</style>
+{% endblock %}
+
+{% block content %}  <!-- 首页独有的内容都放在content块里 -->
+<!-- 图片覆盖层 -->
+<div class="image-overlay"></div>
+
+<!-- 页面过渡动画 -->
+<div class="page-transition" id="pageTransition"></div>
+
+<!-- ====== 极简 Hero 区域开始 - 背景轮播 ====== -->
+<section class="hero-section-new">
+    <!-- 背景轮播 -->
+    <div class="hero-carousel" id="heroCarousel">
+        <div class="hero-carousel-item active">
+            <img src="{% static 'image/background.jfif' %}" alt="Campus View 1">
+        </div>
+        <div class="hero-carousel-item">
+            <img src="{% static 'image/background2.jfif' %}" alt="Campus View 2">
+        </div>
+        <div class="hero-carousel-item">
+            <img src="{% static 'image/background3.jfif' %}" alt="Campus View 3">
+        </div>
+    </div>
+    
+    <!-- 轻量级渐变遮罩 -->
+    <div class="hero-overlay-gradient"></div>
+
+    <!-- 轮播指示器 -->
+    <div class="carousel-indicators">
+        <div class="carousel-indicator active" data-index="0"><div class="progress-bar"></div></div>
+        <div class="carousel-indicator" data-index="1"><div class="progress-bar"></div></div>
+        <div class="carousel-indicator" data-index="2"><div class="progress-bar"></div></div>
+    </div>
+
+    <!-- 滚动提示 (HQU Style) -->
+    <a href="{% url 'knowledge' %}" class="scroll-down-indicator click-trigger text-decoration-none">
+        <i class="bi bi-chevron-down"></i>
+        <span class="scroll-down-text">探索课程</span>
+    </a>
+</section>
+<!-- ====== 极简 Hero 区域结束 ====== -->
+
+<!-- ====== 功能模块区域开始 ====== -->
+<section class="features-section core-feature-section" id="features" style="margin-top: -100px; padding-top: 120px; padding-bottom: 40px; position: relative; overflow: hidden;">
+    <!-- 背景图层 -->
+    <div class="parallax-bg"></div>
+    <!-- 通透遮罩 -->
+    <div class="overlay"></div>
+    
+    <!-- SVG 渐变定义 -->
+    <svg style="width:0;height:0;position:absolute;" aria-hidden="true" focusable="false">
+        <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ff6b35" />
+            <stop offset="100%" stop-color="#d32f2f" />
+        </linearGradient>
+    </svg>
+
+    <div class="container">
+        <div class="section-header fade-in">
+            <span class="sub-title">What we offer</span>
+            <h2>核心功能</h2>
+        </div>
+        
+        <!-- 核心功能网格布局 -->
+        <div class="core-features-grid">
+            <!-- 第一行 -->
+            <div class="core-features-row">
+                <!-- 1. 教材与讲义 -->
+                <a href="{% url 'knowledge' %}" class="core-feature-card fade-in">
+                    <div class="core-feature-bg" style="background-image: url('https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&q=80&w=800');"></div>
+                    <div class="core-feature-overlay">
+                        <div class="core-feature-icon">
+                            <i class="bi bi-book"></i>
+                        </div>
+                        <h3 class="core-feature-title">课程知识</h3>
+                        <p class="core-feature-desc">选用国家级规划教材，配套自编精品讲义，提供参考例题</p>
+                        <span class="core-feature-btn">开始学习</span>
+                    </div>
+                </a>
+
+                <!-- 2. 习题与案例 -->
+                <a href="{% url 'exercises_cases' %}" class="core-feature-card fade-in">
+                    <div class="core-feature-bg" style="background-image: url('https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&q=80&w=800');"></div>
+                    <div class="core-feature-overlay">
+                        <div class="core-feature-icon">
+                            <i class="bi bi-pencil-square"></i>
+                        </div>
+                        <h3 class="core-feature-title">习题练习</h3>
+                        <p class="core-feature-desc">精选高频考题，支持分题型、分难度刷题</p>
+                        <span class="core-feature-btn">开始练习</span>
+                    </div>
+                </a>
+
+                <!-- 3. 学习资源 -->
+                <a href="{% url 'learning_resources' %}" class="core-feature-card fade-in">
+                    <div class="core-feature-bg" style="background-image: url('https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80&w=800');"></div>
+                    <div class="core-feature-overlay">
+                        <div class="core-feature-icon">
+                            <i class="bi bi-collection-play"></i>
+                        </div>
+                        <h3 class="core-feature-title">学习资源</h3>
+                        <p class="core-feature-desc">整合课程讲义、视频精讲、拓展阅读等资料</p>
+                        <span class="core-feature-btn">进入中心</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- 第二行 -->
+            <div class="core-features-row">
+                <!-- 4. 错题本 -->
+                <a href="{% url 'error_notebook' %}" class="core-feature-card fade-in">
+                    <div class="core-feature-bg" style="background-image: url('https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&q=80&w=800');"></div>
+                    <div class="core-feature-overlay">
+                        <div class="core-feature-icon">
+                            <i class="bi bi-journal-x"></i>
+                        </div>
+                        <h3 class="core-feature-title">错题中心</h3>
+                        <p class="core-feature-desc">自动收录错题，重温错题，提升学习效率</p>
+                        <span class="core-feature-btn">查看错题</span>
+                    </div>
+                </a>
+
+                <!-- 5. 仿真平台 -->
+                <a href="{% url 'simulation_platform' %}" class="core-feature-card fade-in">
+                    <div class="core-feature-bg" style="background-image: url('https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&q=80&w=800');"></div>
+                    <div class="core-feature-overlay">
+                        <div class="core-feature-icon">
+                            <i class="bi bi-cpu"></i>
+                        </div>
+                        <h3 class="core-feature-title">仿真平台</h3>
+                        <p class="core-feature-desc">详细了解虚拟仿真实验软件，深化学习成果</p>
+                        <span class="core-feature-btn">了解详情</span>
+                    </div>
+                </a>
+
+                <!-- 6. 学习社区 -->
+                <a href="{% url 'community' %}" class="core-feature-card fade-in">
+                    <div class="core-feature-bg" style="background-image: url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=800');"></div>
+                    <div class="core-feature-overlay">
+                        <div class="core-feature-icon">
+                            <i class="bi bi-chat-dots"></i>
+                        </div>
+                        <h3 class="core-feature-title">学习社区</h3>
+                        <p class="core-feature-desc">提供答疑服务，师生互动，共同进步</p>
+                        <span class="core-feature-btn">进入社区</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- ====== 功能模块区域结束 ====== -->
+
+<!-- ====== 即时日历组件开始 ====== -->
+<section class="calendar-section" style="padding: 50px 0; background-image: url('{% static 'image/index-calender-picture.jfif' %}'); background-size: cover; background-position: center; background-repeat: no-repeat; position: relative; overflow: hidden;">
+    <!-- 背景暗色遮罩，增强文字可读性同时保留背景图像 -->
+    <div style="position: absolute; inset: 0; background: rgba(0, 0, 0, 0.25); z-index: 0;"></div>
+    <div class="container" style="position: relative; z-index: 1; max-width: 960px;">
+        <div class="calendar-container" style="display: flex; flex-wrap: wrap; gap: 20px; align-items: stretch; justify-content: center;">
+            <!-- 左侧：日历组件 -->
+            <div class="calendar-wrapper" style="flex: 1 1 380px; max-width: 460px; background: rgba(255, 255, 255, 0.9); border-radius: 14px; padding: 20px 22px; border: 1px solid rgba(255, 255, 255, 0.5); box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);">
+                <div class="calendar-header" style="text-align: center; margin-bottom: 14px;">
+                    <h3 id="calendar-month-year" style="color: #333333; font-size: 20px; font-weight: 600; margin: 0; letter-spacing: 1px;"></h3>
+                </div>
+                <div class="calendar-weekdays" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 8px;">
+                    <div style="color: rgba(0, 0, 0, 0.5); font-size: 12px; font-weight: 500; text-align: center; padding: 6px 0;">日</div>
+                    <div style="color: rgba(0, 0, 0, 0.5); font-size: 12px; font-weight: 500; text-align: center; padding: 6px 0;">一</div>
+                    <div style="color: rgba(0, 0, 0, 0.5); font-size: 12px; font-weight: 500; text-align: center; padding: 6px 0;">二</div>
+                    <div style="color: rgba(0, 0, 0, 0.5); font-size: 12px; font-weight: 500; text-align: center; padding: 6px 0;">三</div>
+                    <div style="color: rgba(0, 0, 0, 0.5); font-size: 12px; font-weight: 500; text-align: center; padding: 6px 0;">四</div>
+                    <div style="color: rgba(0, 0, 0, 0.5); font-size: 12px; font-weight: 500; text-align: center; padding: 6px 0;">五</div>
+                    <div style="color: rgba(0, 0, 0, 0.5); font-size: 12px; font-weight: 500; text-align: center; padding: 6px 0;">六</div>
+                </div>
+                <div id="calendar-days" class="calendar-days" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;">
+                    <!-- 日期将通过JavaScript动态生成 -->
+                </div>
+
+                <!-- 规划你的时间链接 -->
+                <div class="calendar-link-wrapper" style="margin-top: 16px; text-align: center;">
+                    <a href="/calendar/" class="calendar-plan-link" style="display: inline-flex; align-items: center; gap: 6px; color: #C20E0E; text-decoration: none; font-size: 13px; font-weight: 500; padding: 10px 22px; border: 1px solid rgba(194, 14, 14, 0.5); border-radius: 25px; background: rgba(194, 14, 14, 0.08); transition: all 0.3s ease; position: relative; overflow: hidden;">
+                        <i class="bi bi-calendar-plus" style="font-size: 15px;"></i>
+                        <span>规划你的时间</span>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- 右侧：学习成果模块 -->
+            <div class="learning-results-wrapper" style="flex: 1 1 340px; max-width: 420px; background: rgba(255, 255, 255, 0.9); border-radius: 14px; padding: 20px 22px; border: 1px solid rgba(255, 255, 255, 0.5); box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15); display: flex; flex-direction: column;">
+                <!-- 标题区域 -->
+                <div class="learning-results-header" style="text-align: center; margin-bottom: 16px;">
+                    <h3 style="color: #333333; font-size: 20px; font-weight: 600; margin: 0; letter-spacing: 1px;">学习成果</h3>
+                    <p style="color: rgba(0, 0, 0, 0.45); font-size: 11px; margin: 6px 0 0 0; text-transform: uppercase; letter-spacing: 2px;">LEARNING RESULTS</p>
+                </div>
+
+                <!-- 数据展示区域 -->
+                <div class="learning-results-content" style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                    <!-- 已完成课程 -->
+                    <div class="result-item" style="background: rgba(0, 0, 0, 0.03); border-radius: 10px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; border: 1px solid rgba(0, 0, 0, 0.06);">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="width: 7px; height: 7px; background: #4CAF50; border-radius: 50%;"></span>
+                            <span style="color: rgba(0, 0, 0, 0.8); font-size: 14px;">已完成课程</span>
+                        </div>
+                        <div style="display: flex; align-items: baseline; gap: 3px;">
+                            <span class="result-number" id="completed-courses" data-target="{{ user_stats.completed_courses|default:0 }}" style="color: #333333; font-size: 26px; font-weight: 700;">0</span>
+                            <span style="color: rgba(0, 0, 0, 0.5); font-size: 12px;">个</span>
+                        </div>
+                    </div>
+
+                    <!-- 已完成习题 -->
+                    <div class="result-item" style="background: rgba(0, 0, 0, 0.03); border-radius: 10px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; border: 1px solid rgba(0, 0, 0, 0.06);">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="width: 7px; height: 7px; background: #2196F3; border-radius: 50%;"></span>
+                            <span style="color: rgba(0, 0, 0, 0.8); font-size: 14px;">已完成习题</span>
+                        </div>
+                        <div style="display: flex; align-items: baseline; gap: 3px;">
+                            <span class="result-number" id="completed-exercises" data-target="{{ user_stats.completed_exercises|default:0 }}" style="color: #333333; font-size: 26px; font-weight: 700;">0</span>
+                            <span style="color: rgba(0, 0, 0, 0.5); font-size: 12px;">道</span>
+                        </div>
+                    </div>
+
+                    <!-- 学习总时长 -->
+                    <div class="result-item" style="background: rgba(0, 0, 0, 0.03); border-radius: 10px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; border: 1px solid rgba(0, 0, 0, 0.06);">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="width: 7px; height: 7px; background: #FF5722; border-radius: 50%;"></span>
+                            <span style="color: rgba(0, 0, 0, 0.8); font-size: 14px;">学习总时长</span>
+                        </div>
+                        <div style="display: flex; align-items: baseline; gap: 3px;">
+                            <span class="result-number" id="study-hours" data-target="{{ user_stats.study_hours|default:0 }}" style="color: #333333; font-size: 26px; font-weight: 700;">0</span>
+                            <span style="color: rgba(0, 0, 0, 0.5); font-size: 12px;">小时</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 进入详情页面按钮 -->
+                <div class="learning-results-footer" style="margin-top: 16px;">
+                    <a href="{% url 'learning_progress' %}" class="learning-progress-link" style="display: flex; align-items: center; justify-content: center; gap: 8px; color: #000000; text-decoration: none; font-size: 13px; font-weight: 600; padding: 14px 20px; border-radius: 8px; background: #ffffff; transition: all 0.3s ease; position: relative; overflow: hidden;">
+                        <span>进入详情页面</span>
+                        <i class="bi bi-arrow-right" style="font-size: 15px;"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 日历区域动态效果CSS -->
+<style>
+    .calendar-plan-link:hover {
+        background: rgba(194, 14, 14, 0.25) !important;
+        border-color: rgba(194, 14, 14, 0.8) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(194, 14, 14, 0.3);
+    }
+    
+    .calendar-plan-link::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        transition: left 0.5s ease;
+    }
+    
+    .calendar-plan-link:hover::before {
+        left: 100%;
+    }
+    
+    /* 学习成果模块样式 */
+    .learning-progress-link:hover {
+        background: #f0f0f0 !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .learning-progress-link:hover i {
+        transform: translateX(4px);
+    }
+    
+    .learning-progress-link i {
+        transition: transform 0.3s ease;
+    }
+    
+    .result-item {
+        transition: all 0.3s ease;
+    }
+    
+    .result-item:hover {
+        background: rgba(255, 255, 255, 0.08) !important;
+        border-color: rgba(255, 255, 255, 0.15) !important;
+    }
+    
+    @media (max-width: 992px) {
+        .calendar-container {
+            flex-direction: column !important;
+            align-items: center !important;
+            gap: 20px;
+        }
+        
+        .calendar-wrapper,
+        .learning-results-wrapper {
+            flex: 0 1 auto !important;
+            max-width: 460px !important;
+            width: 90%;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .calendar-section {
+            padding: 40px 0 !important;
+        }
+        
+        .calendar-wrapper,
+        .learning-results-wrapper {
+            margin: 0 15px;
+            padding: 16px 18px !important;
+            max-width: 400px !important;
+        }
+        
+        .calendar-plan-link {
+            font-size: 12px !important;
+            padding: 8px 16px !important;
+        }
+        
+        .learning-results-header h3 {
+            font-size: 18px !important;
+        }
+        
+        .result-number {
+            font-size: 22px !important;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .calendar-wrapper,
+        .learning-results-wrapper {
+            padding: 14px !important;
+            border-radius: 12px !important;
+        }
+        
+        .calendar-weekdays div {
+            font-size: 11px !important;
+            padding: 4px 0 !important;
+        }
+        
+        .result-item {
+            padding: 12px 14px !important;
+        }
+    }
+</style>
+<!-- ====== 即时日历组件结束 ====== -->
+
+<!-- ====== 专题聚焦区域开始 ====== -->
+<section class="extended-features">
+    <div class="container">
+        <h2 class="fade-in">专题聚焦</h2>
+        <p class="section-subtitle fade-in">Highlights</p>
+        <div class="topic-carousel">
+            <button class="carousel-arrow prev" id="topicPrev">
+                <i class="bi bi-chevron-left"></i>
+            </button>
+            <div class="topic-slider" id="topicSlider">
+                <a href="https://hdjt.hqu.edu.cn/" target="_blank" class="topic-card fade-in">
+                    <div class="topic-card-bg" style="background-image: url('{% static 'image/topic-hdjt.jpg' %}');"></div>
+                    <!-- <div class="topic-card-overlay">
+                        <h3 class="topic-card-title">华大讲堂</h3>
+                    </div> -->
+                </a>
+                <a href="https://culture.hqu.edu.cn/" target="_blank" class="topic-card fade-in">
+                    <div class="topic-card-bg" style="background-image: url('{% static 'image/topic-culture.jpg' %}');"></div>
+                    <!-- <div class="topic-card-overlay">
+                        <h3 class="topic-card-title">文化网</h3>
+                    </div> -->
+                </a>
+                <a href="https://wmb.hqu.edu.cn/" target="_blank" class="topic-card fade-in">
+                    <div class="topic-card-bg" style="background-image: url('{% static 'image/topic-wmb.jpg' %}');"></div>
+                    <!-- <div class="topic-card-overlay">
+                        <h3 class="topic-card-title">文明网</h3>
+                    </div> -->
+                </a>
+                <a href="https://jsgzb.hqu.edu.cn/" target="_blank" class="topic-card fade-in">
+                    <div class="topic-card-bg" style="background-image: url('{% static 'image/topic-jsgz.jpg' %}');"></div>
+                    <!-- <div class="topic-card-overlay">
+                        <h3 class="topic-card-title">师德师风网</h3>
+                    </div> -->
+                </a>
+                <a href="https://aq.hqu.edu.cn/" target="_blank" class="topic-card fade-in">
+                    <div class="topic-card-bg" style="background-image: url('{% static 'image/topic-wlaqzt.jpg' %}');"></div>
+                    <!-- <div class="topic-card-overlay">
+                        <h3 class="topic-card-title">网络安全专题</h3>
+                    </div> -->
+                </a>
+            </div>
+            <button class="carousel-arrow next" id="topicNext">
+                <i class="bi bi-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+</section>
+<!-- ====== 专题聚焦区域结束 ====== -->
+
+
+
+<!-- ====== 底部信息区域开始 ====== -->
+<section class="footer-info">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section fade-in">
+                <h3>联系我们</h3>
+                <p>厦门校区地址：福建省厦门市集美区集美大道668号</p>
+                <p>邮编：361021</p>
+                <p>电话：0595-22692211</p>
+                <p>邮箱：contact@hqu.edu.cn</p>
+            </div>
+            <div class="footer-section fade-in">
+                <h3>友情链接</h3>
+                <ul>
+                    <li><a href="https://www.zytzb.gov.cn/" target="_blank" class="click-trigger">中共中央统战部</a></li>
+                    <li><a href="http://www.gqb.gov.cn/" target="_blank" class="click-trigger">国务院侨务办公室</a></li>
+                    <li><a href="http://www.moe.gov.cn/" target="_blank" class="click-trigger">中华人民共和国教育部</a></li>
+                    <li><a href="https://www.fujian.gov.cn/" target="_blank" class="click-trigger">福建省人民政府</a></li>
+                    <li><a href="https://www.quanzhou.gov.cn/" target="_blank" class="click-trigger">泉州市人民政府</a></li>
+                    <li><a href="https://www.xm.gov.cn/" target="_blank" class="click-trigger">厦门市人民政府</a></li>
+                </ul>
+            </div>
+            <div class="footer-section fade-in">
+                <h3>相关资源</h3>
+                <ul>
+                    <li><a href="https://ieeexplore.ieee.org/Xplore/home.jsp" target="_blank" class="click-trigger">IEEE Xplore</a></li>
+                    <li><a href="https://www.sciencedirect.com/" target="_blank" class="click-trigger">ScienceDirect</a></li>
+                    <li><a href="https://www.sigport.org/" target="_blank" class="click-trigger">SIGPORT</a></li>
+                    <li><a href="https://www.antenna-theory.com/" target="_blank" class="click-trigger">Antenna Theory</a></li>
+                    <li><a href="https://www.microwaves101.com/" target="_blank" class="click-trigger">Microwaves101</a></li>
+                    <li><a href="https://www.edaboard.com/" target="_blank" class="click-trigger">EDAboard</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom fade-in">
+            <p style="text-align: center; margin: 0;">会通中外 并育德才 | 华侨大学</p>
+        </div>
+    </div>
+</section>
+<!-- ====== 底部信息区域结束 ====== -->
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // 页面加载完成后执行
+    document.addEventListener('DOMContentLoaded', function() {
+        const pageTransitionFix = document.getElementById('pageTransition');
+        if (pageTransitionFix) {
+            pageTransitionFix.classList.remove('active');
+            pageTransitionFix.style.opacity = '0';
+            pageTransitionFix.style.visibility = 'hidden';
+        }
+        window.addEventListener('pageshow', function() {
+            const pt = document.getElementById('pageTransition');
+            if (pt) {
+                pt.classList.remove('active');
+                pt.style.opacity = '0';
+                pt.style.visibility = 'hidden';
+            }
+        });
+        // 滚动动画效果
+        const fadeElements = document.querySelectorAll('.fade-in');
+        const featuresSection = document.querySelector('.features-section');
+        
+        // 日历功能 - 动态生成当前月份日历
+        function initCalendar() {
+            const calendarDays = document.getElementById('calendar-days');
+            const calendarMonthYear = document.getElementById('calendar-month-year');
+
+            if (!calendarDays || !calendarMonthYear) return;
+
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            const currentMonth = now.getMonth();
+            const currentDate = now.getDate();
+
+            const monthNames = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
+            calendarMonthYear.textContent = `${currentYear}年 ${monthNames[currentMonth]}`;
+
+            // 获取当月第一天和最后一天
+            const firstDay = new Date(currentYear, currentMonth, 1);
+            const lastDay = new Date(currentYear, currentMonth + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            const startingDay = firstDay.getDay(); // 0 = 周日
+
+            // 获取上个月的最后几天
+            const prevMonthLastDay = new Date(currentYear, currentMonth, 0).getDate();
+
+            let html = '';
+
+            // 上个月的日期（灰色显示）
+            for (let i = startingDay - 1; i >= 0; i--) {
+                const day = prevMonthLastDay - i;
+                html += `<div style="color: rgba(0, 0, 0, 0.25); font-size: 13px; text-align: center; padding: 8px 4px; border-radius: 8px;">${day}</div>`;
+            }
+
+            // 当月的日期
+            for (let day = 1; day <= daysInMonth; day++) {
+                const isToday = day === currentDate;
+                const baseStyle = "font-size: 13px; text-align: center; padding: 8px 4px; border-radius: 8px; transition: all 0.3s ease; cursor: pointer;";
+
+                if (isToday) {
+                    // 今天 - 红色描边高亮
+                    html += `<div style="color: #C20E0E; ${baseStyle} border: 2px solid #C20E0E; background: rgba(194, 14, 14, 0.1); font-weight: 600;" class="calendar-day today">${day}</div>`;
+                } else {
+                    // 其他日期 - 默认样式
+                    html += `<div style="color: rgba(0, 0, 0, 0.85); ${baseStyle}" class="calendar-day" onmouseenter="this.style.background='rgba(0,0,0,0.05)'" onmouseleave="this.style.background='transparent'">${day}</div>`;
+                }
+            }
+
+            // 下个月的日期（灰色显示）
+            const remainingCells = 42 - (startingDay + daysInMonth); // 6行 x 7列 = 42格
+            for (let day = 1; day <= remainingCells; day++) {
+                html += `<div style="color: rgba(0, 0, 0, 0.25); font-size: 13px; text-align: center; padding: 8px 4px; border-radius: 8px;">${day}</div>`;
+            }
+
+            calendarDays.innerHTML = html;
+        }
+        
+        // 初始化日历
+        initCalendar();
+        
+        // 学习成果数字动画
+        function animateNumbers() {
+            const numbers = document.querySelectorAll('.result-number');
+            numbers.forEach(num => {
+                const target = parseInt(num.getAttribute('data-target')) || 0;
+                const duration = 2000; // 2秒
+                const step = target / (duration / 16); // 60fps
+                let current = 0;
+                
+                const timer = setInterval(() => {
+                    current += step;
+                    if (current >= target) {
+                        num.textContent = target;
+                        clearInterval(timer);
+                    } else {
+                        num.textContent = Math.floor(current);
+                    }
+                }, 16);
+            });
+        }
+        
+        // 从API获取用户学习统计数据
+        async function fetchUserStats() {
+            try {
+                const response = await fetch('/api/user-stats/');
+                const data = await response.json();
+                
+                if (data.success) {
+                    // 更新DOM中的数据
+                    const completedCourses = document.getElementById('completed-courses');
+                    const completedExercises = document.getElementById('completed-exercises');
+                    const studyHours = document.getElementById('study-hours');
+                    
+                    if (completedCourses) {
+                        completedCourses.setAttribute('data-target', data.data.completed_courses);
+                    }
+                    if (completedExercises) {
+                        completedExercises.setAttribute('data-target', data.data.completed_exercises);
+                    }
+                    if (studyHours) {
+                        studyHours.setAttribute('data-target', data.data.study_hours);
+                    }
+                    
+                    return data.data;
+                }
+            } catch (error) {
+                console.error('获取用户统计数据失败:', error);
+            }
+            return null;
+        }
+        
+        // 当学习成果模块进入视口时触发数字动画
+        const learningResultsWrapper = document.querySelector('.learning-results-wrapper');
+        if (learningResultsWrapper) {
+            const observer = new IntersectionObserver(async (entries) => {
+                entries.forEach(async entry => {
+                    if (entry.isIntersecting) {
+                        // 先尝试从API获取最新数据
+                        await fetchUserStats();
+                        // 然后播放动画
+                        animateNumbers();
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.5 });
+            
+            observer.observe(learningResultsWrapper);
+        }
+        
+        const heroCarousel = document.getElementById('heroCarousel');
+        
+        function checkFade() {
+            fadeElements.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                const elementBottom = element.getBoundingClientRect().bottom;
+                
+                if (elementTop < window.innerHeight - 100 && elementBottom > 0) {
+                    element.classList.add('visible');
+                }
+            });
+            
+            // 检查核心功能区
+            if (featuresSection) {
+                const sectionTop = featuresSection.getBoundingClientRect().top;
+                if (sectionTop < window.innerHeight - 150) {
+                    featuresSection.classList.add('visible');
+                    
+                    // 触发背景动画
+                    const parallaxBg = featuresSection.querySelector('.parallax-bg');
+                    const overlay = featuresSection.querySelector('.overlay');
+                    const featureItems = featuresSection.querySelectorAll('.feature-section-item');
+                    
+                    if (parallaxBg) {
+                        parallaxBg.classList.add('active');
+                    }
+                    
+                    if (overlay) {
+                        overlay.classList.add('active');
+                    }
+                    
+                    if (featureItems.length > 0) {
+                        featureItems.forEach(item => {
+                            item.classList.add('visible');
+                        });
+                    }
+                }
+            }
+            
+            // 视差滚动效果
+            if (heroCarousel) {
+                const scrollY = window.scrollY;
+                heroCarousel.style.transform = `translateY(${scrollY * 0.5}px)`;
+            }
+            
+            // 核心功能区背景显示控制
+            if (featuresSection) {
+                const parallaxBg = featuresSection.querySelector('.parallax-bg');
+                if (parallaxBg) {
+                    const scrollY = window.scrollY;
+                    const sectionTop = featuresSection.offsetTop;
+                    const sectionHeight = featuresSection.offsetHeight;
+                    
+                    // 计算滚动进度
+                    const scrollProgress = (scrollY - sectionTop + window.innerHeight) / (sectionHeight + window.innerHeight);
+                    
+                    // 限制滚动进度在0-1之间
+                    const clampedProgress = Math.max(0, Math.min(1, scrollProgress));
+                    
+                    // 背景图透明度随滚动位置变化
+                    parallaxBg.style.opacity = clampedProgress;
+                }
+            }
+        }
+        
+        // 初始检查
+        checkFade();
+        
+        // 滚动时检查
+        window.addEventListener('scroll', checkFade);
+        
+        // 使用Intersection Observer监听核心功能区域
+        if (featuresSection) {
+            // 调试：手动添加background-visible类，测试背景图片是否显示
+            featuresSection.classList.add('background-visible');
+            
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.6 // 当区域顶部进入视口60%时触发
+            };
+            
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        // 触发背景动画
+                        featuresSection.classList.add('background-visible');
+                        // 只触发一次
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+            
+            observer.observe(featuresSection);
+        }
+        
+        // 点击触发动画
+        const clickTriggers = document.querySelectorAll('.click-trigger');
+        const pageTransition = document.getElementById('pageTransition');
+        
+        clickTriggers.forEach(trigger => {
+            trigger.addEventListener('click', function(e) {
+                // 阻止默认行为
+                e.preventDefault();
+                
+                // 获取目标链接
+                const target = this.getAttribute('href');
+                
+                // 激活过渡动画
+                pageTransition.classList.add('active');
+                
+                // 动画结束后跳转到目标位置
+                setTimeout(() => {
+                    if (target === '#') {
+                        // 如果是#，则不跳转
+                        pageTransition.classList.remove('active');
+                    } else if (target.startsWith('#')) {
+                        // 如果是锚点，平滑滚动到目标位置
+                        document.querySelector(target).scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                        
+                        // 移除过渡动画
+                        setTimeout(() => {
+                            pageTransition.classList.remove('active');
+                        }, 500);
+                    } else {
+                        // 如果是外部链接，直接跳转
+                        window.location.href = target;
+                    }
+                }, 500);
+            });
+        });
+        
+        // ====== Hero 背景轮播功能 - 优化版 ======
+        (function() {
+            'use strict';
+            
+            let heroCarouselInstance = null;
+            let rafId = null;
+            
+            function initHeroCarousel() {
+                const carousel = document.getElementById('heroCarousel');
+                if (!carousel) return;
+                
+                // 如果已经初始化，先清理
+                if (heroCarouselInstance) {
+                    heroCarouselInstance.destroy();
+                }
+                
+                const items = carousel.querySelectorAll('.hero-carousel-item');
+                const indicators = document.querySelectorAll('.carousel-indicator');
+                
+                if (items.length === 0 || indicators.length === 0) return;
+                
+                const totalSlides = items.length;
+                let currentIndex = 0;
+                let lastTime = 0;
+                let elapsed = 0;
+                let isAutoPlayStarted = false;
+                const slideDuration = 5000; // 5秒切换间隔
+                
+                // 预加载所有图片
+                function preloadImages() {
+                    const images = carousel.querySelectorAll('img');
+                    images.forEach(img => {
+                        if (!img.complete) {
+                            const preloadImg = new Image();
+                            preloadImg.src = img.src;
+                        }
+                    });
+                }
+                preloadImages();
+                
+                // 切换到指定幻灯片
+                function goToSlide(index) {
+                    if (index === currentIndex) return;
+                    
+                    // 使用 requestAnimationFrame 确保流畅的过渡
+                    requestAnimationFrame(() => {
+                        // 移除当前活动状态
+                        items[currentIndex].classList.remove('active');
+                        indicators[currentIndex].classList.remove('active');
+                        
+                        // 重置当前指示器的进度条动画
+                        indicators[currentIndex].classList.add('reset');
+                        void indicators[currentIndex].offsetWidth; // 触发重排
+                        indicators[currentIndex].classList.remove('reset');
+                        
+                        // 更新索引
+                        currentIndex = index;
+                        
+                        // 添加新的活动状态
+                        items[currentIndex].classList.add('active');
+                        indicators[currentIndex].classList.add('active');
+                    });
+                }
+                
+                // 下一张幻灯片
+                function nextSlide() {
+                    const nextIndex = (currentIndex + 1) % totalSlides;
+                    goToSlide(nextIndex);
+                }
+                
+                // 动画循环 - 使用 requestAnimationFrame 替代 setInterval
+                function animationLoop(currentTime) {
+                    if (!lastTime) lastTime = currentTime;
+                    const deltaTime = currentTime - lastTime;
+                    lastTime = currentTime;
+                    
+                    elapsed += deltaTime;
+                    
+                    if (elapsed >= slideDuration) {
+                        nextSlide();
+                        elapsed = 0;
+                    }
+                    
+                    rafId = requestAnimationFrame(animationLoop);
+                }
+                
+                // 启动自动播放
+                function startAutoPlay() {
+                    if (isAutoPlayStarted) return;
+                    
+                    elapsed = 0;
+                    lastTime = 0;
+                    
+                    if (!rafId) {
+                        rafId = requestAnimationFrame(animationLoop);
+                    }
+                    
+                    isAutoPlayStarted = true;
+                }
+                
+                // 停止自动播放
+                function stopAutoPlay() {
+                    if (rafId) {
+                        cancelAnimationFrame(rafId);
+                        rafId = null;
+                        lastTime = 0;
+                    }
+                }
+                
+                // 重置自动播放
+                function resetAutoPlay() {
+                    elapsed = 0;
+                    lastTime = 0;
+                }
+                
+                // 清理函数
+                function destroy() {
+                    stopAutoPlay();
+                    indicators.forEach(indicator => {
+                        indicator.removeEventListener('click', handleIndicatorClick);
+                    });
+                }
+                
+                // 指示器点击事件处理
+                function handleIndicatorClick(e) {
+                    const index = parseInt(this.dataset.index);
+                    if (!isNaN(index) && index !== currentIndex) {
+                        goToSlide(index);
+                        resetAutoPlay();
+                    }
+                }
+                
+                // 绑定事件
+                indicators.forEach(indicator => {
+                    indicator.addEventListener('click', handleIndicatorClick);
+                });
+                
+                // 启动自动播放
+                startAutoPlay();
+                
+                // 返回实例供外部使用
+                heroCarouselInstance = {
+                    destroy: destroy,
+                    goToSlide: goToSlide,
+                    nextSlide: nextSlide,
+                    startAutoPlay: startAutoPlay,
+                    stopAutoPlay: stopAutoPlay
+                };
+            }
+            
+            // 立即初始化
+            initHeroCarousel();
+            
+            // 页面显示时重新初始化（处理从其他页面返回的情况）
+            window.addEventListener('pageshow', function(event) {
+                if (event.persisted) {
+                    setTimeout(initHeroCarousel, 100);
+                }
+            });
+            
+            // 窗口大小调整时保持稳定
+            let resizeTimeout;
+            window.addEventListener('resize', function() {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(function() {
+                    // 重置布局相关计算
+                    if (heroCarouselInstance) {
+                        heroCarouselInstance.resetAutoPlay && heroCarouselInstance.resetAutoPlay();
+                    }
+                }, 250);
+            });
+        })();
+        // ====== Hero 背景轮播功能结束 ======
+    });
+
+    // ====== 专题聚焦轮播功能 ======
+    (function() {
+        const slider = document.getElementById('topicSlider');
+        const prevBtn = document.getElementById('topicPrev');
+        const nextBtn = document.getElementById('topicNext');
+        
+        if (!slider) return;
+        
+        let currentIndex = 0;
+        const cards = slider.querySelectorAll('.topic-card');
+        const totalCards = cards.length;
+        
+        function getVisibleCards() {
+            if (window.innerWidth <= 576) return 1;
+            if (window.innerWidth <= 992) return 2;
+            if (window.innerWidth <= 1200) return 3;
+            return 4;
+        }
+        
+        function updateSlider() {
+            const visibleCards = getVisibleCards();
+            const cardWidth = cards[0].offsetWidth + 20; // 包含gap
+            const maxIndex = Math.max(0, totalCards - visibleCards);
+            
+            currentIndex = Math.min(currentIndex, maxIndex);
+            const offset = -currentIndex * cardWidth;
+            slider.style.transform = `translateX(${offset}px)`;
+            
+            // 更新按钮状态
+            if (prevBtn) {
+                prevBtn.style.opacity = currentIndex === 0 ? '0.5' : '1';
+                prevBtn.style.pointerEvents = currentIndex === 0 ? 'none' : 'auto';
+            }
+            if (nextBtn) {
+                nextBtn.style.opacity = currentIndex >= maxIndex ? '0.5' : '1';
+                nextBtn.style.pointerEvents = currentIndex >= maxIndex ? 'none' : 'auto';
+            }
+        }
+        
+        if (prevBtn) {
+            prevBtn.addEventListener('click', function() {
+                if (currentIndex > 0) {
+                    currentIndex--;
+                    updateSlider();
+                }
+            });
+        }
+        
+        if (nextBtn) {
+            nextBtn.addEventListener('click', function() {
+                const visibleCards = getVisibleCards();
+                const maxIndex = Math.max(0, totalCards - visibleCards);
+                if (currentIndex < maxIndex) {
+                    currentIndex++;
+                    updateSlider();
+                }
+            });
+        }
+        
+        // 窗口大小改变时重新计算
+        window.addEventListener('resize', updateSlider);
+        
+        // 初始化
+        setTimeout(updateSlider, 100);
+    })();
+    // ====== 专题聚焦轮播功能结束 ======
+
+    // ====== 核心功能轮播功能 ======
+    (function() {
+        const slider = document.getElementById('featuresSlider');
+        const prevBtn = document.getElementById('featuresPrev');
+        const nextBtn = document.getElementById('featuresNext');
+        
+        if (!slider) return;
+        
+        let currentIndex = 0;
+        const cards = slider.querySelectorAll('.core-feature-card');
+        const totalCards = cards.length;
+        
+        function getVisibleCards() {
+            if (window.innerWidth <= 768) return 1;
+            if (window.innerWidth <= 1100) return 2;
+            if (window.innerWidth <= 1400) return 3;
+            return 4;
+        }
+        
+        function updateSlider(animate = true) {
+            const visibleCards = getVisibleCards();
+            const cardWidth = cards[0].offsetWidth + 24; // 包含gap
+            const maxIndex = Math.max(0, totalCards - visibleCards);
+            
+            // 确保索引在有效范围内
+            currentIndex = Math.max(0, Math.min(currentIndex, maxIndex));
+            
+            const offset = -currentIndex * cardWidth;
+            slider.style.transition = animate ? 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)' : 'none';
+            slider.style.transform = `translateX(${offset}px)`;
+        }
+        
+        // 循环切换 - 上一组
+        function prevSlide() {
+            const visibleCards = getVisibleCards();
+            const maxIndex = Math.max(0, totalCards - visibleCards);
+            
+            if (currentIndex > 0) {
+                currentIndex--;
+            } else {
+                // 循环到最后
+                currentIndex = maxIndex;
+            }
+            updateSlider();
+        }
+        
+        // 循环切换 - 下一组
+        function nextSlide() {
+            const visibleCards = getVisibleCards();
+            const maxIndex = Math.max(0, totalCards - visibleCards);
+            
+            if (currentIndex < maxIndex) {
+                currentIndex++;
+            } else {
+                // 循环到开头
+                currentIndex = 0;
+            }
+            updateSlider();
+        }
+        
+        if (prevBtn) {
+            prevBtn.addEventListener('click', function() {
+                prevSlide();
+            });
+        }
+        
+        if (nextBtn) {
+            nextBtn.addEventListener('click', function() {
+                nextSlide();
+            });
+        }
+        
+        // 窗口大小改变时重新计算
+        let resizeTimeout;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(function() {
+                updateSlider(false);
+            }, 100);
+        });
+        
+        // 初始化
+        setTimeout(function() {
+            updateSlider(false);
+        }, 100);
+    })();
+    // ====== 核心功能轮播功能结束 ======
+
+</script>
+{% endblock %}

@@ -1,0 +1,451 @@
+<!-- templates/base.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}电磁场与微波技术精品课程{% endblock %}</title>
+    <!-- 公共样式：复用首页的引入 -->
+    <link rel="stylesheet" href="{% static 'bootstrap5/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css ">
+    <style>
+        /* 全局统一衬线字体强制声明 */
+        :root {
+            --font-serif: "Georgia", "Times New Roman", "Times", "Songti SC", "STSong", "华文宋体", "宋体", serif;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            font-family: var(--font-serif) !important;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* 强制覆盖所有可能具有独立字体声明的元素 */
+        h1, h2, h3, h4, h5, h6, 
+        p, span, a, div, li, 
+        button, input, select, textarea, 
+        .nav-link, .dropdown-item, .btn {
+            font-family: var(--font-serif) !important;
+        }
+
+        /* 导航栏样式统一设计规范 - 2024 V2 */
+        .site-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 10000;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 20px 0 !important;
+        }
+
+        /* 首页模式：完全透明并辅以顶部渐变遮罩以增强文字可读性 */
+        .header-home {
+            background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 100%) !important;
+            border-bottom: none !important;
+        }
+
+        /* 内页模式：始终华大红实色且有阴影 */
+        .header-internal {
+            background-color: #C20E0E !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 10px 0 !important;
+        }
+
+        /* 首页滚动状态：引入毛玻璃质感（Glassmorphism） */
+        .header-home.scrolled {
+            padding: 12px 0 !important;
+            background: rgba(0, 0, 0, 0.2) !important;
+            backdrop-filter: blur(15px) saturate(150%);
+            -webkit-backdrop-filter: blur(15px) saturate(150%);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-link {
+            color: #fff !important;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        /* 首页透明状态下的文字对比度增强（符合 WCAG 2.1 AA） */
+        .header-home .nav-link {
+            text-shadow: 0 1px 8px rgba(0,0,0,0.4), 0 0 20px rgba(0,0,0,0.2);
+        }
+
+        /* 内页不需要文字阴影 */
+        .header-internal .nav-link {
+            text-shadow: none;
+        }
+
+        .nav-link:hover {
+            opacity: 0.8;
+            transform: translateY(-1px);
+        }
+
+        .hover-opacity-100:hover {
+            opacity: 1 !important;
+        }
+
+        /* 下拉菜单暗色适配 */
+        .dropdown-menu {
+            background-color: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .dropdown-item {
+            color: rgba(255,255,255,0.8);
+            transition: all 0.2s;
+        }
+
+        .dropdown-item:hover {
+            background-color: rgba(211, 47, 47, 0.2);
+            color: #fff;
+        }
+
+        .dropdown-divider {
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* 导航栏下拉菜单样式 - 白底黑字 */
+        .navbar-nav .dropdown-menu {
+            background-color: #FFFFFF;
+            border: 1px solid #E0E0E0;
+            border-radius: 0;
+            padding: 0;
+            margin-top: 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(0);
+            transition: all 0.2s ease;
+            display: block;
+            min-width: 160px;
+        }
+
+        /* 分离式下拉菜单容器 */
+        .navbar-nav .nav-item.dropdown > div.d-flex {
+            display: flex;
+            align-items: center;
+        }
+
+        /* 下拉箭头按钮样式 - 隐藏箭头 */
+        .navbar-nav .dropdown-toggle-split {
+            display: none;
+        }
+
+        /* 鼠标悬停整个dropdown区域时显示下拉菜单 */
+        .navbar-nav .nav-item.dropdown:hover > .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* 鼠标悬停时显示下拉菜单 */
+        .navbar-nav .nav-item.dropdown:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* 下拉菜单项样式 - 白底黑字 */
+        .navbar-nav .dropdown-item {
+            padding: 12px 20px;
+            font-size: 14px;
+            color: #000000;
+            display: block;
+            transition: all 0.2s ease;
+            border-left: none;
+            text-decoration: none;
+        }
+
+        /* 隐藏下拉菜单项中的所有图标 */
+        .navbar-nav .dropdown-item i,
+        .navbar-nav .dropdown-item .bi {
+            display: none !important;
+        }
+
+        .navbar-nav .dropdown-item:hover {
+            background-color: #F5F5F5;
+            color: #000000;
+            padding-left: 20px;
+        }
+
+        /* 下拉菜单分隔线 */
+        .navbar-nav .dropdown-divider {
+            border-top: 1px solid #E0E0E0;
+            margin: 0;
+        }
+
+        /* 下拉箭头样式 - 隐藏 */
+        .navbar-nav .dropdown-toggle::after {
+            display: none;
+        }
+
+        /* 首页透明状态下的下拉菜单 - 同样白底黑字 */
+        .header-home .navbar-nav .dropdown-menu {
+            background-color: #FFFFFF;
+        }
+
+        /* 移动端下拉菜单适配 */
+        @media (max-width: 991px) {
+            .navbar-nav .dropdown-menu {
+                opacity: 1;
+                visibility: visible;
+                transform: none;
+                display: none;
+                background-color: #FFFFFF;
+                border: 1px solid #E0E0E0;
+                box-shadow: none;
+                margin-top: 0;
+                padding-left: 0;
+            }
+
+            .navbar-nav .dropdown-menu.show {
+                display: block;
+            }
+
+            .navbar-nav .nav-item.dropdown:hover > .dropdown-menu {
+                opacity: 1;
+                visibility: visible;
+                transform: none;
+            }
+
+            .navbar-nav .nav-item.dropdown:hover .dropdown-menu {
+                opacity: 1;
+                visibility: visible;
+                transform: none;
+            }
+
+            .navbar-nav .dropdown-item {
+                padding: 12px 20px;
+                border-left: none;
+                color: #000000;
+            }
+
+            .navbar-nav .dropdown-item:hover {
+                padding-left: 20px;
+                border-left: none;
+                background-color: #F5F5F5;
+                color: #000000;
+            }
+
+            /* 移动端分离式菜单适配 */
+            .navbar-nav .dropdown-toggle-split {
+                display: none;
+            }
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 15px;
+            right: 15px;
+            height: 2px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .bg-hqu-red {
+            background-color: #C20E0E !important;
+        }
+
+        /* 头像悬停效果 */
+        .user-avatar-link:hover img {
+            transform: scale(1.1);
+            transition: transform 0.2s;
+        }
+
+        /* 导航栏品牌区域样式 */
+        .navbar-brand-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-decoration: none !important;
+        }
+
+        .navbar-brand-text {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .navbar-brand-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.3;
+            letter-spacing: 1px;
+            text-shadow: 0 1px 8px rgba(0,0,0,0.4), 0 0 20px rgba(0,0,0,0.2);
+        }
+
+        .navbar-brand-subtitle {
+            font-size: 0.75rem;
+            font-weight: 400;
+            color: rgba(255,255,255,0.85);
+            line-height: 1.4;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+        }
+
+        .header-internal .navbar-brand-title,
+        .header-internal .navbar-brand-subtitle {
+            text-shadow: none;
+        }
+
+        @media (max-width: 991px) {
+            .navbar-brand-title {
+                font-size: 1.1rem;
+            }
+            .navbar-brand-subtitle {
+                font-size: 0.65rem;
+                letter-spacing: 1px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .navbar-brand-title {
+                font-size: 0.95rem;
+            }
+            .navbar-brand-subtitle {
+                font-size: 0.6rem;
+                letter-spacing: 0.5px;
+            }
+            .navbar-brand-wrapper img {
+                height: 40px !important;
+            }
+        }
+        /* 子页面自定义样式块 */
+        {% block extra_css %}{% endblock %}
+    </style>
+</head>
+<body>
+<!-- 公共导航栏：完全透明悬浮样式 -->
+<header class="site-header {% if request.resolver_match.url_name == 'index' %}header-home{% else %}header-internal{% endif %}">
+    <nav class="navbar navbar-expand-lg navbar-dark p-0">
+        <div class="container">
+            <!-- Logo + 品牌文字 -->
+            <a href="{% url 'index' %}" class="navbar-brand-wrapper">
+                <img src="{% static 'image/logo1.png' %}" alt="华侨大学" height="50" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">
+                <div class="navbar-brand-text">
+                    <span class="navbar-brand-title">电磁场与微波技术</span>
+                    <span class="navbar-brand-subtitle">交互学习平台</span>
+                </div>
+            </a>
+
+            <!-- 移动端切换按钮 -->
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- 导航菜单 -->
+            <div class="collapse navbar-collapse" id="mainNavbar">
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a href="{% url 'index' %}" class="nav-link px-3 {% if request.resolver_match.url_name == 'index' %}active{% endif %}">首页</a>
+                    </li>
+                    <!-- 课程介绍下拉菜单 -->
+                    <li class="nav-item dropdown">
+                        <a href="{% url 'course_intro' %}" class="nav-link px-3 {% if request.resolver_match.url_name == 'course_intro' %}active{% endif %}">课程介绍</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'course_intro' %}#electromagnetic-field">电磁场与电磁波</a></li>
+                            <li><a class="dropdown-item" href="{% url 'course_intro' %}#microwave-technology">微波工程</a></li>
+                            <li><a class="dropdown-item" href="{% url 'course_intro' %}#teachers">师资队伍</a></li>
+                            <li><a class="dropdown-item" href="{% url 'course_intro' %}#objectives">教学目标</a></li>
+                        </ul>
+                    </li>
+                    <!-- 教学资源下拉菜单 -->
+                    <li class="nav-item dropdown">
+                        <a href="{% url 'teaching_resources' %}" class="nav-link px-3 {% if request.resolver_match.url_name == 'teaching_resources' %}active{% endif %}">教学资源</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'knowledge' %}">课程知识</a></li>
+                            <li><a class="dropdown-item" href="{% url 'simulation_platform' %}">仿真平台</a></li>
+                            <li><a class="dropdown-item" href="{% url 'exercises_cases' %}">习题练习</a></li>
+                            <li><a class="dropdown-item" href="{% url 'learning_resources' %}">学习资源</a></li>
+                            <li><a class="dropdown-item" href="{% url 'error_notebook' %}">错题中心</a></li>
+                            <li><a class="dropdown-item" href="{% url 'community' %}">学习社区</a></li>
+                        </ul>
+                    </li>
+                    <!-- 学习社区下拉菜单 -->
+                    <li class="nav-item dropdown">
+                        <a href="{% url 'community' %}" class="nav-link px-3 {% if request.resolver_match.url_name == 'community' %}active{% endif %}">学习社区</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'create_post' %}">发布问题</a></li>
+                            <li><a class="dropdown-item" href="{% url 'community' %}">全部帖子</a></li>
+                            <li><a class="dropdown-item" href="{% url 'community' %}?chapter=general">综合讨论</a></li>
+                            <li><a class="dropdown-item" href="{% url 'community' %}?chapter=experiment">实验答疑</a></li>
+                        </ul>
+                    </li>
+                    <!-- 他山之石下拉菜单 -->
+                    <li class="nav-item dropdown">
+                        {% if user.is_authenticated %}
+                            <a href="#" class="nav-link px-3">他山之石</a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="https://higher.smartedu.cn/course/68b0c56dd5f9b8b6cf7c9660" target="_blank">国家高等教育智慧教育平台</a></li>
+                                <li><a class="dropdown-item" href="http://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-013-electromagnetics-and-applications-spring-2009/" target="_blank">MIT-电磁学和应用</a></li>
+                                <li><a class="dropdown-item" href="https://www.ednchina.com/" target="_blank">EDN China 射频/微波课程网址大全</a></li>
+                                <li><a class="dropdown-item" href="https://mooc1.gdhkmooc.com/course-ans/courseportal/240320145.html" target="_blank">粤港澳大湾区高校联盟</a></li>
+                                <li><a class="dropdown-item" href="https://muchong.com/bbs/" target="_blank">小木虫</a></li>
+                            </ul>
+                        {% else %}
+                            <a href="{% url 'users:login' %}?next={{ request.get_full_path|urlencode }}" class="nav-link px-3">他山之石</a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'users:login' %}?next=https://higher.smartedu.cn/course/68b0c56dd5f9b8b6cf7c9660">国家高等教育智慧教育平台</a></li>
+                                <li><a class="dropdown-item" href="{% url 'users:login' %}?next=http://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-013-electromagnetics-and-applications-spring-2009/">MIT-电磁学和应用</a></li>
+                                <li><a class="dropdown-item" href="{% url 'users:login' %}?next=https://www.ednchina.com/">EDN China 射频/微波课程网址大全</a></li>
+                                <li><a class="dropdown-item" href="{% url 'users:login' %}?next=https://mooc1.gdhkmooc.com/course-ans/courseportal/240320145.html">粤港澳大湾区高校联盟</a></li>
+                                <li><a class="dropdown-item" href="{% url 'users:login' %}?next=https://muchong.com/bbs/">小木虫</a></li>
+                            </ul>
+                        {% endif %}
+                    </li>
+                </ul>
+
+                <!-- 右侧：用户信息 -->
+                <div class="d-flex align-items-center gap-3">
+                    {% if user.is_authenticated %}
+                        <div class="dropdown">
+                            <a href="#" class="user-avatar-link d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
+                                {% if user.avatar %}
+                                    <img src="{{ user.avatar.url }}" alt="头像" class="rounded-circle border border-2 border-white shadow-sm" style="width: 36px; height: 36px; object-fit: cover;">
+                                {% else %}
+                                    <div class="rounded-circle border border-2 border-white d-flex align-items-center justify-content-center shadow-sm" style="width: 36px; height: 36px; background: #0066B3;">
+                                        <span class="fw-bold">{{ user.username|first|upper }}</span>
+                                    </div>
+                                {% endif %}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                                <li><a class="dropdown-item" href="{% url 'users:profile' %}"><i class="bi bi-person me-2"></i>个人中心</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="{% url 'users:logout' %}"><i class="bi bi-box-arrow-right me-2"></i>退出登录</a></li>
+                            </ul>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'users:login' %}" class="btn btn-link text-white text-decoration-none px-3">登录</a>
+                        <!-- 注册功能仅限管理员使用 -->
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<!-- 子页面内容填充区：核心块 -->
+<main>
+    {% block content %}{% endblock %}
+</main>
+
+<!-- 公共JS -->
+<script src="{% static 'bootstrap5/popper.min.js' %}"></script>
+<script src="{% static 'bootstrap5/bootstrap.min.js' %}"></script>
+<!-- 子页面自定义JS块 -->
+{% block extra_js %}{% endblock %}
+</body>
+</html>

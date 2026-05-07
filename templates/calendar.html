@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>课程日历 - 电磁场与微波技术</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Vue 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- Element Plus -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/element-plus@2.4.4/dist/index.css">
+    <script src="https://cdn.jsdelivr.net/npm/element-plus@2.4.4/dist/index.full.js"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#dc2626',
+                        secondary: '#2563eb',
+                        success: '#059669',
+                        warning: '#d97706',
+                        danger: '#dc2626',
+                        info: '#6b7280',
+                        purple: '#7c3aed'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'system-ui', 'sans-serif']
+                    },
+                    boxShadow: {
+                        'calendar': '0 20px 60px -20px rgba(0,0,0,0.1)',
+                        'card': '0 4px 12px rgba(0,0,0,0.08)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        /* 页面灰白朦胧背景效果 */
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            letter-spacing: 0.025em;
+            position: relative;
+            background-color: #f5f5f7;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                linear-gradient(180deg, 
+                    rgba(255, 255, 255, 0.7) 0%, 
+                    rgba(250, 250, 250, 0.6) 50%, 
+                    rgba(245, 245, 245, 0.7) 100%
+                ),
+                url('/static/image/background_grey.webp') center/cover no-repeat;
+            background-blend-mode: normal;
+            filter: grayscale(100%) brightness(1.15) contrast(0.85) blur(0.5px);
+            opacity: 0.9;
+            z-index: -2;
+        }
+        
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(
+                ellipse at center,
+                rgba(255, 255, 255, 0.3) 0%,
+                rgba(240, 240, 240, 0.4) 50%,
+                rgba(230, 230, 230, 0.5) 100%
+            );
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .calendar-container {
+            box-shadow: 0 20px 60px -20px rgba(0,0,0,0.15);
+            border-radius: 20px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(2px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background: #f0f0f0;
+        }
+        
+        .day-cell {
+            background: rgba(255, 255, 255, 0.85);
+            min-height: 100px;
+            padding: 12px 8px;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            border-radius: 8px;
+        }
+        
+        .day-cell:hover {
+            background: rgba(255, 255, 255, 0.98);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .day-cell.other-month {
+            background: rgba(248, 249, 250, 0.7);
+        }
+        
+        .day-cell.today {
+            background: rgba(255, 255, 255, 0.95);
+        }
+        
+        .day-number {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+        
+        .day-cell.other-month .day-number {
+            color: #ccc;
+        }
+        
+        .day-cell.weekend .day-number {
+            color: #dc2626;
+        }
+        
+        .day-cell.today .day-number {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #dc2626;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .day-cell.selected {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+        }
+        
+        .events {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            overflow: hidden;
+        }
+        
+        .event-chip {
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 0 6px 6px 0;
+            border-left: 3px solid;
+            white-space: normal;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #333;
+            line-height: 1.4;
+            max-height: 40px;
+        }
+        
+        .event-chip.theory {
+            border-left-color: #dc2626;
+            background: rgba(220, 38, 38, 0.1);
+        }
+        
+        .event-chip.lab {
+            border-left-color: #2563eb;
+            background: rgba(37, 99, 235, 0.1);
+        }
+        
+        .event-chip.exercise {
+            border-left-color: #059669;
+            background: rgba(5, 150, 105, 0.1);
+        }
+        
+        .event-chip.exam {
+            border-left-color: #d97706;
+            background: rgba(217, 119, 6, 0.1);
+        }
+        
+        .event-chip.discussion {
+            border-left-color: #7c3aed;
+            background: rgba(124, 58, 237, 0.1);
+        }
+        
+        .event-chip.other {
+            border-left-color: #6b7280;
+            background: rgba(107, 114, 128, 0.1);
+        }
+        
+        .event-chip .time {
+            font-weight: 600;
+            margin-right: 4px;
+        }
+        
+        .more-indicator {
+            font-size: 10px;
+            color: #999;
+            margin-top: 2px;
+        }
+        
+        .event-dot {
+            position: absolute;
+            bottom: 4px;
+            left: 8px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #dc2626;
+        }
+        
+        .transition-fade {
+            transition: opacity 0.3s ease;
+        }
+        
+        .transition-slide {
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        
+        .panel-enter-active,
+        .panel-leave-active {
+            transition: all 0.3s ease;
+        }
+        
+        .panel-enter-from,
+        .panel-leave-to {
+            transform: translateX(30px);
+            opacity: 0;
+        }
+        
+        .modal-enter-active,
+        .modal-leave-active {
+            transition: all 0.3s ease;
+        }
+        
+        .modal-enter-from,
+        .modal-leave-to {
+            transform: scale(0.95);
+            opacity: 0;
+        }
+        
+        .event-card {
+            transition: all 0.3s ease;
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .event-card:nth-child(1) { animation-delay: 0ms; }
+        .event-card:nth-child(2) { animation-delay: 50ms; }
+        .event-card:nth-child(3) { animation-delay: 100ms; }
+        .event-card:nth-child(4) { animation-delay: 150ms; }
+        .event-card:nth-child(5) { animation-delay: 200ms; }
+        
+        @media (max-width: 768px) {
+            .day-cell {
+                min-height: 80px;
+            }
+        }
+        
+        .login-notice {
+            background: linear-gradient(135deg, rgba(254, 243, 199, 0.95) 0%, rgba(253, 230, 138, 0.95) 100%);
+            border-left: 4px solid #f59e0b;
+            backdrop-filter: blur(2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        /* 确保内容在背景上方 */
+        #app {
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* 主标题样式优化 */
+        header h1 {
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* 日历头部背景 */
+        .shadow-calendar {
+            background: rgba(255, 255, 255, 0.92) !important;
+            backdrop-filter: blur(2px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        
+        /* 侧边栏面板背景 */
+        .bg-white.rounded-2xl {
+            background: rgba(255, 255, 255, 0.92) !important;
+            backdrop-filter: blur(2px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body class="min-h-screen py-8">
+    <div id="app" class="container mx-auto px-4">
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl font-bold text-gray-800 tracking-wide">课程日历</h1>
+        </header>
+        
+        <!-- 未登录提示 -->
+        <div v-if="!isAuthenticated" class="login-notice rounded-lg p-4 mb-6 max-w-4xl mx-auto">
+            <div class="flex items-center gap-3">
+                <i class="fas fa-exclamation-triangle text-amber-600 text-xl"></i>
+                <div>
+                    <p class="font-medium text-amber-800">您尚未登录</p>
+                    <p class="text-sm text-amber-700">请先<a href="/users/login/" class="underline font-semibold hover:text-amber-900">登录</a>后查看和管理您的个人日历数据</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex flex-col md:flex-row gap-6">
+            <!-- 日历部分 -->
+            <div class="flex-1 bg-white rounded-2xl shadow-calendar p-6">
+                <!-- 日历头部 -->
+                <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
+                    <h2 class="text-2xl font-bold text-gray-800 tracking-wide">[[ currentYear ]]年 [[ currentMonthName ]]</h2>
+                    <div class="flex gap-3 items-center">
+                        <button 
+                            @click="prevMonth" 
+                            class="w-10 h-10 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-100 transition-colors"
+                        >
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button 
+                            @click="goToday" 
+                            class="px-4 py-2 text-primary font-medium hover:bg-red-50 rounded-md transition-colors"
+                        >
+                            今天
+                        </button>
+                        <button 
+                            @click="nextMonth" 
+                            class="w-10 h-10 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-100 transition-colors"
+                        >
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 星期栏 -->
+                <div class="grid grid-cols-7 gap-1 mb-1">
+                    <div v-for="day in weekdays" :key="day" class="text-center py-3 text-sm text-gray-500 font-medium">
+                        [[ day ]]
+                    </div>
+                </div>
+                
+                <!-- 日历网格 -->
+                <div class="calendar-grid">
+                    <div 
+                        v-for="day in calendarDays" 
+                        :key="day.date"
+                        :class="[
+                            'day-cell',
+                            { 'other-month': !day.isCurrentMonth },
+                            { 'today': day.isToday },
+                            { 'selected': day.date === selectedDate },
+                            { 'weekend': day.isWeekend }
+                        ]"
+                        @click="selectDate(day.date)"
+                    >
+                        <span class="day-number">[[ day.day ]]</span>
+                        <div v-if="day.events.length > 0" class="events">
+                            <div 
+                                v-for="(event, index) in day.events.slice(0, 2)" 
+                                :key="index"
+                                :class="['event-chip', event.type]"
+                            >
+                                <span class="time">[[ event.time ]]</span> [[ event.title ]]
+                            </div>
+                            <div v-if="day.events.length > 2" class="more-indicator">
+                                +[[ day.events.length - 2 ]] more
+                            </div>
+                        </div>
+                        <div v-else-if="day.isCurrentMonth" class="flex-1"></div>
+                    </div>
+                </div>
+                
+                <!-- 图例说明 -->
+                <div class="mt-6 pt-6 border-t border-gray-200 flex flex-wrap gap-4">
+                    <div v-for="type in eventTypes" :key="type.value" class="flex items-center gap-2">
+                        <span 
+                            class="w-3 h-3 rounded-full" 
+                            :style="{ backgroundColor: type.color }"
+                        ></span>
+                        <span class="text-sm text-gray-600">[[ type.label ]]</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 日程详情面板 -->
+            <div class="w-full md:w-1/3 bg-white rounded-2xl shadow-calendar p-6">
+                <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
+                    <h3 class="text-xl font-bold text-gray-800 tracking-wide">
+                        [[ selectedDate ? formatDate(selectedDate) : '选择日期' ]]
+                    </h3>
+                    <button 
+                        v-if="selectedDate" 
+                        @click="openAddEventModal()"
+                        class="px-4 py-2 bg-primary text-white rounded-md hover:bg-red-700 transition-colors flex items-center gap-2"
+                    >
+                        <i class="fas fa-plus"></i>
+                        <span>添加课程</span>
+                    </button>
+                </div>
+                
+                <!-- 空状态 -->
+                <div v-if="!selectedDate" class="flex flex-col items-center justify-center py-12 text-gray-500">
+                    <div class="w-20 h-20 mb-4 flex items-center justify-center">
+                        <i class="fas fa-calendar-alt text-4xl mb-4 text-gray-300"></i>
+                    </div>
+                    <p class="text-center">请选择一个日期查看日程</p>
+                </div>
+                
+                <div v-else-if="selectedDateEvents.length === 0" class="flex flex-col items-center justify-center py-12 text-gray-500">
+                    <div class="w-20 h-20 mb-4 flex items-center justify-center">
+                        <i class="fas fa-book-open text-4xl mb-4 text-gray-300"></i>
+                    </div>
+                    <p class="text-center">当日暂无课程</p>
+                    <button 
+                        @click="openAddEventModal()"
+                        class="mt-4 px-4 py-2 text-primary border border-primary rounded-md hover:bg-red-50 transition-colors"
+                    >
+                        点击添加
+                    </button>
+                </div>
+                
+                <!-- 日程列表 -->
+                <div v-else class="space-y-4">
+                    <div 
+                        v-for="event in selectedDateEvents" 
+                        :key="event.id"
+                        :class="['p-4 rounded-lg border-l-4 event-card', event.type]"
+                        :style="{ borderLeftColor: getEventColor(event.type) }"
+                    >
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <div class="w-2 h-2 rounded-full" :style="{ backgroundColor: getEventColor(event.type) }"></div>
+                                    <h4 class="font-semibold text-gray-800">[[ event.title ]]</h4>
+                                </div>
+                                <p class="text-sm text-gray-600 mt-1">[[ event.time ]] - [[ event.location ]]</p>
+                                <p v-if="event.description" class="text-sm text-gray-500 mt-2">[[ event.description ]]</p>
+                            </div>
+                            <div class="flex gap-2 opacity-50 hover:opacity-100 transition-opacity">
+                                <button 
+                                    @click="editEvent(event)"
+                                    class="text-gray-500 hover:text-primary transition-colors"
+                                >
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button 
+                                    @click="confirmDeleteEvent(event.id)"
+                                    class="text-gray-500 hover:text-danger transition-colors"
+                                >
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 添加/编辑事件模态框 -->
+        <el-dialog
+            v-model="showEventModal"
+            :title="editingEvent ? '编辑课程' : '添加课程'"
+            width="500px"
+        >
+            <el-form :model="eventForm" label-width="80px">
+                <el-form-item label="课程名称">
+                    <el-input v-model="eventForm.title" placeholder="请输入课程名称"></el-input>
+                </el-form-item>
+                <el-form-item label="时间">
+                    <el-time-picker
+                        v-model="eventForm.time"
+                        format="HH:mm"
+                        placeholder="选择时间"
+                        style="width: 100%"
+                    ></el-time-picker>
+                </el-form-item>
+                <el-form-item label="地点">
+                    <el-input v-model="eventForm.location" placeholder="请输入地点"></el-input>
+                </el-form-item>
+                <el-form-item label="类型">
+                    <el-select v-model="eventForm.type" placeholder="选择课程类型" style="width: 100%">
+                        <el-option 
+                            v-for="type in eventTypes" 
+                            :key="type.value"
+                            :label="type.label"
+                            :value="type.value"
+                        ></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="备注">
+                    <el-input
+                        v-model="eventForm.description"
+                        type="textarea"
+                        placeholder="请输入备注信息"
+                        :rows="3"
+                    ></el-input>
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="showEventModal = false">取消</el-button>
+                    <el-button type="primary" @click="saveEvent">保存</el-button>
+                </span>
+            </template>
+        </el-dialog>
+        
+        <!-- 删除确认模态框 -->
+        <el-dialog
+            v-model="showDeleteConfirm"
+            title="确认删除"
+            width="300px"
+        >
+            <p>确定要删除这个课程吗？</p>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="showDeleteConfirm = false">取消</el-button>
+                    <el-button type="danger" @click="deleteEvent">删除</el-button>
+                </span>
+            </template>
+        </el-dialog>
+    </div>
+    
+    <script>
+        const { createApp, ref, computed, onMounted, watch } = Vue;
+        const { ElMessage } = ElementPlus;
+        
+        createApp({
+            delimiters: ['[[', ']]'],
+            setup() {
+                // 响应式数据
+                const currentDate = ref(new Date());
+                const selectedDate = ref(null);
+                const events = ref([]);
+                const showEventModal = ref(false);
+                const showDeleteConfirm = ref(false);
+                const editingEvent = ref(null);
+                const eventForm = ref({
+                    title: '',
+                    time: '',
+                    location: '',
+                    type: 'theory',
+                    description: ''
+                });
+                const eventToDelete = ref(null);
+                const isAuthenticated = ref(false);
+                const isLoading = ref(false);
+                
+                // 常量
+                const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+                const monthNames = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
+                const eventTypes = [
+                    { value: 'theory', label: '理论课', color: '#dc2626' },
+                    { value: 'lab', label: '实验课', color: '#2563eb' },
+                    { value: 'exam', label: '考试', color: '#d97706' },
+                    { value: 'assignment', label: '作业', color: '#059669' },
+                    { value: 'review', label: '复习', color: '#7c3aed' },
+                    { value: 'other', label: '其他', color: '#6b7280' }
+                ];
+                
+                // API基础URL
+                const API_BASE = '/api/calendar';
+                
+                // 获取CSRF Token
+                function getCsrfToken() {
+                    const name = 'csrftoken';
+                    let cookieValue = null;
+                    if (document.cookie && document.cookie !== '') {
+                        const cookies = document.cookie.split(';');
+                        for (let i = 0; i < cookies.length; i++) {
+                            const cookie = cookies[i].trim();
+                            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                break;
+                            }
+                        }
+                    }
+                    return cookieValue;
+                }
+                
+                // 计算属性
+                const currentYear = computed(() => currentDate.value.getFullYear());
+                const currentMonth = computed(() => currentDate.value.getMonth());
+                const currentMonthName = computed(() => monthNames[currentMonth.value]);
+                
+                const calendarDays = computed(() => {
+                    const days = [];
+                    const firstDay = new Date(currentYear.value, currentMonth.value, 1);
+                    const lastDay = new Date(currentYear.value, currentMonth.value + 1, 0);
+                    const startDay = new Date(firstDay);
+                    startDay.setDate(startDay.getDate() - firstDay.getDay());
+                    
+                    for (let i = 0; i < 42; i++) {
+                        const date = new Date(startDay);
+                        date.setDate(startDay.getDate() + i);
+                        const dateStr = formatDateStr(date);
+                        
+                        days.push({
+                            date: dateStr,
+                            day: date.getDate(),
+                            isCurrentMonth: date.getMonth() === currentMonth.value,
+                            isToday: isToday(date),
+                            isWeekend: date.getDay() === 0 || date.getDay() === 6,
+                            events: events.value.filter(event => event.date === dateStr)
+                        });
+                    }
+                    
+                    return days;
+                });
+                
+                const selectedDateEvents = computed(() => {
+                    if (!selectedDate.value) return [];
+                    return events.value.filter(event => event.date === selectedDate.value);
+                });
+                
+                // 方法
+                function formatDateStr(date) {
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    return `${year}-${month}-${day}`;
+                }
+                
+                function formatDate(dateStr) {
+                    if (!dateStr) return '';
+                    const [year, month, day] = dateStr.split('-');
+                    return `${year}年${month}月${day}日`;
+                }
+                
+                function isToday(date) {
+                    const today = new Date();
+                    return date.getFullYear() === today.getFullYear() &&
+                           date.getMonth() === today.getMonth() &&
+                           date.getDate() === today.getDate();
+                }
+                
+                function prevMonth() {
+                    const newDate = new Date(currentDate.value);
+                    newDate.setMonth(newDate.getMonth() - 1);
+                    currentDate.value = newDate;
+                }
+                
+                function nextMonth() {
+                    const newDate = new Date(currentDate.value);
+                    newDate.setMonth(newDate.getMonth() + 1);
+                    currentDate.value = newDate;
+                }
+                
+                function goToday() {
+                    currentDate.value = new Date();
+                    selectedDate.value = formatDateStr(new Date());
+                }
+                
+                function selectDate(date) {
+                    selectedDate.value = date;
+                }
+                
+                function getEventColor(type) {
+                    const eventType = eventTypes.find(t => t.value === type);
+                    return eventType ? eventType.color : '#6b7280';
+                }
+                
+                function openAddEventModal() {
+                    editingEvent.value = null;
+                    eventForm.value = {
+                        title: '',
+                        time: '',
+                        location: '',
+                        type: 'theory',
+                        description: ''
+                    };
+                    showEventModal.value = true;
+                }
+                
+                function editEvent(event) {
+                    editingEvent.value = event;
+                    eventForm.value = {
+                        title: event.title,
+                        time: event.time,
+                        location: event.location,
+                        type: event.type,
+                        description: event.description
+                    };
+                    showEventModal.value = true;
+                }
+                
+                // 检查用户认证状态
+                async function checkAuth() {
+                    try {
+                        const response = await fetch(`${API_BASE}/auth/`);
+                        if (response.ok) {
+                            const data = await response.json();
+                            isAuthenticated.value = data.is_authenticated;
+                            return true;
+                        }
+                    } catch (error) {
+                        console.error('认证检查失败:', error);
+                    }
+                    isAuthenticated.value = false;
+                    return false;
+                }
+                
+                // 从服务器加载事件
+                async function loadEventsFromServer() {
+                    if (!isAuthenticated.value) {
+                        events.value = [];
+                        return;
+                    }
+                    
+                    isLoading.value = true;
+                    try {
+                        const year = currentYear.value;
+                        const month = currentMonth.value + 1;
+                        console.log(`[Calendar Debug] 加载事件: year=${year}, month=${month}`);
+                        const response = await fetch(`${API_BASE}/events/?year=${year}&month=${month}`);
+                        
+                        if (response.ok) {
+                            const data = await response.json();
+                            console.log(`[Calendar Debug] 获取到 ${data.events ? data.events.length : 0} 个事件`);
+                            if (data.events && data.events.length > 0) {
+                                console.log(`[Calendar Debug] 第一个事件:`, data.events[0]);
+                            }
+                            events.value = data.events || [];
+                        } else if (response.status === 403) {
+                            ElMessage.error('请先登录');
+                            isAuthenticated.value = false;
+                            events.value = [];
+                        }
+                    } catch (error) {
+                        console.error('加载事件失败:', error);
+                        ElMessage.error('加载数据失败');
+                    } finally {
+                        isLoading.value = false;
+                    }
+                }
+                
+                // 格式化时间为字符串 HH:mm
+                function formatTime(timeValue) {
+                    if (!timeValue) return '';
+                    
+                    // 如果是Date对象（el-time-picker返回的）
+                    if (timeValue instanceof Date) {
+                        const hours = String(timeValue.getHours()).padStart(2, '0');
+                        const minutes = String(timeValue.getMinutes()).padStart(2, '0');
+                        return `${hours}:${minutes}`;
+                    }
+                    
+                    // 如果已经是字符串，直接返回
+                    if (typeof timeValue === 'string') {
+                        return timeValue;
+                    }
+                    
+                    return '';
+                }
+                
+                // 表单验证
+                function validateEventForm() {
+                    const errors = [];
+                    
+                    if (!eventForm.value.title || eventForm.value.title.trim() === '') {
+                        errors.push('请输入课程名称');
+                    }
+                    
+                    if (!selectedDate.value) {
+                        errors.push('请选择日期');
+                    }
+                    
+                    // 课程名称长度检查
+                    if (eventForm.value.title && eventForm.value.title.length > 100) {
+                        errors.push('课程名称不能超过100个字符');
+                    }
+                    
+                    // 地点长度检查
+                    if (eventForm.value.location && eventForm.value.location.length > 200) {
+                        errors.push('地点信息不能超过200个字符');
+                    }
+                    
+                    // 备注长度检查
+                    if (eventForm.value.description && eventForm.value.description.length > 500) {
+                        errors.push('备注信息不能超过500个字符');
+                    }
+                    
+                    return errors;
+                }
+                
+                // 保存事件到服务器
+                async function saveEvent() {
+                    if (!selectedDate.value) {
+                        ElMessage.warning('请先选择日期');
+                        return;
+                    }
+                    
+                    if (!isAuthenticated.value) {
+                        ElMessage.error('请先登录后再操作');
+                        return;
+                    }
+                    
+                    // 表单验证
+                    const validationErrors = validateEventForm();
+                    if (validationErrors.length > 0) {
+                        ElMessage.error(validationErrors[0]);
+                        return;
+                    }
+                    
+                    // 准备提交的数据
+                    const eventData = {
+                        title: eventForm.value.title.trim(),
+                        date: selectedDate.value,
+                        time: formatTime(eventForm.value.time),
+                        location: eventForm.value.location ? eventForm.value.location.trim() : '',
+                        type: eventForm.value.type || 'other',
+                        description: eventForm.value.description ? eventForm.value.description.trim() : ''
+                    };
+                    
+                    try {
+                        let response;
+                        if (editingEvent.value) {
+                            // 更新现有事件
+                            response = await fetch(`${API_BASE}/events/${editingEvent.value.id}/update/`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRFToken': getCsrfToken()
+                                },
+                                body: JSON.stringify(eventData)
+                            });
+                        } else {
+                            // 创建新事件
+                            response = await fetch(`${API_BASE}/events/create/`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRFToken': getCsrfToken()
+                                },
+                                body: JSON.stringify(eventData)
+                            });
+                        }
+                        
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.success) {
+                                ElMessage.success(data.message || (editingEvent.value ? '更新成功' : '添加成功'));
+                                
+                                // 检查添加/更新的日期是否在当前显示的月份
+                                if (!editingEvent.value && selectedDate.value) {
+                                    const eventDate = new Date(selectedDate.value);
+                                    const eventYear = eventDate.getFullYear();
+                                    const eventMonth = eventDate.getMonth();
+                                    
+                                    if (eventYear !== currentYear.value || eventMonth !== currentMonth.value) {
+                                        // 自动跳转到添加课程的月份
+                                        currentDate.value = new Date(eventYear, eventMonth, 1);
+                                        ElMessage.info(`已自动跳转到 ${eventYear}年${eventMonth + 1}月`);
+                                    }
+                                }
+                                
+                                await loadEventsFromServer();
+                                showEventModal.value = false;
+                            } else {
+                                // 显示后端返回的具体错误信息
+                                const errorMsg = data.error || data.message || '操作失败';
+                                ElMessage.error(errorMsg);
+                                
+                                // 如果有特定字段错误，可以进一步处理
+                                if (data.field) {
+                                    console.warn(`字段 ${data.field} 验证失败:`, errorMsg);
+                                }
+                            }
+                        } else {
+                            // 处理HTTP错误状态
+                            let errorMsg = '操作失败';
+                            try {
+                                const errorData = await response.json();
+                                errorMsg = errorData.error || errorData.message || `请求失败 (${response.status})`;
+                            } catch (e) {
+                                errorMsg = `请求失败 (${response.status}: ${response.statusText})`;
+                            }
+                            
+                            if (response.status === 403) {
+                                ElMessage.error('请先登录后再操作');
+                                isAuthenticated.value = false;
+                            } else if (response.status === 400) {
+                                ElMessage.error(errorMsg);
+                            } else if (response.status === 500) {
+                                ElMessage.error('服务器内部错误，请稍后重试');
+                            } else {
+                                ElMessage.error(errorMsg);
+                            }
+                        }
+                    } catch (error) {
+                        console.error('保存事件失败:', error);
+                        ElMessage.error('网络请求失败，请检查网络连接后重试');
+                    }
+                }
+                
+                function confirmDeleteEvent(eventId) {
+                    eventToDelete.value = eventId;
+                    showDeleteConfirm.value = true;
+                }
+                
+                // 删除事件
+                async function deleteEvent() {
+                    if (!eventToDelete.value) {
+                        ElMessage.warning('未选择要删除的课程');
+                        return;
+                    }
+                    
+                    if (!isAuthenticated.value) {
+                        ElMessage.error('请先登录后再操作');
+                        return;
+                    }
+                    
+                    try {
+                        const response = await fetch(`${API_BASE}/events/${eventToDelete.value}/delete/`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': getCsrfToken()
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.success) {
+                                ElMessage.success(data.message || '删除成功');
+                                await loadEventsFromServer();
+                                showDeleteConfirm.value = false;
+                                eventToDelete.value = null;
+                            } else {
+                                // 显示后端返回的具体错误信息
+                                const errorMsg = data.error || data.message || '删除失败';
+                                ElMessage.error(errorMsg);
+                            }
+                        } else {
+                            // 处理HTTP错误状态
+                            let errorMsg = '删除失败';
+                            try {
+                                const errorData = await response.json();
+                                errorMsg = errorData.error || errorData.message || `请求失败 (${response.status})`;
+                            } catch (e) {
+                                errorMsg = `请求失败 (${response.status}: ${response.statusText})`;
+                            }
+                            
+                            if (response.status === 403) {
+                                ElMessage.error('请先登录后再操作');
+                                isAuthenticated.value = false;
+                            } else if (response.status === 404) {
+                                ElMessage.error('课程不存在或已被删除');
+                                // 刷新列表以同步状态
+                                await loadEventsFromServer();
+                                showDeleteConfirm.value = false;
+                                eventToDelete.value = null;
+                            } else if (response.status === 500) {
+                                ElMessage.error('服务器内部错误，请稍后重试');
+                            } else {
+                                ElMessage.error(errorMsg);
+                            }
+                        }
+                    } catch (error) {
+                        console.error('删除事件失败:', error);
+                        ElMessage.error('网络请求失败，请检查网络连接后重试');
+                    }
+                }
+                
+                // 监听月份变化，重新加载数据
+                watch(currentDate, () => {
+                    loadEventsFromServer();
+                });
+                
+                // 生命周期钩子
+                onMounted(async () => {
+                    const auth = await checkAuth();
+                    if (auth) {
+                        await loadEventsFromServer();
+                    }
+                    selectedDate.value = formatDateStr(new Date());
+                });
+                
+                return {
+                    currentYear,
+                    currentMonth,
+                    currentMonthName,
+                    weekdays,
+                    calendarDays,
+                    selectedDate,
+                    selectedDateEvents,
+                    events,
+                    showEventModal,
+                    showDeleteConfirm,
+                    editingEvent,
+                    eventForm,
+                    eventTypes,
+                    isAuthenticated,
+                    isLoading,
+                    prevMonth,
+                    nextMonth,
+                    goToday,
+                    selectDate,
+                    getEventColor,
+                    openAddEventModal,
+                    editEvent,
+                    saveEvent,
+                    confirmDeleteEvent,
+                    deleteEvent,
+                    formatDate
+                };
+            }
+        }).use(ElementPlus).mount('#app');
+    </script>
+</body>
+</html>
