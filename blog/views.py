@@ -9,6 +9,7 @@ from django.db.models import Q
 from django.shortcuts import render, get_object_or_404, redirect, Http404
 from django.http import JsonResponse, FileResponse, HttpResponse
 from django.utils.encoding import escape_uri_path
+import os
 
 def index(request):
     """首页视图"""
@@ -468,6 +469,17 @@ def upload_material(request):
         
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+
+def serve_video(request, filename):
+    """提供视频文件服务（支持 HTTP Range 请求以实现拖动进度条）"""
+    from django.conf import settings
+    video_path = os.path.join(settings.BASE_DIR, 'static', 'video', filename)
+    if not os.path.exists(video_path):
+        raise Http404('视频文件不存在')
+    response = FileResponse(open(video_path, 'rb'), content_type='video/mp4')
+    response['Accept-Ranges'] = 'bytes'
+    return response
 
 
 @login_required

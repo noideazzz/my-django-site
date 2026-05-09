@@ -27,6 +27,7 @@ urlpatterns = [
     path('api/mark-mastered/', views.mark_as_mastered, name='api_mark_mastered'),
     path('download/<int:material_id>/', views.download_material, name='download_material'),
     path('upload-material/', views.upload_material, name='upload_material'),  # 上传资料（管理员）
+    path('video/<path:filename>', views.serve_video, name='serve_video'),  # 视频流服务（支持 Range 请求）
     path('calendar/', views.calendar, name='calendar'),
     # 日历事件API（用户数据隔离）
     path('api/calendar/events/', views.get_calendar_events, name='api_calendar_events'),
