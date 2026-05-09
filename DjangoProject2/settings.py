@@ -162,6 +162,8 @@ CSRF_COOKIE_SAMESITE = 'Lax'
 CSRF_TRUSTED_ORIGINS = [
     'https://*.tcloudbaseapp.com',
     'https://*.tencentcloud.com',
+    'https://*.tcloudbase.com',
+    'https://django-app1-255413-4-1429690806.sh.run.tcloudbase.com',
 ]
 
 # 登录相关URL
