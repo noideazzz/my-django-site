@@ -148,13 +148,21 @@ AUTHENTICATION_BACKENDS = [
 
 # Session 配置（更安全）
 SESSION_COOKIE_AGE = 86400  # 24小时
-SESSION_COOKIE_SECURE = False  # 生产环境设为True（HTTPS）
+SESSION_COOKIE_SECURE = True  # 生产环境设为True（HTTPS）
 SESSION_COOKIE_HTTPONLY = True  # 防止XSS攻击
 SESSION_COOKIE_SAMESITE = 'Lax'
 
+# 信任反向代理的 HTTPS 请求头（CloudBase 部署必需）
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # CSRF配置
+CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_HTTPONLY = True
 CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.tcloudbaseapp.com',
+    'https://*.tencentcloud.com',
+]
 
 # 登录相关URL
 LOGIN_URL = '/users/login/'
