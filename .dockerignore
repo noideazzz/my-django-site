@@ -11,5 +11,4 @@ env/
 *.md
 .DS_Store
 docker-compose*
-media/*
 staticfiles/
