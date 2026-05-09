@@ -155,10 +155,8 @@ SESSION_COOKIE_SAMESITE = 'Lax'
 # 信任反向代理的 HTTPS 请求头（CloudBase 部署必需）
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-# CSRF配置
-CSRF_COOKIE_SECURE = True
-CSRF_COOKIE_HTTPONLY = True
-CSRF_COOKIE_SAMESITE = None
+# CSRF配置（移动端兼容方案：Token 存 Session，不依赖独立 Cookie）
+CSRF_USE_SESSIONS = True
 CSRF_TRUSTED_ORIGINS = [
     'https://*.tcloudbaseapp.com',
     'https://*.tencentcloud.com',
