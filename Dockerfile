@@ -14,6 +14,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+RUN sed -i 's/\r$//' /app/entrypoint.sh
+
 RUN mkdir -p /app/staticfiles /app/media
 
 RUN chmod +x /app/entrypoint.sh
