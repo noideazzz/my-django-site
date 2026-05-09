@@ -980,7 +980,7 @@
                 '<strong>色散现象</strong>：不同频率分量传播速度不同，导致信号波形展宽或畸变',
                 '<strong>正常色散</strong>：dv<sub>p</sub>/dω < 0，v<sub>g</sub> < v<sub>p</sub>，如波导中的 TE/TM 模',
                 '<strong>反常色散</strong>：dv<sub>p</sub>/dω > 0，v<sub>g</sub> > v<sub>p</sub>，发生在谐振频率附近',
-                '<strong>TEM 模传输线</strong>：同轴线、微带线（准 TEM），无色散，v<sub>p</sub> = c/√ε<sub>r</sub> 为常数',为常数'
+                '<strong>TEM 模传输线</strong>：同轴线、微带线（准 TEM），无色散，v<sub>p</sub> = c/√ε<sub>r</sub> 为常数',
             ],
             examples: [
                 {
@@ -1091,7 +1091,7 @@
                 '<strong>混合参数（h 参数）</strong>：V₁ = h₁₁I₁ + h₁₂V₂，I₂ = h₂₁I₁ + h₂₂V₂，用于晶体管',
                 '<strong>互易网络</strong>：Z₁₂ = Z₂₁，Y₁₂ = Y₂₁，不含非互易介质（铁氧体、有源器件）',
                 '<strong>对称网络</strong>：Z₁₁ = Z₂₂，输入输出端口互换特性不变',
-                '<strong>无耗网络</strong>：Z 参数为纯虚数，Re(Zᵢⱼ) = 0',
+                '<strong>无耗网络</strong>：Z 参数为纯虚数，Re(Z<sub>ij</sub>) = 0',
                 '<strong>参数转换</strong>：各参数矩阵可通过矩阵运算相互转换，如 [Z] = [Y]⁻¹'
             ],
             examples: [
@@ -1140,13 +1140,13 @@
             title: '3.3 多端口网络与信号流图',
             desc: '多端口网络分析和信号流图方法',
             knowledge: [
-                '<strong>多端口网络</strong>：N 端口网络用 N×N S 矩阵描述，Sᵢⱼ 表示从端口 j 到端口 i 的传输',
+                '<strong>多端口网络</strong>：N 端口网络用 N×N S 矩阵描述，S<sub>ij</sub> 表示从端口 j 到端口 i 的传输',
                 '<strong>三端口网络</strong>：如环形器、T 型接头，S 为 3×3 矩阵',
                 '<strong>四端口网络</strong>：如定向耦合器、混合环，S 为 4×4 矩阵',
                 '<strong>信号流图</strong>：用节点和支路表示波的关系，节点表示变量，支路表示传输系数',
                 '<strong>信号流图规则</strong>：节点值等于所有输入支路信号之和',
                 '<strong>流图简化规则</strong>：串联支路相乘、并联支路相加、自环消除',
-                '<strong>梅森增益公式</strong>：T = (Σ PₖΔₖ)/Δ，其中 Pₖ 为第 k 条前向通路增益，Δ 为流图行列式（1 - ΣLᵢ + ΣLᵢLⱼ - ...），Δₖ 为与第 k 条通路不接触子图的行列式',
+                '<strong>梅森增益公式</strong>：T = (Σ P<sub>k</sub>Δ<sub>k</sub>)/Δ，其中 P<sub>k</sub> 为第 k 条前向通路增益，Δ 为流图行列式（1 - ΣL<sub>i</sub> + ΣL<sub>i</sub>L<sub>j</sub> - ...），Δ<sub>k</sub> 为与第 k 条通路不接触子图的行列式',
                 '<strong>不接触环路</strong>：梅森法则中需识别所有环路及其组合',
                 '<strong>应用</strong>：级联网络分析、反馈系统、测量误差修正'
             ],
@@ -1174,7 +1174,7 @@
                 '<strong>Z-S 转换</strong>：[S] = ([Z]+[Z₀])⁻¹([Z]-[Z₀])，[Z₀] 为参考阻抗对角矩阵',
                 '<strong>T 型-Π 型变换</strong>：星形网络与三角形网络的等效变换',
                 '<strong>阻抗变换</strong>：改变参考阻抗时 S 参数的变换公式',
-                '<strong>网络级联</strong>：ABCD 参数直接相乘，[A] = [A₁][A₂]...[Aₙ]',
+                '<strong>网络级联</strong>：ABCD 参数直接相乘，[A] = [A₁][A₂]...[A<sub>n</sub>]',
                 '<strong>网络并联</strong>：Y 参数直接相加，[Y] = [Y₁] + [Y₂]',
                 '<strong>网络串联</strong>：Z 参数直接相加，[Z] = [Z₁] + [Z₂]'
             ],
@@ -1200,7 +1200,7 @@
                 '<strong>互易性判据</strong>：Z₁₂ = Z₂₁，Y₁₂ = Y₂₁，S₁₂ = S₂₁，h₁₂ = -h₂₁',
                 '<strong>非互易器件</strong>：铁氧体器件（环形器、隔离器）、有源器件、时变器件',
                 '<strong>对称网络</strong>：端口互换网络特性不变，Z₁₁ = Z₂₂，S₁₁ = S₂₂',
-                '<strong>无耗网络</strong>：网络无能量损耗，S 矩阵单位ary，Σ|Sᵢⱼ|² = 1（对每行/列）',
+                '<strong>无耗网络</strong>：网络无能量损耗，S 矩阵单位ary，Σ|S<sub>ij</sub>|² = 1（对每行/列）',
                 '<strong>插入损耗（IL）</strong>：IL = -20log|S₂₁|，表示信号通过网络的衰减',
                 '<strong>回波损耗（RL）</strong>：RL = -20log|S₁₁|，表示反射信号衰减',
                 '<strong>网络品质因数</strong>：Q = f₀/Δf，表示频率选择性',
@@ -1283,7 +1283,7 @@
                 '<strong>微带线结构</strong>：导带在介质基板上方，接地板在下方，部分场在空气中',
                 '<strong>准 TEM 模</strong>：微带线传输准横电磁波，存在轻微色散',
                 '<strong>有效介电常数</strong>：ε<sub>e</sub> = (ε<sub>r</sub> + 1)/2 + (ε<sub>r</sub> - 1)/2(1 + 12h/W)^(-0.5)，介于 1 和 ε<sub>r</sub> 之间',
-                '<strong>微带线阻抗公式</strong>：W/h ≤ 1 时，Z₀ = (60/√εₑ)ln(8h/W + W/4h)',
+                '<strong>微带线阻抗公式</strong>：W/h ≤ 1 时，Z₀ = (60/√ε<sub>e</sub>)ln(8h/W + W/4h)',
                 '<strong>带状线结构</strong>：导带夹在两层接地板之间，完全填充介质',
                 '<strong>带状线 TEM 模</strong>：真正的 TEM 模，无色散',
                 '<strong>带状线阻抗</strong>：Z<sub>0</sub> = (30π/√ε<sub>r</sub>)/(W<sub>e</sub>/b + 0.441)，W<sub>e</sub> 为有效宽度',
@@ -1298,8 +1298,8 @@
                 },
                 {
                     title: '例题 4.6',
-                    question: '比较相同尺寸微带线和带状线的特性阻抗（εᵣ = 4.2，W = 3mm，h = 1.6mm）。',
-                    solution: '<strong>微带线</strong>：<br>W/h = 3/1.6 = 1.875<br>εₑ ≈ 3.15<br>Z₀ ≈ 51Ω（用近似公式计算）<br><br><strong>带状线</strong>（假设 b = 2h = 3.2mm）：<br>Z₀ = (30π/√εᵣ)/(W/b + 0.441)<br>= (30π/2.05)/(3/3.2 + 0.441)<br>= 46/(0.938 + 0.441)<br>= 46/1.379 ≈ 33.4Ω<br><br><strong>结论</strong>：<br>相同尺寸下，微带线阻抗高于带状线<br>原因：微带线部分场在空气中，有效介电常数较小'
+                    question: '比较相同尺寸微带线和带状线的特性阻抗（ε<sub>r</sub> = 4.2，W = 3mm，h = 1.6mm）。',
+                    solution: '<strong>微带线</strong>：<br>W/h = 3/1.6 = 1.875<br>ε<sub>e</sub> ≈ 3.15<br>Z₀ ≈ 51Ω（用近似公式计算）<br><br><strong>带状线</strong>（假设 b = 2h = 3.2mm）：<br>Z₀ = (30π/√ε<sub>r</sub>)/(W/b + 0.441)<br>= (30π/2.05)/(3/3.2 + 0.441)<br>= 46/(0.938 + 0.441)<br>= 46/1.379 ≈ 33.4Ω<br><br><strong>结论</strong>：<br>相同尺寸下，微带线阻抗高于带状线<br>原因：微带线部分场在空气中，有效介电常数较小'
                 }
             ]
         },
@@ -1313,10 +1313,10 @@
                 '<strong>TE 模（横电波）</strong>：Ez = 0，Hz ≠ 0，电场纯横向',
                 '<strong>TM 模（横磁波）</strong>：Hz = 0，Ez ≠ 0，磁场纯横向',
                 '<strong>主模 TE₁₀</strong>：截止频率最低的模式，f<sub>c</sub> = c/(2a)，单模工作带宽 1.25:1',
-                '<strong>截止波长</strong>：TEₘₙ 模 λc = 2/√[(m/a)² + (n/b)²]，TM 模类似',
+                '<strong>截止波长</strong>：TEₘ<sub>n</sub> 模 λc = 2/√[(m/a)² + (n/b)²]，TM 模类似',
                 '<strong>相速度</strong>：v<sub>p</sub> = c/√[ε<sub>r</sub> - (f<sub>c</sub>/f)²] > c，超光速但只是等相位面速度',
                 '<strong>群速度</strong>：v<sub>g</sub> = c√[1 - (f<sub>c</sub>/f)²] < c，能量传播速度',
-                '<strong>波导波长</strong>：λg = λ₀/√[1 - (f<sub>c</sub>/f)²] > λ₀',λ₀'
+                '<strong>波导波长</strong>：λg = λ₀/√[1 - (f<sub>c</sub>/f)²] > λ₀',
             ],
             examples: [
                 {
@@ -1337,7 +1337,7 @@
             desc: '圆波导的模式、特性和应用',
             knowledge: [
                 '<strong>圆波导结构</strong>：半径为 a 的圆柱形金属管，轴对称结构',
-                '<strong>模式表示</strong>：TEₘₙ 和 TMₘₙ，m 为方位角变化数，n 为径向变化数',
+                '<strong>模式表示</strong>：TEₘ<sub>n</sub> 和 TMₘ<sub>n</sub>，m 为方位角变化数，n 为径向变化数',
                 '<strong>TE₁₁ 主模</strong>：截止波长 λc ≈ 3.41a，与矩形波导 TE₁₀ 类似',
                 '<strong>TE₀₁ 模特点</strong>：截止波长 λc ≈ 1.64a，衰减随频率升高而降低，低损耗传输',
                 '<strong>TM₀₁ 模特点</strong>：截止波长 λc ≈ 2.61a，轴对称，用于天线馈电旋转关节',
@@ -1410,7 +1410,7 @@
                 },
                 {
                     title: '例题 4.14',
-                    question: '比较空气同轴线和聚四氟乙烯（εᵣ=2.1，tanδ=0.0002）填充同轴线的介质衰减（f = 10GHz）。',
+                    question: '比较空气同轴线和聚四氟乙烯（ε<sub>r</sub>=2.1，tanδ=0.0002）填充同轴线的介质衰减（f = 10GHz）。',
                     solution: '<strong>空气同轴线</strong>：<br>αd ≈ 0（无介质损耗）<br><br><strong>聚四氟乙烯填充</strong>：<br>αd = (π/λ)(ε<sub>r</sub>/√ε<sub>e</sub>)tanδ<br>λ = c/(f√ε<sub>e</sub>) = 3×10⁸/(10¹⁰×√2.1) ≈ 0.0207m<br>ε<sub>e</sub> ≈ 2.1（同轴线完全填充）<br><br>αd = (π/0.0207)(2.1/√2.1)×0.0002<br>= 151.9 × 1.45 × 0.0002<br>= 0.044 Np/m<br>= 0.38 dB/m<br><br><strong>结论</strong>：<br>介质引入约 0.38 dB/m 的附加损耗<br>高频时介质损耗不可忽视'
                 }
             ]
@@ -1422,19 +1422,19 @@
             knowledge: [
                 '<strong>谐振频率 f₀</strong>：谐振器储能最大时的频率，由结构尺寸和模式决定',
                 '<strong>谐振波长 λ₀</strong>：谐振频率对应的自由空间波长，λ₀ = c/f₀',
-                '<strong>品质因数 Q</strong>：Q = ω₀W/Pₗₒₛₛ，储能与损耗之比，表示频率选择性',
-                '<strong>有载 Q 值（Qᴸ）</strong>：考虑外部负载时的总 Q 值，1/Qᴸ = 1/Q₀ + 1/Qᵉ',
+                '<strong>品质因数 Q</strong>：Q = ω₀W/P<sub>loss</sub>，储能与损耗之比，表示频率选择性',
+                '<strong>有载 Q 值（Q<sub>L</sub>）</strong>：考虑外部负载时的总 Q 值，1/Q<sub>L</sub> = 1/Q₀ + 1/Q<sub>e</sub>',
                 '<strong>无载 Q 值（Q₀）</strong>：仅考虑谐振器本身损耗的 Q 值',
-                '<strong>外部 Q 值（Qᵉ）</strong>：仅考虑外部耦合损耗的 Q 值',
-                '<strong>带宽 BW</strong>：BW = f₀/Qᴸ，-3dB 带宽与 Q 值成反比',
-                '<strong>耦合系数 β</strong>：β = Q₀/Qᵉ，表示谐振器与外部电路的耦合程度',
+                '<strong>外部 Q 值（Q<sub>e</sub>）</strong>：仅考虑外部耦合损耗的 Q 值',
+                '<strong>带宽 BW</strong>：BW = f₀/Q<sub>L</sub>，-3dB 带宽与 Q 值成反比',
+                '<strong>耦合系数 β</strong>：β = Q₀/Q<sub>e</sub>，表示谐振器与外部电路的耦合程度',
                 '<strong>输入阻抗特性</strong>：谐振时纯电阻，偏离谐振时呈电抗'
             ],
             examples: [
                 {
                     title: '例题 5.1',
-                    question: '某谐振器谐振频率 10GHz，无载 Q₀ = 5000，外部 Qᵉ = 10000。求有载 Qᴸ 和带宽。',
-                    solution: '<strong>计算有载 Q 值</strong>：<br>1/Qᴸ = 1/Q₀ + 1/Qᵉ<br>= 1/5000 + 1/10000<br>= 0.0002 + 0.0001<br>= 0.0003<br><br>Qᴸ = 1/0.0003 ≈ 3333<br><br><strong>计算带宽</strong>：<br>BW = f₀/Qᴸ = 10×10⁹/3333<br>≈ 3 MHz<br><br><strong>耦合系数</strong>：<br>β = Q₀/Qᵉ = 5000/10000 = 0.5（欠耦合）'
+                    question: '某谐振器谐振频率 10GHz，无载 Q₀ = 5000，外部 Q<sub>e</sub> = 10000。求有载 Q<sub>L</sub> 和带宽。',
+                    solution: '<strong>计算有载 Q 值</strong>：<br>1/Q<sub>L</sub> = 1/Q₀ + 1/Q<sub>e</sub><br>= 1/5000 + 1/10000<br>= 0.0002 + 0.0001<br>= 0.0003<br><br>Q<sub>L</sub> = 1/0.0003 ≈ 3333<br><br><strong>计算带宽</strong>：<br>BW = f₀/Q<sub>L</sub> = 10×10⁹/3333<br>≈ 3 MHz<br><br><strong>耦合系数</strong>：<br>β = Q₀/Q<sub>e</sub> = 5000/10000 = 0.5（欠耦合）'
                 },
                 {
                     title: '例题 5.2',
@@ -1461,8 +1461,8 @@
             examples: [
                 {
                     title: '例题 5.3',
-                    question: '设计一个 λ/2 微带谐振器，f₀ = 2GHz，基板 εᵣ = 4.2，h = 1.6mm。求谐振器长度。',
-                    solution: '<strong>第一步：计算微带线参数</strong><br>对于 50Ω 微带线，W ≈ 3mm<br>有效介电常数 εₑ ≈ 3.15<br><br><strong>第二步：计算导波波长</strong><br>λg = c/(f√εₑ)<br>= 3×10⁸/(2×10⁹×√3.15)<br>= 3×10⁸/(3.55×10⁹)<br>= 0.0845 m = 84.5 mm<br><br><strong>第三步：计算谐振器长度</strong><br>l = λg/2 = 42.25 mm<br><br><strong>结论</strong>：谐振器长度约 42.3mm<br><br><strong>注意</strong>：实际长度需考虑开路端边缘电容效应，通常略短于理论值'
+                    question: '设计一个 λ/2 微带谐振器，f₀ = 2GHz，基板 ε<sub>r</sub> = 4.2，h = 1.6mm。求谐振器长度。',
+                    solution: '<strong>第一步：计算微带线参数</strong><br>对于 50Ω 微带线，W ≈ 3mm<br>有效介电常数 ε<sub>e</sub> ≈ 3.15<br><br><strong>第二步：计算导波波长</strong><br>λg = c/(f√ε<sub>e</sub>)<br>= 3×10⁸/(2×10⁹×√3.15)<br>= 3×10⁸/(3.55×10⁹)<br>= 0.0845 m = 84.5 mm<br><br><strong>第三步：计算谐振器长度</strong><br>l = λg/2 = 42.25 mm<br><br><strong>结论</strong>：谐振器长度约 42.3mm<br><br><strong>注意</strong>：实际长度需考虑开路端边缘电容效应，通常略短于理论值'
                 },
                 {
                     title: '例题 5.4',
@@ -1477,8 +1477,8 @@
             desc: '矩形谐振腔的模式和谐振频率',
             knowledge: [
                 '<strong>结构</strong>：由矩形波导两端短路形成，尺寸 a × b × d',
-                '<strong>TE 模式</strong>：TEₘₙₚ，m、n 为横向场变化数，p 为纵向（z向）变化数',
-                '<strong>TM 模式</strong>：TMₘₙₚ，电场有纵向分量',
+                '<strong>TE 模式</strong>：TEₘ<sub>np</sub>，m、n 为横向场变化数，p 为纵向（z向）变化数',
+                '<strong>TM 模式</strong>：TMₘ<sub>np</sub>，电场有纵向分量',
                 '<strong>谐振频率</strong>：f₀ = (c/2√ε<sub>r</sub>)√[(m/a)² + (n/b)² + (p/d)²]',
                 '<strong>主模 TE₁₀₁</strong>：当 a > d > b 时，TE₁₀₁ 为最低模式',
                 '<strong>TE₁₀₁ 谐振频率</strong>：f₀ = (c/2)√(1/a² + 1/d²)',
@@ -1505,12 +1505,12 @@
             desc: '圆柱谐振腔的模式和谐振特性',
             knowledge: [
                 '<strong>结构</strong>：由圆波导两端短路形成，半径 a，长度 d',
-                '<strong>TE 模式</strong>：TEₘₙₚ，m 为方位角变化，n 为径向变化，p 为轴向变化',
-                '<strong>TM 模式</strong>：TMₘₙₚ，p 可以为 0',
+                '<strong>TE 模式</strong>：TEₘ<sub>np</sub>，m 为方位角变化，n 为径向变化，p 为轴向变化',
+                '<strong>TM 模式</strong>：TMₘ<sub>np</sub>，p 可以为 0',
                 '<strong>TM₀₁₀ 模</strong>：最低模式，f₀ = 2.405c/(2πa√ε<sub>r</sub>)，与长度 d 无关',
                 '<strong>TE₀₁₁ 模</strong>：Q 值最高的模式，f₀ = (c/2π√ε<sub>r</sub>)√[(3.832/a)² + (π/d)²]',
                 '<strong>谐振频率通用公式</strong>：TE 模 f₀ = (c/2π√ε<sub>r</sub>)√[(χ\'<sub>mn</sub>/a)² + (pπ/d)²]，TM 模类似',
-                '<strong>贝塞尔函数根</strong>：χ\'ₘₙ 为 J\'ₘ(x)=0 的根，χₘₙ 为 Jₘ(x)=0 的根',
+                '<strong>贝塞尔函数根</strong>：χ\'ₘ<sub>n</sub> 为 J\'ₘ(x)=0 的根，χₘ<sub>n</sub> 为 Jₘ(x)=0 的根',
                 '<strong>常用根值</strong>：χ\'₀₁=3.832，χ\'₁₁=1.841，χ₀₁=2.405，χ₁₁=3.832',
                 '<strong>应用</strong>：高精度频率计、滤波器、介质测量'
             ],
@@ -1534,11 +1534,11 @@
             knowledge: [
                 '<strong>结构</strong>：微带线段，两端开路或一端开路一端短路',
                 '<strong>开路端效应</strong>：边缘电容使有效长度增加 Δl ≈ 0.4h',
-                '<strong>有效长度</strong>：lᵉff = l + 2Δl（两端开路）或 lᵉff = l + Δl（单端开路）',
-                '<strong>λ/2 微带谐振器</strong>：两端开路，lᵉff = λg/2',
-                '<strong>λ/4 微带谐振器</strong>：一端开路一端短路，lᵉff = λg/4',
+                '<strong>有效长度</strong>：l<sub>e</sub>ff = l + 2Δl（两端开路）或 l<sub>e</sub>ff = l + Δl（单端开路）',
+                '<strong>λ/2 微带谐振器</strong>：两端开路，l<sub>e</sub>ff = λg/2',
+                '<strong>λ/4 微带谐振器</strong>：一端开路一端短路，l<sub>e</sub>ff = λg/4',
                 '<strong>环形谐振器</strong>：微带线闭合环形，周长 C = nλg，n = 1,2,3...',
-                '<strong>圆盘谐振器</strong>：圆形微带贴片，TMₘₙ₀ 模，用于滤波器和天线',
+                '<strong>圆盘谐振器</strong>：圆形微带贴片，TMₘ<sub>n</sub>₀ 模，用于滤波器和天线',
                 '<strong>Q 值</strong>：微带谐振器 Q 值较低（100-500），受导体损耗和辐射损耗限制',
                 '<strong>优点</strong>：体积小、重量轻、易集成、成本低',
                 '<strong>应用</strong>：微波集成电路滤波器、振荡器、混频器'
@@ -1546,12 +1546,12 @@
             examples: [
                 {
                     title: '例题 5.9',
-                    question: '设计一个 5GHz 的 λ/2 微带谐振器，基板 εᵣ = 9.8，h = 0.5mm。求谐振器长度。',
+                    question: '设计一个 5GHz 的 λ/2 微带谐振器，基板 ε<sub>r</sub> = 9.8，h = 0.5mm。求谐振器长度。',
                     solution: '<strong>第一步：估算有效介电常数</strong><br>对于窄微带线（W < h），ε<sub>e</sub> ≈ (ε<sub>r</sub> + 1)/2 = 5.4<br><br><strong>第二步：计算导波波长</strong><br>λg = c/(f√ε<sub>e</sub>)<br>= 3×10⁸/(5×10⁹×√5.4)<br>= 3×10⁸/(1.16×10¹⁰)<br>= 0.0258 m = 25.8 mm<br><br><strong>第三步：计算有效长度</strong><br>l<sub>eff</sub> = λg/2 = 12.9 mm<br><br><strong>第四步：考虑边缘效应</strong><br>Δl ≈ 0.4h = 0.2 mm<br>l = l<sub>eff</sub> - 2Δl = 12.9 - 0.4 = 12.5 mm<br><br><strong>结论</strong>：谐振器长度约 12.5mm'
                 },
                 {
                     title: '例题 5.10',
-                    question: '微带环形谐振器周长 C = 30mm，基板 εᵣ = 4.2。求主模谐振频率。',
+                    question: '微带环形谐振器周长 C = 30mm，基板 ε<sub>r</sub> = 4.2。求主模谐振频率。',
                     solution: '<strong>主模条件</strong>：<br>C = λg（n = 1）<br><br><strong>计算有效介电常数</strong>：<br>设微带线宽度 W = 1mm，h = 1.6mm<br>W/h = 0.625 < 1<br>ε<sub>e</sub> ≈ (ε<sub>r</sub> + 1)/2 + (ε<sub>r</sub> - 1)/2(1 + 12h/W)^(-0.5)<br>= 2.6 + 1.6×(1 + 19.2)^(-0.5)<br>= 2.6 + 1.6/4.5<br>= 2.6 + 0.36 = 2.96<br><br><strong>计算谐振频率</strong>：<br>λg = C = 30mm<br>f₀ = c/(λg√ε<sub>e</sub>)<br>= 3×10⁸/(0.03×√2.96)<br>= 3×10⁸/0.0516<br>= 5.81×10⁹ Hz<br>= 5.81 GHz<br><br><strong>结论</strong>：主模谐振频率约 5.81GHz'
                 }
             ]
@@ -1574,13 +1574,13 @@
             examples: [
                 {
                     title: '例题 5.11',
-                    question: '比较相同频率的金属腔和介质谐振器体积（介质 εᵣ = 36）。',
+                    question: '比较相同频率的金属腔和介质谐振器体积（介质 ε<sub>r</sub> = 36）。',
                     solution: '<strong>体积缩放关系</strong>：<br>介质谐振器尺寸 ∝ λ₀/√ε<sub>r</sub><br>体积 ∝ (λ₀/√ε<sub>r</sub>)³ = λ₀³/ε<sub>r</sub>^(3/2)<br><br><strong>计算</strong>：<br>ε<sub>r</sub>^(3/2) = 36^1.5 = 216<br><br><strong>结论</strong>：<br>介质谐振器体积约为金属腔的 1/216<br><br><strong>示例</strong>：<br>10GHz 时 λ₀ = 3cm<br>金属腔尺寸约 3cm 量级<br>介质谐振器尺寸约 3/6 = 0.5cm 量级<br>体积比约 (1/6)³ = 1/216'
                 },
                 {
                     title: '例题 5.12',
-                    question: '介质谐振器 εᵣ = 80，直径 D = 4mm，高度 h = 2mm。估算 TE₀₁δ 模谐振频率。',
-                    solution: '<strong>近似公式</strong>（圆柱介质谐振器）：<br>f₀ ≈ c/(2πD√εᵣ) × 2.5<br>（经验系数 2.5 考虑高度和边界效应）<br><br><strong>计算</strong>：<br>f₀ ≈ 3×10⁸/(2π×4×10⁻³×√80) × 2.5<br>= 3×10⁸/(2.25×10⁻¹) × 2.5<br>= 1.33×10⁹ × 2.5<br>= 3.33×10⁹ Hz<br>= 3.33 GHz<br><br><strong>结论</strong>：谐振频率约 3.3GHz<br><br><strong>注</strong>：精确计算需用数值方法或查图表'
+                    question: '介质谐振器 ε<sub>r</sub> = 80，直径 D = 4mm，高度 h = 2mm。估算 TE₀₁δ 模谐振频率。',
+                    solution: '<strong>近似公式</strong>（圆柱介质谐振器）：<br>f₀ ≈ c/(2πD√ε<sub>r</sub>) × 2.5<br>（经验系数 2.5 考虑高度和边界效应）<br><br><strong>计算</strong>：<br>f₀ ≈ 3×10⁸/(2π×4×10⁻³×√80) × 2.5<br>= 3×10⁸/(2.25×10⁻¹) × 2.5<br>= 1.33×10⁹ × 2.5<br>= 3.33×10⁹ Hz<br>= 3.33 GHz<br><br><strong>结论</strong>：谐振频率约 3.3GHz<br><br><strong>注</strong>：精确计算需用数值方法或查图表'
                 }
             ]
         },
@@ -1589,12 +1589,12 @@
             title: '5.7 品质因数 Q 与等效电路',
             desc: '谐振器 Q 值的计算和集总参数等效',
             knowledge: [
-                '<strong>Q 值定义</strong>：Q = ω₀×（储能）/（损耗功率）= ω₀W/Pₗₒₛₛ',
-                '<strong>储能计算</strong>：W = Wᵉ + Wᵐ = 2Wᵉ = 2Wᵐ（谐振时电场储能与磁场储能相等）',
+                '<strong>Q 值定义</strong>：Q = ω₀×（储能）/（损耗功率）= ω₀W/P<sub>loss</sub>',
+                '<strong>储能计算</strong>：W = W<sub>e</sub> + W<sub>m</sub> = 2W<sub>e</sub> = 2W<sub>m</sub>（谐振时电场储能与磁场储能相等）',
                 '<strong>导体损耗 Qᶜ</strong>：Qᶜ = ω₀W/Pᶜ，与表面电阻 Rs 成反比',
                 '<strong>介质损耗 Qd</strong>：Qd = 1/tanδ，与介质损耗角正切成反比',
-                '<strong>辐射损耗 Qᵣ</strong>：Qᵣ = ω₀W/Pᵣ，开放结构存在辐射损耗',
-                '<strong>总 Q 值</strong>：1/Q = 1/Qᶜ + 1/Qd + 1/Qᵣ',
+                '<strong>辐射损耗 Q<sub>r</sub></strong>：Q<sub>r</sub> = ω₀W/P<sub>r</sub>，开放结构存在辐射损耗',
+                '<strong>总 Q 值</strong>：1/Q = 1/Qᶜ + 1/Qd + 1/Q<sub>r</sub>',
                 '<strong>串联等效电路</strong>：R-L-C 串联，谐振时 Z = R',
                 '<strong>并联等效电路</strong>：R-L-C 并联，谐振时 Z = R',
                 '<strong>Q 与带宽关系</strong>：Q = f₀/BW = ω₀L/R = R/(ω₀L)（并联）',
@@ -1637,7 +1637,7 @@
                 {
                     title: '例题 6.2',
                     question: '开关线型移相器，工作频率 10GHz，要求相移 90°。求两路径长度差。',
-                    solution: '<strong>相位差与路径差关系</strong>：<br>Δφ = βΔl = (2π/λg)Δl<br><br><strong>计算波长</strong>：<br>λ₀ = c/f = 3×10⁸/10¹⁰ = 0.03m = 30mm<br>假设微带线 εₑ = 3，则 λg = λ₀/√εₑ = 17.3mm<br><br><strong>计算长度差</strong>：<br>Δl = Δφ×λg/(2π)<br>= (π/2)×17.3/(2π)<br>= 17.3/4 = 4.33mm<br><br><strong>结论</strong>：两路径长度差约 4.33mm'
+                    solution: '<strong>相位差与路径差关系</strong>：<br>Δφ = βΔl = (2π/λg)Δl<br><br><strong>计算波长</strong>：<br>λ₀ = c/f = 3×10⁸/10¹⁰ = 0.03m = 30mm<br>假设微带线 ε<sub>e</sub> = 3，则 λg = λ₀/√ε<sub>e</sub> = 17.3mm<br><br><strong>计算长度差</strong>：<br>Δl = Δφ×λg/(2π)<br>= (π/2)×17.3/(2π)<br>= 17.3/4 = 4.33mm<br><br><strong>结论</strong>：两路径长度差约 4.33mm'
                 }
             ]
         },
@@ -1694,7 +1694,7 @@
                 {
                     title: '例题 6.6',
                     question: '设计一个 10dB 微带平行线定向耦合器，Z₀ = 50Ω，中心频率 2GHz。',
-                    solution: '<strong>设计步骤</strong>：<br><br>1. <strong>计算耦合系数</strong>：<br>k = 10^(-10/20) = 0.316<br><br>2. <strong>计算奇偶模阻抗</strong>：<br>Z₀ₑ = Z₀√[(1+k)/(1-k)] = 50√(1.316/0.684) = 69.4Ω<br>Z₀ₒ = Z₀√[(1-k)/(1+k)] = 50√(0.684/1.316) = 36.0Ω<br><br>3. <strong>微带线尺寸</strong>（εᵣ = 4.2，h = 1.6mm）：<br>查表或用软件计算得：<br>Wₑ ≈ 1.2mm，S ≈ 0.3mm<br><br>4. <strong>耦合区长度</strong>：<br>l = λg/4 = c/(4f√εₑ) ≈ 21mm<br><br><strong>结论</strong>：耦合线宽 1.2mm，间距 0.3mm，长度 21mm'
+                    solution: '<strong>设计步骤</strong>：<br><br>1. <strong>计算耦合系数</strong>：<br>k = 10^(-10/20) = 0.316<br><br>2. <strong>计算奇偶模阻抗</strong>：<br>Z₀<sub>e</sub> = Z₀√[(1+k)/(1-k)] = 50√(1.316/0.684) = 69.4Ω<br>Z₀<sub>o</sub> = Z₀√[(1-k)/(1+k)] = 50√(0.684/1.316) = 36.0Ω<br><br>3. <strong>微带线尺寸</strong>（ε<sub>r</sub> = 4.2，h = 1.6mm）：<br>查表或用软件计算得：<br>W<sub>e</sub> ≈ 1.2mm，S ≈ 0.3mm<br><br>4. <strong>耦合区长度</strong>：<br>l = λg/4 = c/(4f√ε<sub>e</sub>) ≈ 21mm<br><br><strong>结论</strong>：耦合线宽 1.2mm，间距 0.3mm，长度 21mm'
                 }
             ]
         },
@@ -1717,12 +1717,12 @@
                 {
                     title: '例题 6.7',
                     question: '设计一个 50Ω 二路等分威尔金森功分器，中心频率 1GHz。',
-                    solution: '<strong>威尔金森功分器参数</strong>：<br><br>1. <strong>λ/4 变换段阻抗</strong>：<br>Z = Z₀√2 = 50×1.414 = 70.7Ω<br><br>2. <strong>隔离电阻</strong>：<br>R = 2Z₀ = 100Ω<br><br>3. <strong>λ/4 线长度</strong>（微带线 εᵣ = 4.2）：<br>λg = c/(f√εₑ) = 3×10⁸/(10⁹×√3.15) ≈ 169mm<br>l = λg/4 ≈ 42mm<br><br>4. <strong>微带线宽度</strong>：<br>Z = 70.7Ω 时，W ≈ 1.8mm（h = 1.6mm）<br><br><strong>结论</strong>：<br>• 变换段：70.7Ω，42mm<br>• 隔离电阻：100Ω<br>• 输出端口：50Ω'
+                    solution: '<strong>威尔金森功分器参数</strong>：<br><br>1. <strong>λ/4 变换段阻抗</strong>：<br>Z = Z₀√2 = 50×1.414 = 70.7Ω<br><br>2. <strong>隔离电阻</strong>：<br>R = 2Z₀ = 100Ω<br><br>3. <strong>λ/4 线长度</strong>（微带线 ε<sub>r</sub> = 4.2）：<br>λg = c/(f√ε<sub>e</sub>) = 3×10⁸/(10⁹×√3.15) ≈ 169mm<br>l = λg/4 ≈ 42mm<br><br>4. <strong>微带线宽度</strong>：<br>Z = 70.7Ω 时，W ≈ 1.8mm（h = 1.6mm）<br><br><strong>结论</strong>：<br>• 变换段：70.7Ω，42mm<br>• 隔离电阻：100Ω<br>• 输出端口：50Ω'
                 },
                 {
                     title: '例题 6.8',
                     question: '八路功率合成器，每路输入 1W。求总输出功率（假设效率 100%）。',
-                    solution: '<strong>理想情况</strong>：<br>Pₒᵤₜ = 8 × 1W = 8W<br><br><strong>实际考虑</strong>：<br>• 功分器/合成器损耗：约 0.5-1dB<br>• 幅度相位不平衡：合成效率降低<br>• 实际效率：约 80-90%<br><br><strong>实际输出</strong>：<br>Pₒᵤₜ ≈ 8W × 0.85 = 6.8W<br><br><strong>结论</strong>：八路合成理想输出 8W，实际约 6-7W<br><br><strong>应用</strong>：固态功率放大器功率合成'
+                    solution: '<strong>理想情况</strong>：<br>P<sub>out</sub> = 8 × 1W = 8W<br><br><strong>实际考虑</strong>：<br>• 功分器/合成器损耗：约 0.5-1dB<br>• 幅度相位不平衡：合成效率降低<br>• 实际效率：约 80-90%<br><br><strong>实际输出</strong>：<br>P<sub>out</sub> ≈ 8W × 0.85 = 6.8W<br><br><strong>结论</strong>：八路合成理想输出 8W，实际约 6-7W<br><br><strong>应用</strong>：固态功率放大器功率合成'
                 }
             ]
         },
@@ -1773,7 +1773,7 @@
                 {
                     title: '例题 6.11',
                     question: '环行器用作雷达收发开关，发射功率 100W，接收信号 -80dBm。计算隔离度要求。',
-                    solution: '<strong>分析</strong>：<br>发射端功率：Pᵀ = 100W = 50dBm<br>接收端允许泄漏：Pᴿ = -80dBm<br><br><strong>计算隔离度</strong>：<br>I = Pᵀ - Pᴿ = 50 - (-80) = 130dB<br><br><strong>实际考虑</strong>：<br>• 单级环行器隔离度：20-30dB<br>• 需多级级联或使用其他技术<br>• 实际系统使用收发开关（如 PIN 管）<br><br><strong>结论</strong>：理论需 130dB 隔离，实际采用组合方案'
+                    solution: '<strong>分析</strong>：<br>发射端功率：P<sub>T</sub> = 100W = 50dBm<br>接收端允许泄漏：P<sub>R</sub> = -80dBm<br><br><strong>计算隔离度</strong>：<br>I = P<sub>T</sub> - P<sub>R</sub> = 50 - (-80) = 130dB<br><br><strong>实际考虑</strong>：<br>• 单级环行器隔离度：20-30dB<br>• 需多级级联或使用其他技术<br>• 实际系统使用收发开关（如 PIN 管）<br><br><strong>结论</strong>：理论需 130dB 隔离，实际采用组合方案'
                 },
                 {
                     title: '例题 6.12',
@@ -1829,12 +1829,12 @@
                 {
                     title: '例题 7.1',
                     question: '肖特基二极管检波器，输入功率 -20dBm，电压灵敏度 20mV/μW。求输出视频电压。',
-                    solution: '<strong>输入功率转换</strong>：<br>Pᵢₙ = -20dBm = 10^(-20/10) mW = 0.01mW = 10μW<br><br><strong>计算输出电压</strong>：<br>Vₒᵤₜ = 灵敏度 × Pᵢₙ<br>= 20mV/μW × 10μW<br>= 200mV = 0.2V<br><br><strong>结论</strong>：输出视频电压约 0.2V<br><br><strong>应用</strong>：功率计、场强仪、雷达接收机'
+                    solution: '<strong>输入功率转换</strong>：<br>P<sub>in</sub> = -20dBm = 10^(-20/10) mW = 0.01mW = 10μW<br><br><strong>计算输出电压</strong>：<br>V<sub>out</sub> = 灵敏度 × P<sub>in</sub><br>= 20mV/μW × 10μW<br>= 200mV = 0.2V<br><br><strong>结论</strong>：输出视频电压约 0.2V<br><br><strong>应用</strong>：功率计、场强仪、雷达接收机'
                 },
                 {
                     title: '例题 7.2',
                     question: 'Gunn 二极管振荡器，工作频率 10GHz，负阻 -20Ω，负载 50Ω。判断能否振荡。',
-                    solution: '<strong>振荡条件</strong>：<br>Rⁿeg + Rˡoad < 0<br>即 |Rⁿeg| > Rˡoad<br><br><strong>判断</strong>：<br>|Rⁿeg| = 20Ω<br>Rˡoad = 50Ω<br>20 < 50，不满足条件<br><br><strong>解决方案</strong>：<br>• 降低负载阻抗（如用 25Ω 传输线）<br>• 增加负阻绝对值<br>• 使用阻抗变换器<br><br><strong>结论</strong>：当前条件下不能振荡'
+                    solution: '<strong>振荡条件</strong>：<br>Rⁿeg + R<sub>l</sub>oad < 0<br>即 |Rⁿeg| > R<sub>l</sub>oad<br><br><strong>判断</strong>：<br>|Rⁿeg| = 20Ω<br>R<sub>l</sub>oad = 50Ω<br>20 < 50，不满足条件<br><br><strong>解决方案</strong>：<br>• 降低负载阻抗（如用 25Ω 传输线）<br>• 增加负阻绝对值<br>• 使用阻抗变换器<br><br><strong>结论</strong>：当前条件下不能振荡'
                 }
             ]
         },
@@ -1844,11 +1844,11 @@
             desc: 'BJT 在微波频段的特性与应用',
             knowledge: [
                 '<strong>结构特点</strong>：NPN 或 PNP，微波用 Si、SiGe、GaAs 材料',
-                '<strong>特征频率 fᵀ</strong>：电流增益为 1 时的频率，fᵀ ≈ gₘ/(2πCᵖⁱ)',
-                '<strong>最高振荡频率 fₘₐₓ</strong>：功率增益为 1 时的频率',
-                '<strong>fₘₐₓ 与 fᵀ 关系</strong>：fₘₐₓ = √(fᵀ/(8πRᵇCᵘ))',
-                '<strong>噪声系数</strong>：F = Fₘᵢₙ + (Rⁿ/Gˢ)|Yˢ - Yₒₚₜ|²',
-                '<strong>小信号模型</strong>：混合 π 模型，含 Cᵖⁱ、Cᵘ、rᵖⁱ、gₘ',
+                '<strong>特征频率 f<sub>T</sub></strong>：电流增益为 1 时的频率，f<sub>T</sub> ≈ g<sub>m</sub>/(2πC<sub>pi</sub>)',
+                '<strong>最高振荡频率 f<sub>max</sub></strong>：功率增益为 1 时的频率',
+                '<strong>f<sub>max</sub> 与 f<sub>T</sub> 关系</strong>：f<sub>max</sub> = √(f<sub>T</sub>/(8πR<sub>b</sub>C<sub>μ</sub>))',
+                '<strong>噪声系数</strong>：F = F<sub>min</sub> + (Rⁿ/G<sub>s</sub>)|Y<sub>s</sub> - Y<sub>opt</sub>|²',
+                '<strong>小信号模型</strong>：混合 π 模型，含 C<sub>pi</sub>、C<sub>μ</sub>、r<sub>pi</sub>、g<sub>m</sub>',
                 '<strong>偏置条件</strong>：微波 BJT 通常工作在 A 类',
                 '<strong>功率限制</strong>：击穿电压、热限制、电流限制',
                 '<strong>应用</strong>：低噪声放大器（LNA）、功率放大器（< 6GHz）、振荡器'
@@ -1856,13 +1856,13 @@
             examples: [
                 {
                     title: '例题 7.3',
-                    question: '微波 BJT 参数：fᵀ = 10GHz，Rᵇ = 10Ω，Cᵘ = 0.1pF。估算 fₘₐₓ。',
-                    solution: '<strong>计算 fₘₐₓ</strong>：<br>fₘₐₓ = √(fᵀ/(8πRᵇCᵘ))<br>= √(10×10⁹/(8π×10×0.1×10⁻¹²))<br>= √(10¹⁰/(2.51×10⁻¹¹))<br>= √(3.98×10²⁰)<br>= 19.95 GHz<br>≈ 20 GHz<br><br><strong>结论</strong>：最高振荡频率约 20GHz<br><br><strong>关系</strong>：fₘₐₓ ≈ 2fᵀ（典型值）'
+                    question: '微波 BJT 参数：f<sub>T</sub> = 10GHz，R<sub>b</sub> = 10Ω，C<sub>μ</sub> = 0.1pF。估算 f<sub>max</sub>。',
+                    solution: '<strong>计算 f<sub>max</sub></strong>：<br>f<sub>max</sub> = √(f<sub>T</sub>/(8πR<sub>b</sub>C<sub>μ</sub>))<br>= √(10×10⁹/(8π×10×0.1×10⁻¹²))<br>= √(10¹⁰/(2.51×10⁻¹¹))<br>= √(3.98×10²⁰)<br>= 19.95 GHz<br>≈ 20 GHz<br><br><strong>结论</strong>：最高振荡频率约 20GHz<br><br><strong>关系</strong>：f<sub>max</sub> ≈ 2f<sub>T</sub>（典型值）'
                 },
                 {
                     title: '例题 7.4',
-                    question: 'BJT 功率放大器，Vᶜᶜ = 12V，Iᶜ = 100mA，输出功率 1W。求功率附加效率 PAE。',
-                    solution: '<strong>直流功耗</strong>：<br>Pᵈᶜ = Vᶜᶜ × Iᶜ = 12 × 0.1 = 1.2W<br><br><strong>漏极效率</strong>：<br>η = Pₒᵤₜ/Pᵈᶜ = 1/1.2 ≈ 83.3%<br><br><strong>分析</strong>：<br>该效率值超过了 A 类放大器理论最大效率 50%，说明此工作点已超出 A 类线性区，可能工作在 AB 类或存在非线性失真。<br><br><strong>功率附加效率</strong>：<br>PAE = (Pₒᵤₜ - Pᵢₙ)/Pᵈᶜ<br>假设增益 10dB（10 倍），则 Pᵢₙ = 0.1W<br>PAE = (1 - 0.1)/1.2 = 0.9/1.2 = 75%<br><br><strong>结论</strong>：<br>PAE = 75%，η ≈ 83.3%<br>（注：A 类理想最大效率 50%，此高效率表明实际工作在非 A 类状态）'
+                    question: 'BJT 功率放大器，V<sub>CC</sub> = 12V，I<sub>C</sub> = 100mA，输出功率 1W。求功率附加效率 PAE。',
+                    solution: '<strong>直流功耗</strong>：<br>P<sub>DC</sub> = V<sub>CC</sub> × I<sub>C</sub> = 12 × 0.1 = 1.2W<br><br><strong>漏极效率</strong>：<br>η = P<sub>out</sub>/P<sub>DC</sub> = 1/1.2 ≈ 83.3%<br><br><strong>分析</strong>：<br>该效率值超过了 A 类放大器理论最大效率 50%，说明此工作点已超出 A 类线性区，可能工作在 AB 类或存在非线性失真。<br><br><strong>功率附加效率</strong>：<br>PAE = (P<sub>out</sub> - P<sub>in</sub>)/P<sub>DC</sub><br>假设增益 10dB（10 倍），则 P<sub>in</sub> = 0.1W<br>PAE = (1 - 0.1)/1.2 = 0.9/1.2 = 75%<br><br><strong>结论</strong>：<br>PAE = 75%，η ≈ 83.3%<br>（注：A 类理想最大效率 50%，此高效率表明实际工作在非 A 类状态）'
                 }
             ]
         },
@@ -1875,22 +1875,22 @@
                 '<strong>MESFET</strong>：金属-半导体肖特基栅，GaAs 材料，高频特性好',
                 '<strong>HEMT</strong>：高电子迁移率晶体管，异质结结构，噪声极低',
                 '<strong>2DEG</strong>：二维电子气，HEMT 中载流子限制在界面量子阱中',
-                '<strong>跨导 gₘ</strong>：gₘ = ∂Iᵈ/∂Vᵍˢ，表示栅压对漏流的控制',
-                '<strong>截止频率</strong>：fᵀ = gₘ/(2π(Cᵍˢ + Cᵍᵈ))',
-                '<strong>最高频率</strong>：fₘₐₓ = fᵀ/2 × √(Rᵈˢ/Rᵍ)',
+                '<strong>跨导 g<sub>m</sub></strong>：g<sub>m</sub> = ∂I<sub>d</sub>/∂V<sub>gs</sub>，表示栅压对漏流的控制',
+                '<strong>截止频率</strong>：f<sub>T</sub> = g<sub>m</sub>/(2π(C<sub>gs</sub> + C<sub>gd</sub>))',
+                '<strong>最高频率</strong>：f<sub>max</sub> = f<sub>T</sub>/2 × √(R<sub>ds</sub>/R<sub>g</sub>)',
                 '<strong>噪声性能</strong>：HEMT 噪声系数可低至 0.5dB（12GHz）',
                 '<strong>应用</strong>：低噪声放大器、功率放大器、混频器、开关'
             ],
             examples: [
                 {
                     title: '例题 7.5',
-                    question: 'GaAs MESFET 参数：gₘ = 50mS，Cᵍˢ = 0.5pF，Cᵍᵈ = 0.05pF。计算 fᵀ。',
-                    solution: '<strong>计算 fᵀ</strong>：<br>fᵀ = gₘ/(2π(Cᵍˢ + Cᵍᵈ))<br>= 50×10⁻³/(2π(0.5 + 0.05)×10⁻¹²)<br>= 0.05/(2π×0.55×10⁻¹²)<br>= 0.05/(3.45×10⁻¹²)<br>= 14.5×10⁹ Hz<br>= 14.5 GHz<br><br><strong>结论</strong>：截止频率约 14.5GHz<br><br><strong>提高 fᵀ 方法</strong>：<br>• 减小栅长（亚微米）<br>• 减小寄生电容'
+                    question: 'GaAs MESFET 参数：g<sub>m</sub> = 50mS，C<sub>gs</sub> = 0.5pF，C<sub>gd</sub> = 0.05pF。计算 f<sub>T</sub>。',
+                    solution: '<strong>计算 f<sub>T</sub></strong>：<br>f<sub>T</sub> = g<sub>m</sub>/(2π(C<sub>gs</sub> + C<sub>gd</sub>))<br>= 50×10⁻³/(2π(0.5 + 0.05)×10⁻¹²)<br>= 0.05/(2π×0.55×10⁻¹²)<br>= 0.05/(3.45×10⁻¹²)<br>= 14.5×10⁹ Hz<br>= 14.5 GHz<br><br><strong>结论</strong>：截止频率约 14.5GHz<br><br><strong>提高 f<sub>T</sub> 方法</strong>：<br>• 减小栅长（亚微米）<br>• 减小寄生电容'
                 },
                 {
                     title: '例题 7.6',
                     question: '比较 Si MOSFET 与 GaAs HEMT 的微波特性。',
-                    solution: '<strong>Si MOSFET</strong>：<br>优点：成本低、集成度高、数字兼容<br>缺点：电子迁移率低、fᵀ 较低（< 50GHz）<br>应用：< 10GHz 消费电子<br><br><strong>GaAs HEMT</strong>：<br>优点：电子迁移率高、fᵀ 高（> 100GHz）、噪声极低<br>缺点：成本高、集成度低、功耗大<br>应用：卫星通信、雷达、5G 基站<br><br><strong>发展趋势</strong>：<br>GaN HEMT：高功率、高效率<br>SiGe BiCMOS：成本与性能折中'
+                    solution: '<strong>Si MOSFET</strong>：<br>优点：成本低、集成度高、数字兼容<br>缺点：电子迁移率低、f<sub>T</sub> 较低（< 50GHz）<br>应用：< 10GHz 消费电子<br><br><strong>GaAs HEMT</strong>：<br>优点：电子迁移率高、f<sub>T</sub> 高（> 100GHz）、噪声极低<br>缺点：成本高、集成度低、功耗大<br>应用：卫星通信、雷达、5G 基站<br><br><strong>发展趋势</strong>：<br>GaN HEMT：高功率、高效率<br>SiGe BiCMOS：成本与性能折中'
                 }
             ]
         },
@@ -1900,8 +1900,8 @@
             desc: '微波晶体管的小信号建模',
             knowledge: [
                 '<strong>小信号条件</strong>：信号幅度足够小，器件工作在线性区',
-                '<strong>混合 π 模型</strong>：BJT 小信号模型，含 rᵖⁱ、Cᵖⁱ、Cᵘ、gₘ、rₒ',
-                '<strong>小信号 FET 模型</strong>：含 Cᵍˢ、Cᵍᵈ、Cᵈˢ、gₘ、Rⁱ、Rᵈ、Rˢ',
+                '<strong>混合 π 模型</strong>：BJT 小信号模型，含 r<sub>pi</sub>、C<sub>pi</sub>、C<sub>μ</sub>、g<sub>m</sub>、r<sub>o</sub>',
+                '<strong>小信号 FET 模型</strong>：含 C<sub>gs</sub>、C<sub>gd</sub>、C<sub>ds</sub>、g<sub>m</sub>、R<sub>i</sub>、R<sub>d</sub>、R<sub>s</sub>',
                 '<strong>S 参数模型</strong>：基于测量，最准确，频率相关',
                 '<strong>噪声模型</strong>：含噪声源（热噪声、散粒噪声、闪烁噪声）',
                 '<strong>寄生参数</strong>：引线电感、焊盘电容、封装效应',
@@ -1912,13 +1912,13 @@
             examples: [
                 {
                     title: '例题 7.7',
-                    question: '从 S 参数提取 FET 的 gₘ 和 Cᵍˢ，已知在 1GHz：S₂₁ = 3∠90°，输入阻抗 50Ω。',
-                    solution: '<strong>S₂₁ 与增益关系</strong>：<br>|S₂₁| ≈ 2gₘZ₀/(ωCᵍˢZ₀) = 2gₘ/(ωCᵍˢ)<br>（简化模型，忽略寄生）<br><br><strong>已知</strong>：<br>|S₂₁| = 3<br>∠S₂₁ = 90°（符合电容耦合特征）<br><br><strong>建立方程</strong>：<br>3 = 2gₘ/(2π×10⁹×Cᵍˢ)<br>gₘ/Cᵍˢ = 3π×10⁹<br><br><strong>需补充条件</strong>：<br>通常 fᵀ = gₘ/(2πCᵍˢ) 已知<br>或从其他 S 参数提取<br><br><strong>结论</strong>：需更多信息或测量数据'
+                    question: '从 S 参数提取 FET 的 g<sub>m</sub> 和 C<sub>gs</sub>，已知在 1GHz：S₂₁ = 3∠90°，输入阻抗 50Ω。',
+                    solution: '<strong>S₂₁ 与增益关系</strong>：<br>|S₂₁| ≈ 2g<sub>m</sub>Z₀/(ωC<sub>gs</sub>Z₀) = 2g<sub>m</sub>/(ωC<sub>gs</sub>)<br>（简化模型，忽略寄生）<br><br><strong>已知</strong>：<br>|S₂₁| = 3<br>∠S₂₁ = 90°（符合电容耦合特征）<br><br><strong>建立方程</strong>：<br>3 = 2g<sub>m</sub>/(2π×10⁹×C<sub>gs</sub>)<br>g<sub>m</sub>/C<sub>gs</sub> = 3π×10⁹<br><br><strong>需补充条件</strong>：<br>通常 f<sub>T</sub> = g<sub>m</sub>/(2πC<sub>gs</sub>) 已知<br>或从其他 S 参数提取<br><br><strong>结论</strong>：需更多信息或测量数据'
                 },
                 {
                     title: '例题 7.8',
                     question: '解释为什么微波晶体管模型需要随频率变化。',
-                    solution: '<strong>频率相关效应</strong>：<br><br>1. <strong>分布参数效应</strong>：<br>高频下电极尺寸与波长可比拟<br>不能用集总参数描述<br><br>2. <strong>寄生参数</strong>：<br>引线电感：L ~ nH，在 10GHz 时 Xᴸ = 2πfL ~ 几十 Ω<br>焊盘电容：C ~ pF，在 10GHz 时 Xᶜ = 1/(2πfC) ~ 几 Ω<br><br>3. <strong>物理效应</strong>：<br>载流子渡越时间<br>界面态响应<br>热效应<br><br><strong>结论</strong>：<br>微波模型需分段或连续随频率变化<br>常用 S 参数表或宽带等效电路'
+                    solution: '<strong>频率相关效应</strong>：<br><br>1. <strong>分布参数效应</strong>：<br>高频下电极尺寸与波长可比拟<br>不能用集总参数描述<br><br>2. <strong>寄生参数</strong>：<br>引线电感：L ~ nH，在 10GHz 时 X<sub>L</sub> = 2πfL ~ 几十 Ω<br>焊盘电容：C ~ pF，在 10GHz 时 X<sub>C</sub> = 1/(2πfC) ~ 几 Ω<br><br>3. <strong>物理效应</strong>：<br>载流子渡越时间<br>界面态响应<br>热效应<br><br><strong>结论</strong>：<br>微波模型需分段或连续随频率变化<br>常用 S 参数表或宽带等效电路'
                 }
             ]
         },
@@ -1955,9 +1955,9 @@
             title: '8.1 放大器的功率与增益',
             desc: '放大器增益定义与功率关系',
             knowledge: [
-                '<strong>转换功率增益 Gᵀ</strong>：Gᵀ = Pᴸ/Pₐᵥₛ，负载吸收功率/源可用功率',
-                '<strong>工作功率增益 Gᴾ</strong>：Gᴾ = Pᴸ/Pᵢₙ，负载吸收功率/输入功率',
-                '<strong>可用功率增益 Gᴬ</strong>：Gᴬ = Pₐᵥₙ/Pₐᵥₛ，网络可用功率/源可用功率',
+                '<strong>转换功率增益 G<sub>T</sub></strong>：G<sub>T</sub> = P<sub>L</sub>/P<sub>avs</sub>，负载吸收功率/源可用功率',
+                '<strong>工作功率增益 G<sub>P</sub></strong>：G<sub>P</sub> = P<sub>L</sub>/P<sub>in</sub>，负载吸收功率/输入功率',
+                '<strong>可用功率增益 G<sub>A</sub></strong>：G<sub>A</sub> = P<sub>avn</sub>/P<sub>avs</sub>，网络可用功率/源可用功率',
                 '<strong>单向增益 U</strong>：S₁₂ = 0 时的最大增益，U = |S₂₁|²/[(1-|S₁₁|²)(1-|S₂₂|²)]',
                 '<strong>最大稳定增益 MSG</strong>：MSG = |S₂₁/S₁₂|，K < 1 时最大增益',
                 '<strong>最大可用增益 MAG</strong>：MAG = |S₂₁/S₁₂|(K - √(K²-1))，K > 1 时',
@@ -1987,7 +1987,7 @@
                 '<strong>条件稳定</strong>：K < 1，某些负载范围不稳定',
                 '<strong>稳定性圆</strong>：Smith 圆图上稳定与不稳定的边界',
                 '<strong>源稳定性圆</strong>：Γ_S 平面上的稳定性边界',
-                '<strong>负载稳定性圆</strong>：Γᴸ 平面上的稳定性边界',
+                '<strong>负载稳定性圆</strong>：Γ<sub>L</sub> 平面上的稳定性边界',
                 '<strong>稳定区域判断</strong>：圆内或圆外稳定取决于 S 参数',
                 '<strong>稳定措施</strong>：源端串联/并联电阻、负载端串联/并联电阻、负反馈',
                 '<strong>阻性加载</strong>：牺牲增益换取稳定性',
@@ -1997,12 +1997,12 @@
                 {
                     title: '例题 8.3',
                     question: '晶体管潜在不稳定（K = 0.8），设计源端串联电阻使其绝对稳定。',
-                    solution: '<strong>分析</strong>：<br>源端串联电阻 Rˢ 增加输入损耗<br>等效增加输入反射损耗<br><br><strong>设计</strong>：<br>目标：K > 1<br>通常需要增加输入损耗约 20-30%<br><br><strong>计算</strong>：<br>设 Z₀ = 50Ω<br>串联 Rˢ = 10Ω<br>新 S₁₁\' = (S₁₁(Rˢ+Z₀) - Rˢ)/(Rˢ+Z₀+S₁₁Rˢ)<br>（近似计算）<br><br><strong>验证</strong>：<br>重新计算 K\'，应 > 1<br><br><strong>结论</strong>：<br>串联 10Ω 电阻可使 K > 1<br>但增益降低约 1-2dB'
+                    solution: '<strong>分析</strong>：<br>源端串联电阻 R<sub>s</sub> 增加输入损耗<br>等效增加输入反射损耗<br><br><strong>设计</strong>：<br>目标：K > 1<br>通常需要增加输入损耗约 20-30%<br><br><strong>计算</strong>：<br>设 Z₀ = 50Ω<br>串联 R<sub>s</sub> = 10Ω<br>新 S₁₁\' = (S₁₁(R<sub>s</sub>+Z₀) - R<sub>s</sub>)/(R<sub>s</sub>+Z₀+S₁₁R<sub>s</sub>)<br>（近似计算）<br><br><strong>验证</strong>：<br>重新计算 K\'，应 > 1<br><br><strong>结论</strong>：<br>串联 10Ω 电阻可使 K > 1<br>但增益降低约 1-2dB'
                 },
                 {
                     title: '例题 8.4',
                     question: '解释为什么低噪声放大器通常条件稳定而非绝对稳定。',
-                    solution: '<strong>低噪声设计考虑</strong>：<br><br>1. <strong>最佳噪声匹配</strong>：<br>Γₒₚₜ 通常不等于 Γ_S 稳定区<br>追求低噪声可能进入不稳定区<br><br>2. <strong>增益与噪声权衡</strong>：<br>绝对稳定需要阻性加载<br>增加损耗 = 增加噪声<br><br>3. <strong>实际解决方案</strong>：<br>• 在特定频段内稳定<br>• 使用稳定圆选择工作点<br>• 带外增加稳定网络<br><br><strong>结论</strong>：<br>LNA 设计是噪声、增益、稳定性的权衡<br>通常接受条件稳定'
+                    solution: '<strong>低噪声设计考虑</strong>：<br><br>1. <strong>最佳噪声匹配</strong>：<br>Γ<sub>opt</sub> 通常不等于 Γ_S 稳定区<br>追求低噪声可能进入不稳定区<br><br>2. <strong>增益与噪声权衡</strong>：<br>绝对稳定需要阻性加载<br>增加损耗 = 增加噪声<br><br>3. <strong>实际解决方案</strong>：<br>• 在特定频段内稳定<br>• 使用稳定圆选择工作点<br>• 带外增加稳定网络<br><br><strong>结论</strong>：<br>LNA 设计是噪声、增益、稳定性的权衡<br>通常接受条件稳定'
                 }
             ]
         },
@@ -2012,12 +2012,12 @@
             desc: '放大器噪声分析与低噪声设计',
             knowledge: [
                 '<strong>噪声来源</strong>：热噪声、散粒噪声、闪烁噪声（1/f 噪声）',
-                '<strong>噪声系数 F</strong>：F = (SNRⁱn)/(SNRₒᵤₜ) = 1 + (Nₐddₑd/Nᵢₙ)',
+                '<strong>噪声系数 F</strong>：F = (SNR<sub>i</sub>n)/(SNR<sub>out</sub>) = 1 + (N<sub>a</sub>dd<sub>e</sub>d/N<sub>in</sub>)',
                 '<strong>噪声因子</strong>：NF = 10log(F)，单位 dB',
-                '<strong>级联噪声系数</strong>：Fₜₒₜₐₗ = F₁ + (F₂-1)/G₁ + (F₃-1)/(G₁G₂) + ...',
-                '<strong>等效噪声温度</strong>：Tᵉ = (F-1)T₀，T₀ = 290K',
-                '<strong>最小噪声系数 Fₘᵢₙ</strong>：器件可达到的最佳噪声性能',
-                '<strong>最佳源反射系数 Γₒₚₜ</strong>：实现 Fₘᵢₙ 的源阻抗',
+                '<strong>级联噪声系数</strong>：F<sub>total</sub> = F₁ + (F₂-1)/G₁ + (F₃-1)/(G₁G₂) + ...',
+                '<strong>等效噪声温度</strong>：T<sub>e</sub> = (F-1)T₀，T₀ = 290K',
+                '<strong>最小噪声系数 F<sub>min</sub></strong>：器件可达到的最佳噪声性能',
+                '<strong>最佳源反射系数 Γ<sub>opt</sub></strong>：实现 F<sub>min</sub> 的源阻抗',
                 '<strong>噪声圆</strong>：Smith 圆图上等噪声系数轨迹',
                 '<strong>噪声电阻 Rⁿ</strong>：噪声系数对源阻抗的敏感程度'
             ],
@@ -2025,12 +2025,12 @@
                 {
                     title: '例题 8.5',
                     question: '两级放大器，第一级 F₁ = 2dB，G₁ = 15dB；第二级 F₂ = 4dB。求总噪声系数。',
-                    solution: '<strong>转换为线性值</strong>：<br>F₁ = 10^(2/10) = 1.585<br>G₁ = 10^(15/10) = 31.6<br>F₂ = 10^(4/10) = 2.512<br><br><strong>计算总噪声系数</strong>：<br>Fₜₒₜₐₗ = F₁ + (F₂-1)/G₁<br>= 1.585 + (2.512-1)/31.6<br>= 1.585 + 0.048<br>= 1.633<br><br><strong>转换为 dB</strong>：<br>NFₜₒₜₐₗ = 10log(1.633) = 2.13 dB<br><br><strong>结论</strong>：总噪声系数约 2.13dB<br>（第一级噪声占主导）'
+                    solution: '<strong>转换为线性值</strong>：<br>F₁ = 10^(2/10) = 1.585<br>G₁ = 10^(15/10) = 31.6<br>F₂ = 10^(4/10) = 2.512<br><br><strong>计算总噪声系数</strong>：<br>F<sub>total</sub> = F₁ + (F₂-1)/G₁<br>= 1.585 + (2.512-1)/31.6<br>= 1.585 + 0.048<br>= 1.633<br><br><strong>转换为 dB</strong>：<br>NF<sub>total</sub> = 10log(1.633) = 2.13 dB<br><br><strong>结论</strong>：总噪声系数约 2.13dB<br>（第一级噪声占主导）'
                 },
                 {
                     title: '例题 8.6',
-                    question: '设计 2GHz 低噪声放大器，FET 参数：Fₘᵢₙ = 0.5dB，Γₒₚₜ = 0.6∠120°，Rⁿ = 20Ω。求最佳源阻抗。',
-                    solution: '<strong>最佳源反射系数</strong>：<br>Γˢ = Γₒₚₜ = 0.6∠120°<br><br><strong>转换为阻抗</strong>：<br>Zˢ = Z₀(1+Γˢ)/(1-Γˢ)<br>= 50(1+0.6∠120°)/(1-0.6∠120°)<br><br><strong>计算</strong>：<br>1 + 0.6∠120° = 1 - 0.3 + j0.52 = 0.7 + j0.52<br>1 - 0.6∠120° = 1 + 0.3 - j0.52 = 1.3 - j0.52<br><br>Zˢ = 50×(0.7+j0.52)/(1.3-j0.52)<br>≈ 50×(0.4 + j0.55)<br>= 20 + j27.5 Ω<br><br><strong>结论</strong>：最佳源阻抗约 20 + j27.5Ω'
+                    question: '设计 2GHz 低噪声放大器，FET 参数：F<sub>min</sub> = 0.5dB，Γ<sub>opt</sub> = 0.6∠120°，Rⁿ = 20Ω。求最佳源阻抗。',
+                    solution: '<strong>最佳源反射系数</strong>：<br>Γ<sub>S</sub> = Γ<sub>opt</sub> = 0.6∠120°<br><br><strong>转换为阻抗</strong>：<br>Z<sub>s</sub> = Z₀(1+Γ<sub>S</sub>)/(1-Γ<sub>S</sub>)<br>= 50(1+0.6∠120°)/(1-0.6∠120°)<br><br><strong>计算</strong>：<br>1 + 0.6∠120° = 1 - 0.3 + j0.52 = 0.7 + j0.52<br>1 - 0.6∠120° = 1 + 0.3 - j0.52 = 1.3 - j0.52<br><br>Z<sub>s</sub> = 50×(0.7+j0.52)/(1.3-j0.52)<br>≈ 50×(0.4 + j0.55)<br>= 20 + j27.5 Ω<br><br><strong>结论</strong>：最佳源阻抗约 20 + j27.5Ω'
                 }
             ]
         },
@@ -2040,9 +2040,9 @@
             desc: '低噪声和增益放大器设计方法',
             knowledge: [
                 '<strong>设计流程</strong>：选择器件 → 稳定性分析 → 确定工作点 → 阻抗匹配 → 仿真优化',
-                '<strong>直流偏置</strong>：确定 Vᵍˢ、Vᵈˢ（FET）或 Vᵇᵉ、Vᶜᵉ（BJT）',
-                '<strong>增益匹配设计</strong>：Γ_S = S₁₁*，Γᴸ = S₂₂*，共轭匹配',
-                '<strong>低噪声设计</strong>：Γ_S = Γₒₚₜ，牺牲部分增益换取低噪声',
+                '<strong>直流偏置</strong>：确定 V<sub>gs</sub>、V<sub>ds</sub>（FET）或 V<sub>be</sub>、Vᶜ<sub>e</sub>（BJT）',
+                '<strong>增益匹配设计</strong>：Γ_S = S₁₁*，Γ<sub>L</sub> = S₂₂*，共轭匹配',
+                '<strong>低噪声设计</strong>：Γ_S = Γ<sub>opt</sub>，牺牲部分增益换取低噪声',
                 '<strong>单向化设计</strong>：假设 S₁₂ = 0，简化设计',
                 '<strong>双向设计</strong>：考虑 S₁₂，使用完整公式',
                 '<strong>匹配网络</strong>：L 型、π 型、T 型，微带线实现',
@@ -2053,12 +2053,12 @@
                 {
                     title: '例题 8.7',
                     question: '设计 1GHz 小信号放大器，FET S 参数：S₁₁ = 0.8∠-90°，S₂₂ = 0.6∠-45°，S₂₁ = 3∠60°，S₁₂ = 0。求输入输出匹配网络。',
-                    solution: '<strong>单向化设计</strong>（S₁₂ = 0）：<br><br>1. <strong>输入匹配</strong>：<br>Γ_S = S₁₁* = 0.8∠90°<br><br>2. <strong>输出匹配</strong>：<br>Γᴸ = S₂₂* = 0.6∠45°<br><br>3. <strong>计算增益</strong>：<br>Gˢ = 1/(1-|S₁₁|²) = 1/(1-0.64) = 2.78 = 4.4dB<br>G₀ = |S₂₁|² = 9 = 9.5dB<br>Gᴸ = 1/(1-|S₂₂|²) = 1/(1-0.36) = 1.56 = 1.9dB<br>Gₜₒₜₐₗ = 4.4 + 9.5 + 1.9 = 15.8dB<br><br><strong>匹配网络</strong>：<br>用 Smith 圆图设计 L 型网络'
+                    solution: '<strong>单向化设计</strong>（S₁₂ = 0）：<br><br>1. <strong>输入匹配</strong>：<br>Γ_S = S₁₁* = 0.8∠90°<br><br>2. <strong>输出匹配</strong>：<br>Γ<sub>L</sub> = S₂₂* = 0.6∠45°<br><br>3. <strong>计算增益</strong>：<br>G<sub>s</sub> = 1/(1-|S₁₁|²) = 1/(1-0.64) = 2.78 = 4.4dB<br>G₀ = |S₂₁|² = 9 = 9.5dB<br>G<sub>L</sub> = 1/(1-|S₂₂|²) = 1/(1-0.36) = 1.56 = 1.9dB<br>G<sub>total</sub> = 4.4 + 9.5 + 1.9 = 15.8dB<br><br><strong>匹配网络</strong>：<br>用 Smith 圆图设计 L 型网络'
                 },
                 {
                     title: '例题 8.8',
                     question: 'LNA 设计，要求 NF < 1dB，增益 > 15dB。选择器件并说明设计要点。',
-                    solution: '<strong>器件选择</strong>：<br>• 频率：< 6GHz：pHEMT<br>• 频率：> 6GHz：GaAs HEMT 或 GaN HEMT<br>• 要求 NF < 1dB：选低噪声管，如 ATF-54143<br><br><strong>设计要点</strong>：<br>1. 偏置在最佳噪声点（通常 Iᵈ = 10-20% Iᵈss）<br>2. 输入匹配：Γˢ = Γₒₚₜ<br>3. 输出匹配：共轭匹配<br>4. 稳定性：必要时加稳定网络<br>5. 直流偏置：射频扼流圈 + 去耦电容<br><br><strong>结论</strong>：pHEMT LNA 可实现 NF < 0.5dB，增益 15-20dB'
+                    solution: '<strong>器件选择</strong>：<br>• 频率：< 6GHz：pHEMT<br>• 频率：> 6GHz：GaAs HEMT 或 GaN HEMT<br>• 要求 NF < 1dB：选低噪声管，如 ATF-54143<br><br><strong>设计要点</strong>：<br>1. 偏置在最佳噪声点（通常 I<sub>d</sub> = 10-20% I<sub>d</sub>ss）<br>2. 输入匹配：Γ<sub>S</sub> = Γ<sub>opt</sub><br>3. 输出匹配：共轭匹配<br>4. 稳定性：必要时加稳定网络<br>5. 直流偏置：射频扼流圈 + 去耦电容<br><br><strong>结论</strong>：pHEMT LNA 可实现 NF < 0.5dB，增益 15-20dB'
                 }
             ]
         },

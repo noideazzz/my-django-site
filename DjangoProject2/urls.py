@@ -15,10 +15,11 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path,include
+from django.urls import path, include, re_path
 from django.shortcuts import render
-from django.conf import settings          # 新增
-from django.conf.urls.static import static  # 新增
+from django.conf import settings
+from django.conf.urls.static import static
+from django.views.static import serve
 def home_view(request):
     """首页视图（示例）"""
     return render(request, 'home.html')
@@ -30,6 +31,9 @@ urlpatterns = [
 
     #path('', home_view, name='home'),  # 首页
 ]
-# 开发环境下提供媒体文件服务
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+else:
+    urlpatterns += [
+        re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+    ]

@@ -709,6 +709,7 @@
                 
                 function editEvent(event) {
                     editingEvent.value = event;
+                    selectedDate.value = event.date;
                     eventForm.value = {
                         title: event.title,
                         time: event.time,

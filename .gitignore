@@ -11,9 +11,7 @@ env/
 *.swp
 *.swo
 db.sqlite3
-media/
 staticfiles/
-static/video/
 *.exe
 .DS_Store
 Thumbs.db

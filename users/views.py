@@ -178,9 +178,12 @@ def profile_update(request):
     """更新个人信息"""
     user = request.user
     user.nickname = request.POST.get('nickname', '')
+    email = request.POST.get('email', '').strip()
+    if email:
+        user.email = email
     user.major = request.POST.get('major', '')
     user.grade = request.POST.get('grade', '')
-    user.bio = request.POST.get('bio', '')
+    user.bio = request.POST.get('bio', '')[:500]
     user.save()
 
     messages.success(request, '个人信息更新成功！')

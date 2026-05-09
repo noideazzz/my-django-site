@@ -437,6 +437,10 @@
                         <input type="text" name="nickname" class="form-input" value="{{ user.nickname|default:'' }}" placeholder="请输入昵称">
                     </div>
                     <div class="form-group">
+                        <label class="form-label">邮箱</label>
+                        <input type="email" name="email" class="form-input" value="{{ user.email|default:'' }}" placeholder="请输入邮箱">
+                    </div>
+                    <div class="form-group">
                         <label class="form-label">专业</label>
                         <input type="text" name="major" class="form-input" value="{{ user.major|default:'' }}" placeholder="请输入专业">
                     </div>
@@ -445,8 +449,8 @@
                         <input type="text" name="grade" class="form-input" value="{{ user.grade|default:'' }}" placeholder="如：2022级">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">个人简介</label>
-                        <textarea name="bio" class="form-input form-textarea" placeholder="介绍一下你自己...">{{ user.bio|default:'' }}</textarea>
+                        <label class="form-label">个人简介（<span id="bioCount">0</span>/500）</label>
+                        <textarea name="bio" class="form-input form-textarea" maxlength="500" placeholder="介绍一下你自己..." oninput="updateBioCount()">{{ user.bio|default:'' }}</textarea>
                     </div>
                 </form>
             </div>
@@ -477,8 +481,21 @@
     <!-- Cropper.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <script>
+        function getCookie(name) {
+            let value = '; ' + document.cookie;
+            let parts = value.split('; ' + name + '=');
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return '';
+        }
+
         let cropper = null;
         let croppedData = null;
+
+        function updateBioCount() {
+            const textarea = document.querySelector('textarea[name="bio"]');
+            document.getElementById('bioCount').textContent = textarea.value.length;
+        }
+        updateBioCount();
 
         // 切换编辑模式
         function toggleEdit() {
@@ -578,7 +595,7 @@
         fetch('{% url "users:avatar_upload" %}', {
             method: 'POST',
             headers: {
-                'X-CSRFToken': '{{ csrf_token }}'
+                'X-CSRFToken': getCookie('csrftoken')
             },
             body: formData
         })
