@@ -497,10 +497,13 @@ def serve_video(request, filename):
         response['Content-Range'] = 'bytes {0}-{1}/{2}'.format(start, end, file_size)
         response['Content-Length'] = str(content_length)
     else:
-        response = FileResponse(open(video_path, 'rb'), content_type='video/mp4')
+        with open(video_path, 'rb') as f:
+            response = HttpResponse(f.read(), content_type='video/mp4')
         response['Content-Length'] = str(file_size)
 
     response['Accept-Ranges'] = 'bytes'
+    response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response['Content-Disposition'] = 'inline'
     return response
 
 
