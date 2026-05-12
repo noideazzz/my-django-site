@@ -146,17 +146,16 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
-# Session 配置（更安全）
+# Session 配置
 SESSION_COOKIE_AGE = 86400  # 24小时
-SESSION_COOKIE_SECURE = True  # 生产环境设为True（HTTPS）
+SESSION_COOKIE_SECURE = not DEBUG  # DEBUG模式下允许HTTP，生产环境强制HTTPS
 SESSION_COOKIE_HTTPONLY = True  # 防止XSS攻击
-SESSION_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SAMESITE = 'Lax'  # Lax：移动端兼容，同站请求自动携带Cookie
 
 # 信任反向代理的 HTTPS 请求头（CloudBase 部署必需）
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-# CSRF配置（移动端兼容方案：Token 存 Session，不依赖独立 Cookie）
-CSRF_USE_SESSIONS = True
+# CSRF配置
 CSRF_TRUSTED_ORIGINS = [
     'https://*.tcloudbaseapp.com',
     'https://*.tencentcloud.com',

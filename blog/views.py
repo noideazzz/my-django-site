@@ -472,12 +472,34 @@ def upload_material(request):
 
 
 def serve_video(request, filename):
-    """提供视频文件服务（支持 HTTP Range 请求以实现拖动进度条）"""
     from django.conf import settings
+    import re
     video_path = os.path.join(settings.BASE_DIR, 'static', 'video', filename)
     if not os.path.exists(video_path):
         raise Http404('视频文件不存在')
-    response = FileResponse(open(video_path, 'rb'), content_type='video/mp4')
+
+    file_size = os.path.getsize(video_path)
+    range_header = request.META.get('HTTP_RANGE', '').strip()
+    range_match = re.match(r'bytes=(\d*)-(\d*)', range_header)
+
+    if range_match:
+        start = int(range_match.group(1)) if range_match.group(1) else 0
+        end = int(range_match.group(2)) if range_match.group(2) else file_size - 1
+        end = min(end, file_size - 1)
+        content_length = end - start + 1
+
+        file_handle = open(video_path, 'rb')
+        file_handle.seek(start)
+        file_data = file_handle.read(content_length)
+        file_handle.close()
+
+        response = HttpResponse(file_data, content_type='video/mp4', status=206)
+        response['Content-Range'] = 'bytes {0}-{1}/{2}'.format(start, end, file_size)
+        response['Content-Length'] = str(content_length)
+    else:
+        response = FileResponse(open(video_path, 'rb'), content_type='video/mp4')
+        response['Content-Length'] = str(file_size)
+
     response['Accept-Ranges'] = 'bytes'
     return response
 
