@@ -147,12 +147,26 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 # Session 配置
-SESSION_COOKIE_AGE = 86400  # 24小时
+SESSION_COOKIE_AGE = 86400  # 24小时（默认）
 SESSION_COOKIE_SECURE = not DEBUG  # DEBUG模式下允许HTTP，生产环境强制HTTPS
 SESSION_COOKIE_HTTPONLY = True  # 防止XSS攻击
 SESSION_COOKIE_SAMESITE = 'Lax'  # Lax：移动端兼容，同站请求自动携带Cookie
+SESSION_SAVE_EVERY_REQUEST = True  # 每次请求都更新session过期时间，防止移动端闲置过期
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # 关闭浏览器不销毁session
 
-# 信任反向代理的 HTTPS 请求头（CloudBase 部署必需）
+# CSRF Cookie 安全配置（显式设置，与 Session 保持一致）
+CSRF_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_HTTPONLY = False  # False允许JS读取csrf token
+CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_USE_SESSIONS = False  # 将CSRF token存储在cookie中而非session中
+
+# HTTPS 安全配置
+SECURE_SSL_REDIRECT = not DEBUG  # 生产环境强制HTTP→HTTPS跳转
+SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0  # HSTS 1年（仅生产环境）
+SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
+SECURE_HSTS_PRELOAD = not DEBUG
+
+# 信任反向代理的 HTTPS 请求头（CloudBase / Docker + Nginx 部署必需）
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # CSRF配置

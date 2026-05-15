@@ -370,6 +370,12 @@ def login_view(request):
             if user is not None:
                 login(request, user)
                 print(f"DEBUG: login 成功，准备跳转")
+
+                remember_me = form.cleaned_data.get('remember_me', False)
+                if remember_me:
+                    request.session.set_expiry(60 * 60 * 24 * 30)
+                    print(f"DEBUG: remember_me=True, session将在30天后过期")
+
                 # 登录成功后跳转到 next 指定的页面
                 if next_url:
                     return redirect(next_url)

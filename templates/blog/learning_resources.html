@@ -621,8 +621,8 @@
             </div>
             
             <!-- 视频元素 -->
-            <video id="mainVideo" preload="auto" playsinline>
-                <source src="{% static 'video/test_demo.mp4' %}" type="video/mp4">
+            <video id="mainVideo" preload="metadata" playsinline controlsList="nodownload" x5-video-player-type="h5" x5-video-orientation="portrait" webkit-playsinline="true">
+                <source src="{% url 'serve_video' filename='test_demo.mp4' %}" type="video/mp4">
                 您的浏览器不支持视频播放，请升级浏览器或尝试其他浏览器。
             </video>
             
@@ -1208,9 +1208,57 @@ document.getElementById('course').addEventListener('change', function() {
         }
     });
     
+    // 错误重试机制（网络/服务器临时故障恢复）
+    let errorRetryCount = 0;
+    const MAX_RETRIES = 3;
+
+    video.addEventListener('error', function(e) {
+        console.error('视频加载错误 (尝试 ' + (errorRetryCount + 1) + '/' + MAX_RETRIES + '):', video.error);
+        if (errorRetryCount < MAX_RETRIES) {
+            errorRetryCount++;
+            hideError();
+            showLoading();
+            setTimeout(function() {
+                var src = video.querySelector('source').src;
+                video.querySelector('source').src = '';
+                video.load();
+                video.querySelector('source').src = src;
+                video.load();
+            }, 1000 * errorRetryCount);
+        } else {
+            showError();
+            var errorMsg = video.error ? video.error.message : '未知错误';
+            var errorCode = video.error ? video.error.code : 0;
+            if (errorCode === 4) {
+                videoError.querySelector('p').textContent = '视频格式不受支持，请尝试刷新页面';
+            } else if (errorCode === 3) {
+                videoError.querySelector('p').textContent = '视频加载中断，请检查网络连接';
+            }
+            console.error('视频最终加载失败: code=' + errorCode + ', message=' + errorMsg);
+        }
+    });
+
+    video.addEventListener('loadeddata', function() {
+        errorRetryCount = 0;
+        hideError();
+    });
+
+    // 移动端自动播放兼容（静音自动播放以符合移动浏览器策略）
+    var isMobile = /Android|iPhone|iPad|iPod|webOS/i.test(navigator.userAgent);
+    if (isMobile) {
+        video.setAttribute('autoplay', '');
+        video.setAttribute('muted', '');
+        video.muted = true;
+        video.volume = 0;
+        volumeSlider.value = 0;
+        muteBtn.querySelector('i').className = 'bi bi-volume-mute-fill';
+    }
+
     // 初始化
-    video.volume = 1;
+    video.volume = isMobile ? 0 : 1;
     hideLoading();
+    
+    video.load();
 })();
 </script>
 {% endif %}

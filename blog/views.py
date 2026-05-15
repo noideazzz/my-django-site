@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
 from django.shortcuts import render, get_object_or_404, redirect, Http404
-from django.http import JsonResponse, FileResponse, HttpResponse
+from django.http import JsonResponse, FileResponse, HttpResponse, StreamingHttpResponse
 from django.utils.encoding import escape_uri_path
 import os
 
@@ -151,10 +151,6 @@ def simulation_platform(request):
 def exercises_cases(request):
     """习题案例页面"""
     return render(request, 'blog/exercises_cases.html')
-
-def learning_resources(request):
-    """学习资源页面"""
-    return render(request, 'blog/learning_resources.html')
 
 def error_notebook(request):
     """错题本页面"""
@@ -472,9 +468,14 @@ def upload_material(request):
 
 
 def serve_video(request, filename):
+    """视频流服务——流式传输避免内存溢出"""
     from django.conf import settings
+    from django.http import StreamingHttpResponse
     import re
+
     video_path = os.path.join(settings.BASE_DIR, 'static', 'video', filename)
+    if not os.path.exists(video_path):
+        video_path = os.path.join(settings.STATIC_ROOT, 'video', filename)
     if not os.path.exists(video_path):
         raise Http404('视频文件不存在')
 
@@ -488,21 +489,26 @@ def serve_video(request, filename):
         end = min(end, file_size - 1)
         content_length = end - start + 1
 
-        file_handle = open(video_path, 'rb')
-        file_handle.seek(start)
-        file_data = file_handle.read(content_length)
-        file_handle.close()
+        with open(video_path, 'rb') as f:
+            f.seek(start)
+            file_data = f.read(content_length)
 
         response = HttpResponse(file_data, content_type='video/mp4', status=206)
         response['Content-Range'] = 'bytes {0}-{1}/{2}'.format(start, end, file_size)
         response['Content-Length'] = str(content_length)
     else:
-        with open(video_path, 'rb') as f:
-            response = HttpResponse(f.read(), content_type='video/mp4')
+        def file_iterator(path, chunk_size=64*1024):
+            with open(path, 'rb') as f:
+                while True:
+                    chunk = f.read(chunk_size)
+                    if not chunk:
+                        break
+                    yield chunk
+        response = StreamingHttpResponse(file_iterator(video_path), content_type='video/mp4')
         response['Content-Length'] = str(file_size)
 
     response['Accept-Ranges'] = 'bytes'
-    response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response['Cache-Control'] = 'private, max-age=3600'
     response['Content-Disposition'] = 'inline'
     return response
 
