@@ -342,49 +342,51 @@ def register_view(request):
 @require_http_methods(["GET", "POST"])
 def login_view(request):
     """用户登录视图 - 支持登录后跳转"""
-    # 获取 next 参数，用于登录后跳转
+    import logging
+    logger = logging.getLogger('django')
+
     next_url = request.GET.get('next') or request.POST.get('next')
-    
-    print(f"DEBUG: user.is_authenticated = {request.user.is_authenticated}")
-    print(f"DEBUG: next_url = {next_url}")
+    logger.info(f"[LOGIN] 请求方法={request.method}, is_authenticated={request.user.is_authenticated}, next={next_url}")
 
     if request.user.is_authenticated:
-        print("DEBUG: 用户已登录，准备跳转")
+        logger.info(f"[LOGIN] 用户已登录(username={request.user.username}), 直接跳转")
         if next_url:
             return redirect(next_url)
         return redirect('index')
 
     if request.method == 'POST':
-        print(f"DEBUG: POST 数据 = {request.POST}")
+        logger.info(f"[LOGIN] 收到POST登录请求, POST keys={list(request.POST.keys())}")
         form = LoginForm(request.POST)
 
         if form.is_valid():
-            print("DEBUG: 表单验证通过")
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
-            print(f"DEBUG: username={username}, password={'*' * len(password)}")
+            logger.info(f"[LOGIN] 表单验证通过, 尝试认证 username={username}")
 
             user = authenticate(request, username=username, password=password)
-            print(f"DEBUG: authenticate 返回 = {user}")
+            logger.info(f"[LOGIN] authenticate结果={'成功' if user else '失败'}, user_id={user.id if user else 'None'}")
 
             if user is not None:
                 login(request, user)
-                print(f"DEBUG: login 成功，准备跳转")
+                logger.info(f"[LOGIN] login()调用成功, session_key={request.session.session_key[:8]}...")
 
                 remember_me = form.cleaned_data.get('remember_me', False)
                 if remember_me:
                     request.session.set_expiry(60 * 60 * 24 * 30)
-                    print(f"DEBUG: remember_me=True, session将在30天后过期")
+                    logger.info(f"[LOGIN] remember_me=True, session过期=30天")
 
-                # 登录成功后跳转到 next 指定的页面
+                logger.info(f"[LOGIN] 准备重定向→ {'next_url=' + next_url if next_url else 'index'}")
                 if next_url:
                     return redirect(next_url)
                 return redirect('index')
             else:
-                print("DEBUG: 用户名或密码错误")
+                logger.warning(f"[LOGIN] 密码错误 username={username}")
                 messages.error(request, '用户名或密码错误')
         else:
-            print(f"DEBUG: 表单验证失败，错误 = {form.errors}")
+            logger.warning(f"[LOGIN] 表单验证失败: {form.errors.as_json()}")
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f'{error}')
     else:
         form = LoginForm()
 
