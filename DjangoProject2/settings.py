@@ -173,9 +173,13 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # CSRF配置
 CSRF_TRUSTED_ORIGINS = [
     'https://*.tcloudbaseapp.com',
+    'http://*.tcloudbaseapp.com',
     'https://*.tencentcloud.com',
+    'http://*.tencentcloud.com',
     'https://*.tcloudbase.com',
+    'http://*.tcloudbase.com',
     'https://django-app1-255413-4-1429690806.sh.run.tcloudbase.com',
+    'http://django-app1-255413-4-1429690806.sh.run.tcloudbase.com',
 ]
 
 # 登录相关URL
