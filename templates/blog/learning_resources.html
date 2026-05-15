@@ -928,6 +928,7 @@ document.getElementById('course').addEventListener('change', function() {
     const options = chapterSelect.querySelectorAll('option[data-course]');
     options.forEach(option => option.style.display = 'none');
 })();
+{% endif %}
 
 // 视频播放器功能
 (function() {
@@ -1261,7 +1262,6 @@ document.getElementById('course').addEventListener('change', function() {
     video.load();
 })();
 </script>
-{% endif %}
 
 <style>
 /* 加载动画旋转 */

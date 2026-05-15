@@ -10,6 +10,7 @@ from django.shortcuts import render, get_object_or_404, redirect, Http404
 from django.http import JsonResponse, FileResponse, HttpResponse, StreamingHttpResponse
 from django.utils.encoding import escape_uri_path
 import os
+import re
 
 def index(request):
     """首页视图"""
@@ -468,10 +469,8 @@ def upload_material(request):
 
 
 def serve_video(request, filename):
-    """视频流服务——流式传输避免内存溢出"""
+    """视频流服务——流式传输避免内存溢出，支持Range请求和跨域"""
     from django.conf import settings
-    from django.http import StreamingHttpResponse
-    import re
 
     video_path = os.path.join(settings.BASE_DIR, 'static', 'video', filename)
     if not os.path.exists(video_path):
@@ -479,37 +478,70 @@ def serve_video(request, filename):
     if not os.path.exists(video_path):
         raise Http404('视频文件不存在')
 
+    ext = os.path.splitext(filename)[1].lower()
+    content_type_map = {
+        '.mp4': 'video/mp4',
+        '.webm': 'video/webm',
+        '.ogv': 'video/ogg',
+        '.mov': 'video/quicktime',
+    }
+    content_type = content_type_map.get(ext, 'video/mp4')
+
     file_size = os.path.getsize(video_path)
     range_header = request.META.get('HTTP_RANGE', '').strip()
-    range_match = re.match(r'bytes=(\d*)-(\d*)', range_header)
+    response = None
 
-    if range_match:
-        start = int(range_match.group(1)) if range_match.group(1) else 0
-        end = int(range_match.group(2)) if range_match.group(2) else file_size - 1
-        end = min(end, file_size - 1)
-        content_length = end - start + 1
+    if range_header:
+        range_match = re.match(r'bytes=(\d*)-(\d*)', range_header)
 
-        with open(video_path, 'rb') as f:
-            f.seek(start)
-            file_data = f.read(content_length)
+        if range_match:
+            first_byte_str = range_match.group(1)
+            last_byte_str = range_match.group(2)
 
-        response = HttpResponse(file_data, content_type='video/mp4', status=206)
-        response['Content-Range'] = 'bytes {0}-{1}/{2}'.format(start, end, file_size)
-        response['Content-Length'] = str(content_length)
-    else:
-        def file_iterator(path, chunk_size=64*1024):
+            if first_byte_str == '' and last_byte_str == '':
+                start = 0
+                end = file_size - 1
+            else:
+                start = int(first_byte_str) if first_byte_str else 0
+                if last_byte_str:
+                    end = int(last_byte_str)
+                    end = min(end, file_size - 1)
+                else:
+                    end = file_size - 1
+
+            if start > end or start >= file_size:
+                response = HttpResponse(status=416)
+                response['Content-Range'] = 'bytes */{0}'.format(file_size)
+                return response
+
+            content_length = end - start + 1
+
+            with open(video_path, 'rb') as f:
+                f.seek(start)
+                file_data = f.read(content_length)
+
+            response = HttpResponse(file_data, content_type=content_type, status=206)
+            response['Content-Range'] = 'bytes {0}-{1}/{2}'.format(start, end, file_size)
+            response['Content-Length'] = str(content_length)
+
+    if response is None:
+        def file_iterator(path, chunk_size=128 * 1024):
             with open(path, 'rb') as f:
                 while True:
                     chunk = f.read(chunk_size)
                     if not chunk:
                         break
                     yield chunk
-        response = StreamingHttpResponse(file_iterator(video_path), content_type='video/mp4')
+
+        response = StreamingHttpResponse(file_iterator(video_path), content_type=content_type)
         response['Content-Length'] = str(file_size)
 
     response['Accept-Ranges'] = 'bytes'
-    response['Cache-Control'] = 'private, max-age=3600'
-    response['Content-Disposition'] = 'inline'
+    response['Cache-Control'] = 'public, max-age=86400'
+    response['Content-Disposition'] = 'inline; filename="' + filename + '"'
+    response['Access-Control-Allow-Origin'] = '*'
+    response['Access-Control-Allow-Methods'] = 'GET, OPTIONS'
+    response['Access-Control-Allow-Headers'] = 'Range, Content-Type'
     return response
 
 
