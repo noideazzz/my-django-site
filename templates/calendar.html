@@ -458,29 +458,29 @@
                 <!-- 日程列表 -->
                 <div v-else class="space-y-4">
                     <div 
-                        v-for="event in selectedDateEvents" 
-                        :key="event.id"
-                        :class="['p-4 rounded-lg border-l-4 event-card', event.type]"
-                        :style="{ borderLeftColor: getEventColor(event.type) }"
+                        v-for="evt in selectedDateEvents" 
+                        :key="evt.id"
+                        :class="['p-4 rounded-lg border-l-4 event-card', evt.type]"
+                        :style="{ borderLeftColor: getEventColor(evt.type) }"
                     >
                         <div class="flex justify-between items-start">
                             <div>
                                 <div class="flex items-center gap-2 mb-1">
-                                    <div class="w-2 h-2 rounded-full" :style="{ backgroundColor: getEventColor(event.type) }"></div>
-                                    <h4 class="font-semibold text-gray-800">[[ event.title ]]</h4>
+                                    <div class="w-2 h-2 rounded-full" :style="{ backgroundColor: getEventColor(evt.type) }"></div>
+                                    <h4 class="font-semibold text-gray-800">[[ evt.title ]]</h4>
                                 </div>
-                                <p class="text-sm text-gray-600 mt-1">[[ event.time ]] - [[ event.location ]]</p>
-                                <p v-if="event.description" class="text-sm text-gray-500 mt-2">[[ event.description ]]</p>
+                                <p class="text-sm text-gray-600 mt-1">[[ evt.time ]] - [[ evt.location ]]</p>
+                                <p v-if="evt.description" class="text-sm text-gray-500 mt-2">[[ evt.description ]]</p>
                             </div>
                             <div class="flex gap-2 opacity-50 hover:opacity-100 transition-opacity">
                                 <button 
-                                    @click="editEvent(event)"
+                                    @click="editEvent(evt)"
                                     class="text-gray-500 hover:text-primary transition-colors"
                                 >
                                     <i class="fas fa-edit"></i>
                                 </button>
                                 <button 
-                                    @click="confirmDeleteEvent(event.id)"
+                                    @click="confirmDeleteEvent(evt.id)"
                                     class="text-gray-500 hover:text-danger transition-colors"
                                 >
                                     <i class="fas fa-trash"></i>
@@ -497,6 +497,7 @@
             v-model="showEventModal"
             :title="editingEvent ? '编辑课程' : '添加课程'"
             width="500px"
+            destroy-on-close
         >
             <el-form :model="eventForm" label-width="80px">
                 <el-form-item label="课程名称">
@@ -545,6 +546,7 @@
             v-model="showDeleteConfirm"
             title="确认删除"
             width="300px"
+            destroy-on-close
         >
             <p>确定要删除这个课程吗？</p>
             <template #footer>
@@ -557,7 +559,7 @@
     </div>
     
     <script>
-        const { createApp, ref, computed, onMounted, watch } = Vue;
+        const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
         const { ElMessage } = ElementPlus;
         
         createApp({
@@ -707,15 +709,19 @@
                     showEventModal.value = true;
                 }
                 
-                function editEvent(event) {
-                    editingEvent.value = event;
-                    selectedDate.value = event.date;
+                function editEvent(evt) {
+                    if (!evt || !evt.id) {
+                        console.error('[Calendar] editEvent: 无效的事件数据', evt);
+                        return;
+                    }
+                    editingEvent.value = evt;
+                    selectedDate.value = evt.date;
                     eventForm.value = {
-                        title: event.title,
-                        time: event.time,
-                        location: event.location,
-                        type: event.type,
-                        description: event.description
+                        title: evt.title || '',
+                        time: evt.time || '',
+                        location: evt.location || '',
+                        type: evt.type || 'other',
+                        description: evt.description || ''
                     };
                     showEventModal.value = true;
                 }
@@ -877,21 +883,21 @@
                             if (data.success) {
                                 ElMessage.success(data.message || (editingEvent.value ? '更新成功' : '添加成功'));
                                 
-                                // 检查添加/更新的日期是否在当前显示的月份
+                                // 先关模态框再加载数据，确保UI始终可交互
+                                showEventModal.value = false;
+                                
                                 if (!editingEvent.value && selectedDate.value) {
                                     const eventDate = new Date(selectedDate.value);
                                     const eventYear = eventDate.getFullYear();
                                     const eventMonth = eventDate.getMonth();
                                     
                                     if (eventYear !== currentYear.value || eventMonth !== currentMonth.value) {
-                                        // 自动跳转到添加课程的月份
                                         currentDate.value = new Date(eventYear, eventMonth, 1);
                                         ElMessage.info(`已自动跳转到 ${eventYear}年${eventMonth + 1}月`);
                                     }
                                 }
                                 
-                                await loadEventsFromServer();
-                                showEventModal.value = false;
+                                loadEventsFromServer();
                             } else {
                                 // 显示后端返回的具体错误信息
                                 const errorMsg = data.error || data.message || '操作失败';
@@ -1001,6 +1007,24 @@
                 // 监听月份变化，重新加载数据
                 watch(currentDate, () => {
                     loadEventsFromServer();
+                });
+                
+                // 强制清理模态框遮罩层（防止Element Plus backdrop遗留导致页面不可交互）
+                watch(showEventModal, (val) => {
+                    if (!val) {
+                        nextTick(() => {
+                            const backdrops = document.querySelectorAll('.el-overlay:not(:has(.el-dialog))');
+                            backdrops.forEach(b => b.remove());
+                        });
+                    }
+                });
+                watch(showDeleteConfirm, (val) => {
+                    if (!val) {
+                        nextTick(() => {
+                            const backdrops = document.querySelectorAll('.el-overlay:not(:has(.el-dialog))');
+                            backdrops.forEach(b => b.remove());
+                        });
+                    }
                 });
                 
                 // 生命周期钩子

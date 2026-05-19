@@ -294,14 +294,19 @@ def submit_answer(request):
             is_correct=is_correct
         )
         
-        # 如果答错了，添加到错题本
+        # 如果答错了，添加到错题本（或增加错误次数）
         if not is_correct:
-            ErrorNotebook.objects.get_or_create(
+            error_note, created = ErrorNotebook.objects.get_or_create(
                 user=request.user,
-                course=question.course,
                 question=question,
-                defaults={'error_count': 1}
+                defaults={
+                    'course': question.course,
+                    'error_count': 1
+                }
             )
+            if not created:
+                error_note.error_count += 1
+                error_note.save()
         
         return JsonResponse({
             'correct': is_correct,
