@@ -9,8 +9,12 @@ from django.db.models import Q
 from django.shortcuts import render, get_object_or_404, redirect, Http404
 from django.http import JsonResponse, FileResponse, HttpResponse, StreamingHttpResponse
 from django.utils.encoding import escape_uri_path
+from django.db import IntegrityError, transaction
 import os
 import re
+import logging
+
+logger = logging.getLogger('django')
 
 def index(request):
     """首页视图"""
@@ -280,12 +284,13 @@ def submit_answer(request):
         try:
             question = Question.objects.select_related('course', 'chapter').get(id=question_id)
         except Question.DoesNotExist:
+            logger.warning(f"[SUBMIT] 题目不存在 id={question_id}, user={request.user.username}")
             return JsonResponse({'error': '题目不存在'}, status=404)
         
-        # 判断答案是否正确
         is_correct = user_answer == question.correct_answer.upper()
+        course_code = question.course.code if question.course else 'unknown'
+        logger.info(f"[SUBMIT] user={request.user.username}, qid={question_id}, course={course_code}, answer={user_answer}, correct={is_correct}")
         
-        # 记录练习
         PracticeRecord.objects.create(
             user=request.user,
             question=question,
@@ -294,19 +299,24 @@ def submit_answer(request):
             is_correct=is_correct
         )
         
-        # 如果答错了，添加到错题本（或增加错误次数）
         if not is_correct:
-            error_note, created = ErrorNotebook.objects.get_or_create(
-                user=request.user,
-                question=question,
-                defaults={
-                    'course': question.course,
-                    'error_count': 1
-                }
-            )
-            if not created:
-                error_note.error_count += 1
-                error_note.save()
+            try:
+                with transaction.atomic():
+                    error_note, created = ErrorNotebook.objects.get_or_create(
+                        user=request.user,
+                        question=question,
+                        defaults={
+                            'course': question.course,
+                            'error_count': 1
+                        }
+                    )
+                    if not created:
+                        error_note.error_count += 1
+                        error_note.save()
+                logger.info(f"[SUBMIT] 错题{'已创建' if created else '已更新'} id={error_note.id}, count={error_note.error_count}, course={course_code}")
+            except IntegrityError as ie:
+                logger.error(f"[SUBMIT] 错题写入IntegrityError: {ie}, user={request.user.username}, qid={question_id}")
+                return JsonResponse({'correct': is_correct, 'correct_answer': question.correct_answer, 'explanation': question.explanation, 'note': '错题已存在'})
         
         return JsonResponse({
             'correct': is_correct,
@@ -317,6 +327,7 @@ def submit_answer(request):
     except json.JSONDecodeError:
         return JsonResponse({'error': '无效的JSON数据'}, status=400)
     except Exception as e:
+        logger.exception(f"[SUBMIT] 未预期异常: {e}, user={request.user.username if request.user.is_authenticated else 'anonymous'}")
         return JsonResponse({'error': str(e)}, status=500)
 
 

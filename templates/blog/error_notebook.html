@@ -53,38 +53,207 @@
         z-index: 1;
         padding-top: 100px;
         min-height: calc(100vh - 76px);
-    }
-
-    /* 课程筛选按钮 */
-    .course-tabs {
         display: flex;
-        gap: 12px;
-        margin-bottom: 24px;
+        gap: 0;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding-left: 16px;
+        padding-right: 16px;
     }
 
-    .course-tab {
-        padding: 10px 24px;
-        border-radius: 24px;
-        border: 1px solid #e5e7eb;
-        background: rgba(255, 255, 255, 0.8);
+    /* ===== 浮动科目切换组件 ===== */
+    .en-float {
+        position: fixed;
+        z-index: 9999;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                    right 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                    left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .en-float.dragging {
+        transition: none;
+    }
+
+    /* 折叠态：只露一小条 */
+    .en-float-handle {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 10px 12px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        border-radius: 12px 0 0 12px;
+        box-shadow: -4px 0 20px rgba(0, 0, 0, 0.08);
+        cursor: grab;
+        user-select: none;
+        white-space: nowrap;
+    }
+
+    .en-float.dragging .en-float-handle {
+        cursor: grabbing;
+    }
+
+    .en-float-handle .handle-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #dc2626;
+        flex-shrink: 0;
+    }
+
+    .en-float-handle .handle-label {
+        font-size: 12px;
+        font-weight: 600;
         color: #6b7280;
-        font-size: 14px;
+        letter-spacing: 0.5px;
+    }
+
+    .en-float-handle .handle-current {
+        font-size: 11px;
+        color: #dc2626;
+        font-weight: 500;
+        max-width: 60px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* 展开面板 */
+    .en-float-panel {
+        position: absolute;
+        right: 0;
+        top: 100%;
+        margin-top: 6px;
+        background: rgba(255, 255, 255, 0.97);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        border-radius: 14px;
+        padding: 8px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        min-width: 140px;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateX(10px);
+        transition: opacity 0.25s ease, visibility 0.25s ease, transform 0.25s ease;
+        pointer-events: none;
+    }
+
+    .en-float:hover .en-float-panel,
+    .en-float.pinned .en-float-panel,
+    .en-float.expanded .en-float-panel {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(0);
+        pointer-events: auto;
+    }
+
+    .en-float-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+        padding: 10px 14px;
+        border: none;
+        border-radius: 8px;
+        background: transparent;
+        color: #4b5563;
+        font-size: 13px;
         font-weight: 500;
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: all 0.2s ease;
+        text-align: left;
+        font-family: inherit;
+        white-space: nowrap;
     }
 
-    .course-tab:hover {
-        background: rgba(255, 255, 255, 1);
-        border-color: #dc2626;
-        color: #dc2626;
+    .en-float-btn:hover {
+        background: #f3f4f6;
+        color: #1f2937;
     }
 
-    .course-tab.active {
-        background: #dc2626;
-        border-color: #dc2626;
+    .en-float-btn.active {
+        background: linear-gradient(135deg, #dc2626, #b91c1c);
         color: white;
-        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+    }
+
+    .en-float-btn .fbtn-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        flex-shrink: 0;
+        background: rgba(220, 38, 38, 0.1);
+        color: #dc2626;
+        transition: all 0.2s ease;
+    }
+
+    .en-float-btn.active .fbtn-icon {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+
+    .en-float-btn .fbtn-check {
+        margin-left: auto;
+        font-size: 10px;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+
+    .en-float-btn.active .fbtn-check {
+        opacity: 1;
+    }
+
+    /* 吸边左 */
+    .en-float.snap-left {
+        right: auto;
+        left: 0;
+    }
+    .en-float.snap-left .en-float-handle {
+        border-radius: 0 12px 12px 0;
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);
+    }
+    .en-float.snap-left .en-float-panel {
+        right: auto;
+        left: 0;
+    }
+
+    /* 响应式 */
+    @media (max-width: 768px) {
+        .en-float {
+            top: auto;
+            bottom: 80px;
+            transform: none;
+        }
+        .en-float.snap-left,
+        .en-float.snap-right {
+            right: 0;
+            left: auto;
+        }
+        .en-float-handle {
+            border-radius: 12px !important;
+        }
+        .en-float-panel {
+            top: auto;
+            bottom: 100%;
+            margin-top: 0;
+            margin-bottom: 6px;
+        }
+    }
+
+    /* ===== 右侧主内容区 ===== */
+    .en-main {
+        flex: 1;
+        min-width: 0;
     }
 
     /* 统计卡片 */
@@ -447,8 +616,18 @@
         transform: translateX(-30px);
     }
 
-    /* 响应式 */
+    /* 响应式 - 内容区 */
     @media (max-width: 768px) {
+        #error-notebook-app {
+            flex-direction: column;
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
+        .en-main {
+            width: 100%;
+        }
+
         .stats-row {
             grid-template-columns: 1fr;
         }
@@ -469,20 +648,33 @@
 {% endblock %}
 
 {% block content %}
-<div id="error-notebook-app" class="container py-4">
-    <!-- 课程筛选 -->
-    <div class="course-tabs">
-        <button 
-            v-for="course in courses" 
-            :key="course.code"
-            class="course-tab"
-            :class="{ active: selectedCourse === course.code }"
-            @click="selectCourse(course.code)"
-        >
-            [[ course.name ]]
-        </button>
+<div id="error-notebook-app">
+    <!-- 浮动科目切换组件 -->
+    <div class="en-float snap-right" id="enFloat">
+        <div class="en-float-handle" id="enFloatHandle" title="拖拽移动 · 悬停点击—切换科目">
+            <span class="handle-dot"></span>
+            <span class="handle-label">错题本</span>
+            <span class="handle-current">[[ currentCourseShortName ]]</span>
+        </div>
+        <div class="en-float-panel">
+            <button 
+                v-for="course in courses" 
+                :key="course.code"
+                class="en-float-btn"
+                :class="{ active: selectedCourse === course.code }"
+                @click="selectCourse(course.code)"
+            >
+                <span class="fbtn-icon">
+                    <i class="bi" :class="course.code === 'electromagnetic' ? 'bi-lightning-charge' : 'bi-broadcast'"></i>
+                </span>
+                <span>[[ course.name ]]</span>
+                <span class="fbtn-check" v-if="selectedCourse === course.code">✓</span>
+            </button>
+        </div>
     </div>
 
+    <!-- 主内容区 -->
+    <div class="en-main" style="flex:1;min-width:0;">
     <!-- 统计卡片 -->
     <div class="stats-row">
         <div class="stat-card">
@@ -605,11 +797,18 @@
         <i class="bi bi-emoji-smile"></i>
         <p>太棒了！该课程暂无错题</p>
     </div>
-</div>
+    </div><!-- .en-main -->
+</div><!-- #error-notebook-app -->
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script src="{% static 'js/vue.global.js' %}"></script>
+<!-- 备用CDN：如本地文件未加载成功，从jsdelivr加载 -->
+<script>
+if (typeof Vue === 'undefined') {
+    document.write('<script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"><\/script>');
+}
+</script>
 <script>
 const { createApp, ref, computed, onMounted } = Vue;
 
@@ -625,6 +824,10 @@ createApp({
         const stats = ref({ total: 0, unmastered: 0, mastered: 0 });
         const currentIndex = ref(0);
 
+        const currentCourseShortName = computed(() => {
+            return selectedCourse.value === 'microwave' ? '微波' : '电磁场';
+        });
+
         // 当前显示的题目
         const currentError = computed(() => {
             return errors.value[currentIndex.value] || null;
@@ -634,23 +837,39 @@ createApp({
             try {
                 console.log('[错题本] 开始加载数据，课程:', selectedCourse.value);
                 const response = await fetch(`/api/error-notebook/?course=${selectedCourse.value}`);
-                const data = await response.json();
-                console.log('[错题本] 数据加载成功:', data);
+                const contentType = response.headers.get('content-type') || '';
+                console.log('[错题本] 响应状态:', response.status, 'Content-Type:', contentType);
                 
-                errors.value = data.errors;
+                if (!contentType.includes('application/json')) {
+                    console.error('[错题本] 服务器返回非JSON响应，可能未登录或接口异常');
+                    if (response.status === 302 || response.status === 403) {
+                        console.warn('[错题本] 需要重新登录');
+                    }
+                    return;
+                }
+                
+                const data = await response.json();
+                console.log('[错题本] 数据加载成功, course=' + selectedCourse.value + 
+                    ', total=' + (data.total || 0) + ', errors_count=' + (data.errors ? data.errors.length : 0));
+                if (data.errors && data.errors.length > 0) {
+                    console.log('[错题本] 第一条错题:', data.errors[0].course, '-', data.errors[0].content.substring(0, 40));
+                }
+                
+                errors.value = data.errors || [];
                 stats.value = {
                     total: data.total || 0,
                     unmastered: data.unmastered || 0,
                     mastered: data.mastered || 0
                 };
-                currentIndex.value = 0; // 重置到第一题
-                console.log('[错题本] 统计数据更新:', stats.value);
+                currentIndex.value = 0;
+                console.log('[错题本] 已渲染: errors=' + errors.value.length + ', stats=' + JSON.stringify(stats.value));
             } catch (error) {
                 console.error('[错题本] 加载失败:', error);
             }
         };
 
         const selectCourse = (code) => {
+            console.log('[错题本] 切换到课程:', code);
             selectedCourse.value = code;
             loadErrors();
         };
@@ -732,6 +951,7 @@ createApp({
         return {
             courses,
             selectedCourse,
+            currentCourseShortName,
             errors,
             stats,
             currentIndex,
@@ -745,6 +965,177 @@ createApp({
         };
     }
 }).mount('#error-notebook-app');
+</script>
+
+<!-- 浮动组件拖拽/吸边引擎 -->
+<script>
+(function() {
+    var el = document.getElementById('enFloat');
+    var handle = document.getElementById('enFloatHandle');
+    if (!el || !handle) return;
+
+    var dragging = false;
+    var startX, startY, startLeft, startTop;
+    var SNAP_THRESHOLD = 120; // 离边缘多近触发吸边
+
+    function snapToEdge() {
+        var rect = el.getBoundingClientRect();
+        var centerX = rect.left + rect.width / 2;
+        var screenW = window.innerWidth;
+
+        el.classList.remove('snap-left', 'snap-right');
+
+        if (centerX < screenW / 2) {
+            el.classList.add('snap-left');
+            el.style.left = '0px';
+            el.style.right = 'auto';
+        } else {
+            el.classList.add('snap-right');
+            el.style.right = '0px';
+            el.style.left = 'auto';
+        }
+    }
+
+    handle.addEventListener('mousedown', function(e) {
+        if (e.target.closest('.en-float-btn')) return; // 不拦截面板按钮点击
+        e.preventDefault();
+        dragging = true;
+        el.classList.add('dragging');
+        var rect = el.getBoundingClientRect();
+        startX = e.clientX;
+        startY = e.clientY;
+        startLeft = rect.left;
+        startTop = rect.top;
+    });
+
+    document.addEventListener('mousemove', function(e) {
+        if (!dragging) return;
+        var dx = e.clientX - startX;
+        var dy = e.clientY - startY;
+        el.classList.remove('snap-left', 'snap-right');
+        el.style.left = (startLeft + dx) + 'px';
+        el.style.top = (startTop + dy) + 'px';
+        el.style.right = 'auto';
+        el.style.transform = 'none';
+    });
+
+    document.addEventListener('mouseup', function() {
+        if (!dragging) return;
+        dragging = false;
+        el.classList.remove('dragging');
+        snapToEdge();
+    });
+
+    // 触摸事件
+    handle.addEventListener('touchstart', function(e) {
+        if (e.target.closest('.en-float-btn')) return;
+        e.preventDefault();
+        dragging = true;
+        el.classList.add('dragging');
+        var touch = e.touches[0];
+        var rect = el.getBoundingClientRect();
+        startX = touch.clientX;
+        startY = touch.clientY;
+        startLeft = rect.left;
+        startTop = rect.top;
+    }, { passive: false });
+
+    document.addEventListener('touchmove', function(e) {
+        if (!dragging) return;
+        var touch = e.touches[0];
+        var dx = touch.clientX - startX;
+        var dy = touch.clientY - startY;
+        el.classList.remove('snap-left', 'snap-right');
+        el.style.left = (startLeft + dx) + 'px';
+        el.style.top = (startTop + dy) + 'px';
+        el.style.right = 'auto';
+        el.style.transform = 'none';
+    }, { passive: false });
+
+    document.addEventListener('touchend', function() {
+        if (!dragging) return;
+        dragging = false;
+        el.classList.remove('dragging');
+        snapToEdge();
+    });
+
+    // 窗口大小改变时重新吸边
+    window.addEventListener('resize', function() {
+        if (!el.classList.contains('snap-left') && !el.classList.contains('snap-right')) {
+            snapToEdge();
+        }
+    });
+
+    // 初始吸边
+    snapToEdge();
+
+    // 悬停延迟展开 + 面板内保持 + 离开延迟收起
+    var hoverTimer = null;
+    var closeTimer = null;
+
+    function openPanel() {
+        clearTimeout(hoverTimer);
+        clearTimeout(closeTimer);
+        el.classList.add('expanded');
+    }
+
+    function scheduleClose(delay) {
+        clearTimeout(closeTimer);
+        closeTimer = setTimeout(function() {
+            el.classList.remove('expanded');
+        }, delay || 800);
+    }
+
+    function cancelClose() {
+        clearTimeout(closeTimer);
+    }
+
+    // 鼠标进入整体区域 → 1s后展开（已展开则取消收起计时器）
+    el.addEventListener('mouseenter', function() {
+        if (dragging) return;
+        if (el.classList.contains('expanded')) {
+            cancelClose();
+            return;
+        }
+        clearTimeout(hoverTimer);
+        hoverTimer = setTimeout(openPanel, 1000);
+    });
+
+    // 鼠标离开整体区域 → 0.8s后收起
+    el.addEventListener('mouseleave', function() {
+        clearTimeout(hoverTimer);
+        if (el.classList.contains('expanded')) {
+            scheduleClose(800);
+        }
+    });
+
+    // 点击科目按钮 → 展开 + 切换后 1s 收起
+    el.addEventListener('click', function(e) {
+        if (e.target.closest('.en-float-btn')) {
+            openPanel();
+            scheduleClose(1000);
+        }
+    });
+
+    // 触摸设备：点击 handle 直接展开/收起
+    var wasDragging = false;
+    handle.addEventListener('click', function(e) {
+        if (wasDragging) { wasDragging = false; return; }
+        if (e.target.closest('.en-float-btn')) return;
+        if (el.classList.contains('expanded')) {
+            el.classList.remove('expanded');
+            clearTimeout(closeTimer);
+        } else {
+            openPanel();
+            scheduleClose(3000);
+        }
+    });
+    // 标记触摸拖拽结束，避免误触 click
+    document.addEventListener('touchend', function() {
+        if (dragging) wasDragging = true;
+        setTimeout(function() { wasDragging = false; }, 100);
+    });
+})();
 </script>
 {% endblock %}
 </html>

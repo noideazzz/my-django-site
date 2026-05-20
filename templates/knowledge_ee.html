@@ -2732,6 +2732,12 @@
                     is_completed: isCompleted
                 })
             });
+            const contentType = response.headers.get('content-type') || '';
+            if (!contentType.includes('application/json')) {
+                console.warn(`⚠ 同步请求返回非JSON响应 (可能未登录)，状态码: ${response.status}`);
+                markForRetry(chapterId, isCompleted, chapterName);
+                return;
+            }
             const result = await response.json();
             if (result.success) {
                 console.log('✅ 进度同步成功:', result.message, result.data);
