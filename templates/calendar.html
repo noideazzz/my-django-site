@@ -579,7 +579,7 @@
                 const editingEvent = ref(null);
                 const eventForm = ref({
                     title: '',
-                    time: '',
+                    time: null,
                     location: '',
                     type: 'theory',
                     description: ''
@@ -706,7 +706,7 @@
                     editingEvent.value = null;
                     eventForm.value = {
                         title: '',
-                        time: '',
+                        time: null,
                         location: '',
                         type: 'theory',
                         description: ''
@@ -721,9 +721,19 @@
                     }
                     editingEvent.value = evt;
                     selectedDate.value = evt.date;
+                    
+                    // el-time-picker需要Date对象，将"HH:MM"字符串转为Date
+                    let timeVal = '';
+                    if (evt.time && typeof evt.time === 'string' && evt.time.includes(':')) {
+                        const parts = evt.time.split(':');
+                        const d = new Date();
+                        d.setHours(parseInt(parts[0], 10), parseInt(parts[1], 10), 0, 0);
+                        timeVal = d;
+                    }
+                    
                     eventForm.value = {
                         title: evt.title || '',
-                        time: evt.time || '',
+                        time: timeVal,
                         location: evt.location || '',
                         type: evt.type || 'other',
                         description: evt.description || ''
@@ -886,12 +896,14 @@
                         if (response.ok) {
                             const data = await response.json();
                             if (data.success) {
+                                const wasNewEvent = !editingEvent.value;
+                                
                                 ElMessage.success(data.message || (editingEvent.value ? '更新成功' : '添加成功'));
                                 
-                                // 先关模态框再加载数据，确保UI始终可交互
                                 showEventModal.value = false;
+                                editingEvent.value = null;
                                 
-                                if (!editingEvent.value && selectedDate.value) {
+                                if (wasNewEvent && selectedDate.value) {
                                     const eventDate = new Date(selectedDate.value);
                                     const eventYear = eventDate.getFullYear();
                                     const eventMonth = eventDate.getMonth();
@@ -1014,22 +1026,24 @@
                     loadEventsFromServer();
                 });
                 
-                // 强制清理模态框遮罩层（防止Element Plus backdrop遗留导致页面不可交互）
-                watch(showEventModal, (val) => {
-                    if (!val) {
-                        nextTick(() => {
-                            const backdrops = document.querySelectorAll('.el-overlay:not(:has(.el-dialog))');
-                            backdrops.forEach(b => b.remove());
+                // 安全清理残留遮罩层（延迟足够久，等Element Plus动画完成）
+                function cleanupBackdrops() {
+                    setTimeout(() => {
+                        const overlays = document.querySelectorAll('.el-overlay:not(.el-overlay-is-message-box):not(.el-overlay-message-box)');
+                        overlays.forEach(overlay => {
+                            // 确认overlay内部没有活的el-dialog（Element Plus已移除dialog但overlay还在）
+                            const hasDialog = overlay.querySelector('.el-dialog, .el-dialog__wrapper, .el-overlay-dialog');
+                            if (!hasDialog && overlay.children.length === 0) {
+                                overlay.remove();
+                            }
                         });
-                    }
+                    }, 500);
+                }
+                watch(showEventModal, (val) => {
+                    if (!val) cleanupBackdrops();
                 });
                 watch(showDeleteConfirm, (val) => {
-                    if (!val) {
-                        nextTick(() => {
-                            const backdrops = document.querySelectorAll('.el-overlay:not(:has(.el-dialog))');
-                            backdrops.forEach(b => b.remove());
-                        });
-                    }
+                    if (!val) cleanupBackdrops();
                 });
                 
                 // 生命周期钩子
